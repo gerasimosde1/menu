@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=Manrope:wght@600;700&display=swap&subset=greek" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#0A0D11;color:#EDEAE3;font:600 14px Manrope,system-ui,sans-serif}
+.b{display:flex;align-items:center;justify-content:space-between;gap:12px;height:100%;padding:12px 20px}
+small{display:block;color:#D9B877;font-size:10px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:3px}
+h1{margin:0;font:500 22px/1.15 Literata,Georgia,serif}
+p{margin:3px 0 0;color:#85909A;font-weight:600;font-size:13px}
+.p{font:400 22px Literata,Georgia,serif;color:#F0D9A4;white-space:nowrap}
+</style></head><body>
+<div class="b"><div><small id="r"></small><h1 id="n"></h1><p id="s"></p></div><div class="p" id="p"></div></div>
+<script>
+var q=new URLSearchParams(location.search);
+["n","s","p","r"].forEach(function(k){document.getElementById(k).textContent=q.get(k)||"";});
+</script></body></html>
