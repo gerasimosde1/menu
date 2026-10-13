@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#0A0D11">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forno – Pizzeria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#0A0D11;--surface:#11161C;--ink:#EDEAE3;--mute:#85909A;--gold:#D9B877;--gold2:#F0D9A4;--line:#1D252D}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+/* language picker */
+.lg{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:15;display:flex;align-items:center;gap:7px;padding:9px 13px;border:1px solid var(--line);border-radius:99px;background:rgba(10,13,17,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--ink);font:700 12px Manrope,sans-serif;letter-spacing:.1em;cursor:pointer}
+.lg svg{width:15px;height:15px}
+.lgbox{position:fixed;top:calc(62px + env(safe-area-inset-top,0px));right:14px;z-index:16;width:min(300px,calc(100vw - 28px));display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 18px 50px rgba(0,0,0,.55);animation:pop .22s ease}
+.lgbox[hidden]{display:none}
+.lgbox button{padding:11px 12px;border:0;border-radius:11px;background:none;color:var(--ink);font:600 14px Manrope,sans-serif;text-align:left;cursor:pointer}
+.lgbox button[aria-selected="true"]{background:var(--gold);color:#17110A}
+@keyframes pop{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+/* hero */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 28px 110px;overflow:hidden}
+.glow{position:absolute;inset:0;background:radial-gradient(60% 42% at 50% 34%,rgba(217,184,119,.15),transparent 70%);animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.55}}
+.hc{position:relative;max-width:420px;will-change:transform,opacity}
+.eyebrow{margin:0 0 16px;font:700 11px Manrope,sans-serif;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);opacity:0;animation:rise .9s .1s forwards}
+.hc h1{margin:0;font:400 clamp(56px,17vw,84px)/1 Literata,Georgia,serif;letter-spacing:-.02em;opacity:0;animation:rise .9s .25s forwards}
+.rule{height:1px;width:0;margin:26px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:grow 1.2s .6s forwards}
+@keyframes grow{to{width:140px}}
+.intro{margin:0;color:var(--mute);font-size:16px;line-height:1.6;opacity:0;animation:rise .9s .8s forwards}
+.chip{display:inline-flex;align-items:center;gap:5px;margin:0 2px;padding:1px 9px;border:1px solid var(--gold);border-radius:99px;color:var(--gold);font:700 10.5px Manrope,sans-serif;letter-spacing:.12em;vertical-align:1px}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.cue{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;color:var(--gold2);font:700 14px Manrope,sans-serif;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;opacity:0;animation:rise .9s 1.3s forwards}
+.arrows{display:flex;flex-direction:column;align-items:center;gap:0}
+.arrows svg{width:30px;height:17px;margin-top:-5px;opacity:0;animation:wave 1.7s ease-in-out infinite}
+.arrows svg:nth-child(2){animation-delay:.22s}.arrows svg:nth-child(3){animation-delay:.44s}
+@keyframes wave{0%{opacity:0;transform:translateY(-6px)}45%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+/* menu */
+.wrap{max-width:580px;margin:0 auto;padding:36px 22px 80px}
+h2{font:600 13px Manrope,sans-serif;letter-spacing:.28em;text-transform:uppercase;margin:52px 0 6px;color:var(--gold)}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.dish{display:flex;width:100%;gap:16px;align-items:flex-start;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:24px 0;margin:0;color:inherit;font:inherit;cursor:pointer}
+.dish .t{flex:1;min-width:0}
+.dish b{display:block;font:500 24px/1.25 Literata,Georgia,serif}
+.dish small{display:block;color:var(--mute);font-size:15.5px;line-height:1.45;margin-top:4px}
+.dish .tag{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:2px 9px;border:1px solid var(--gold);border-radius:99px;color:var(--gold);font:700 11px Manrope,sans-serif;letter-spacing:.14em}
+.price{font:400 21px Literata,Georgia,serif;white-space:nowrap;color:var(--gold2);padding-top:3px}
+/* sheet */
+body.lock{position:fixed;width:100%;overflow:hidden}
+.sheet{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:none;align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.panel{position:relative;background:var(--surface);width:100%;max-width:520px;max-height:93%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:28px 28px 0 0;border-top:1px solid rgba(217,184,119,.35);padding:0 22px calc(28px + env(safe-area-inset-bottom,0px));animation:up .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(60px);opacity:.3}to{transform:none;opacity:1}}
+.bar{position:sticky;top:0;z-index:3;display:flex;justify-content:center;padding:12px 0 14px;margin:0 -22px;background:linear-gradient(var(--surface) 65%,rgba(17,22,28,0))}
+.grab{width:44px;height:4px;border-radius:4px;background:#2A343D}
+.x{position:absolute;right:16px;top:8px;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--ink);cursor:pointer}
+.x svg{width:16px;height:16px}
+.panel h3{font:400 34px/1.1 Literata,Georgia,serif;margin:6px 0 8px}
+.panel p{margin:0 0 6px;color:var(--mute)}
+.bd{--s:34px;display:inline-grid;place-items:center;width:var(--s);height:var(--s);border:1px solid var(--gold);border-radius:50%;background:var(--surface);color:var(--gold2);flex:none}
+.bd svg{width:62%;height:62%;overflow:visible}
+.tags{display:flex;flex-wrap:wrap;gap:12px 10px;margin:16px 0 2px}
+.tags figure{margin:0;width:72px;text-align:center;font-size:10.5px;line-height:1.25;color:var(--mute)}
+.tags figure .bd{display:grid;margin:0 auto 7px}
+model-viewer{display:block;width:100%;height:2px;margin-top:0;opacity:0;background:transparent;--poster-color:transparent;transition:height .35s,opacity .35s,margin .35s}
+model-viewer.ok{height:300px;margin-top:12px;opacity:1}
+.pills{display:flex;gap:8px;margin:14px 0 4px}
+.pill{flex:1;padding:10px 8px;border:1px solid var(--gold);border-radius:99px;background:none;color:var(--gold2);font:700 12.5px Manrope,sans-serif;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--gold);color:#17110A}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin:16px 0 6px}
+.facts div{padding:12px 0;border-bottom:1px solid var(--line);font:700 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.facts b{display:block;font:400 21px Literata,Georgia,serif;letter-spacing:0;text-transform:none;color:var(--ink);margin-top:5px}
+.alg{margin:14px 0 6px}
+.alg h4{margin:0 0 12px;font:700 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.alg .row{display:flex;flex-wrap:wrap;gap:18px}
+.alg figure{margin:0;text-align:center;font-size:11px;color:var(--mute)}
+.alg figure .bd{--s:44px;display:grid;margin:0 auto 6px}
+.ar{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;width:100%;margin-top:18px;padding:16px 18px;border:0;border-radius:18px;background:linear-gradient(135deg,var(--gold2),var(--gold) 55%,#B8944F);color:#17110A;text-align:left;cursor:pointer;animation:pulse 2.6s infinite}
+.ar::after{content:"";position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:shine 3.4s infinite}
+.ar .ic{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:rgba(20,14,6,.9);color:var(--gold2)}
+.ar .tx b{display:block;font:700 17px/1.2 Manrope,sans-serif}
+.ar .tx small{display:block;font:600 12px/1.3 Manrope,sans-serif;opacity:.75;margin-top:2px}
+.ar .ic svg{animation:scan 2.2s ease-in-out infinite}
+@keyframes scan{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(217,184,119,.45)}70%,100%{box-shadow:0 0 0 14px rgba(217,184,119,0)}}
+@keyframes shine{0%,55%{left:-80px}100%{left:130%}}
+.hint{margin:10px 2px 0;font-size:12.5px;color:var(--mute);line-height:1.4}
+.note{font-size:13px;color:var(--gold2);margin-top:10px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}.eyebrow,.hc h1,.intro,.cue{opacity:1}.rule{width:140px}}
+</style>
+</head>
+<body>
+<button class="lg" id="lgbtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/></svg><span id="lgcode">EL</span></button>
+<div class="lgbox" id="lgbox" role="listbox" hidden></div>
+
+<div id="page">
+  <section class="hero" id="hero">
+    <div class="glow"></div>
+    <div class="hc" id="hc">
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="title"></h1>
+      <div class="rule"></div>
+      <p class="intro" id="intro"></p>
+    </div>
+    <button class="cue" id="cue" aria-label="Scroll"><span id="cuetxt"></span><span class="arrows"><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg></span></button>
+  </section>
+  <div class="wrap"><div id="menu"></div></div>
+</div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-name">
+  <div class="panel" id="panel"></div>
+</div>
+
+<script>
+/* ==== EDIT HERE: restaurant name, enabled languages, dishes ==== */
+var RESTAURANT = "Forno";
+var LANGS_ENABLED = ["el","en","de","it","fr","es","nl","pl","ru","sv"];   /* remove a code to hide that language */
+/* 3D files per dish: glb + usdz in the same folder, e.g. "pizza-pepperoni.glb" / "pizza-pepperoni.usdz" */
+
+/* All texts below: 10 languages separated by |  in this order: el|en|de|it|fr|es|nl|pl|ru|sv */
+var LANGS=[{c:"el",n:"Ελληνικά"},{c:"en",n:"English"},{c:"de",n:"Deutsch"},{c:"it",n:"Italiano"},{c:"fr",n:"Français"},{c:"es",n:"Español"},{c:"nl",n:"Nederlands"},{c:"pl",n:"Polski"},{c:"ru",n:"Русский"},{c:"sv",n:"Svenska"}];
+var UIS={
+ eyebrow:"Πιτσαρία|Pizzeria|Pizzeria|Pizzeria|Pizzeria|Pizzería|Pizzeria|Pizzeria|Пиццерия|Pizzeria",
+ intro:"Ανακαλύψτε το μενού μας και δείτε τα πιάτα με το σύμβολο {3D} σε πραγματικό μέγεθος μπροστά σας.|Discover our menu and see the dishes marked {3D} at real size right in front of you.|Entdecken Sie unsere Speisekarte und sehen Sie die Gerichte mit {3D} in Originalgröße direkt vor sich.|Scopri il nostro menu e guarda i piatti con il simbolo {3D} a grandezza reale davanti a te.|Découvrez notre carte et voyez les plats marqués {3D} en taille réelle devant vous.|Descubre nuestra carta y mira los platos con el símbolo {3D} a tamaño real frente a ti.|Ontdek ons menu en zie de gerechten met {3D} op ware grootte vlak voor je.|Odkryj nasze menu i zobacz dania z symbolem {3D} w prawdziwym rozmiarze tuż przed sobą.|Откройте для себя наше меню и посмотрите блюда со значком {3D} в реальном размере прямо перед вами.|Upptäck vår meny och se rätterna med {3D} i verklig storlek rakt framför dig.",
+ enter:"Μενού|Menu|Speisekarte|Menu|La carte|Carta|Menu|Menu|Меню|Meny",
+ size:"Διάμετρος|Diameter|Durchmesser|Diametro|Diamètre|Diámetro|Diameter|Średnica|Диаметр|Diameter",
+ serves:"Μερίδα|Serves|Portion|Porzione|Portion|Porción|Portie|Porcja|Порция|Portion",
+ weight:"Βάρος|Weight|Gewicht|Peso|Poids|Peso|Gewicht|Waga|Вес|Vikt",
+ kcal:"Θερμίδες|Calories|Kalorien|Calorie|Calories|Calorías|Calorieën|Kalorie|Калории|Kalorier",
+ time:"Χρόνος|Time|Zeit|Tempo|Temps|Tiempo|Tijd|Czas|Время|Tid",
+ price:"Τιμή|Price|Preis|Prezzo|Prix|Precio|Prijs|Cena|Цена|Pris",
+ alg:"Αλλεργιογόνα|Allergens|Allergene|Allergeni|Allergènes|Alérgenos|Allergenen|Alergeny|Аллергены|Allergener",
+ cm:"εκ.|cm|cm|cm|cm|cm|cm|cm|см|cm",
+ g:"γρ.|g|g|g|g|g|g|g|г|g",
+ min:"λεπτά|min|Min.|min|min|min|min|min|мин|min",
+ ar:"Δες το στο τραπέζι σου|View on your table|Auf Ihrem Tisch ansehen|Guardala sul tuo tavolo|Voir sur votre table|Verlo en tu mesa|Bekijk op je tafel|Zobacz na swoim stole|Посмотреть на вашем столе|Se på ditt bord",
+ arsub:"Άνοιξε την κάμερα · πραγματικό μέγεθος|Open your camera · real size|Kamera öffnen · Originalgröße|Apri la fotocamera · grandezza reale|Ouvrez la caméra · taille réelle|Abre la cámara · tamaño real|Open je camera · ware grootte|Otwórz aparat · rozmiar rzeczywisty|Откройте камеру · реальный размер|Öppna kameran · verklig storlek",
+ hint:"Κράτα το κινητό κοντά πάνω από το τραπέζι και σκόπευσε προς τα κάτω.|Hold your phone close above the table and aim down.|Halten Sie das Handy nah über den Tisch und zielen Sie nach unten.|Tieni il telefono vicino al tavolo e inquadra verso il basso.|Tenez le téléphone près de la table et visez vers le bas.|Mantén el móvil cerca de la mesa y apunta hacia abajo.|Houd je telefoon dicht boven de tafel en richt naar beneden.|Trzymaj telefon blisko stołu i skieruj go w dół.|Держите телефон близко к столу и направьте камеру вниз.|Håll telefonen nära bordet och rikta den nedåt.",
+ noar:"Το 3D μοντέλο θα προστεθεί σύντομα.|The 3D model will be added soon.|Das 3D-Modell folgt in Kürze.|Il modello 3D sarà aggiunto presto.|Le modèle 3D sera bientôt ajouté.|El modelo 3D se añadirá pronto.|Het 3D-model komt binnenkort.|Model 3D zostanie dodany wkrótce.|3D-модель скоро появится.|3D-modellen läggs till snart.",
+ close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng"
+};
+var TAGS={
+ veg:"Χορτοφαγικό|Vegetarian|Vegetarisch|Vegetariano|Végétarien|Vegetariano|Vegetarisch|Wegetariańskie|Вегетарианское|Vegetariskt",
+ vegan:"Vegan|Vegan|Vegan|Vegano|Végétalien|Vegano|Veganistisch|Wegańskie|Веганское|Veganskt",
+ glutenfree:"Χωρίς γλουτένη|Gluten-free|Glutenfrei|Senza glutine|Sans gluten|Sin gluten|Glutenvrij|Bezglutenowe|Без глютена|Glutenfritt",
+ lactosefree:"Χωρίς λακτόζη|Lactose-free|Laktosefrei|Senza lattosio|Sans lactose|Sin lactosa|Lactosevrij|Bez laktozy|Без лактозы|Laktosfritt",
+ spicy:"Πικάντικο|Spicy|Scharf|Piccante|Épicé|Picante|Pittig|Pikantne|Острое|Kryddigt",
+ fasting:"Νηστίσιμο|Lenten|Fastenspeise|Di magro|De carême|De ayuno|Vastenmaaltijd|Postne|Постное|Fastemat",
+ star:"Επιλογή του σεφ|Chef's pick|Empfehlung des Küchenchefs|Scelta dello chef|Choix du chef|Elección del chef|Keuze van de chef|Wybór szefa kuchni|Выбор шефа|Kockens val",
+ new:"Νέο|New|Neu|Novità|Nouveau|Novedad|Nieuw|Nowość|Новинка|Nyhet",
+ flame:"Ξυλόφουρνο|Wood-fired|Holzofen|Forno a legna|Au feu de bois|Horno de leña|Houtoven|Z pieca opalanego drewnem|Дровяная печь|Vedugn",
+ share:"Για μοιρασιά|To share|Zum Teilen|Da condividere|À partager|Para compartir|Om te delen|Do dzielenia|Для компании|Att dela",
+ pin:"Τοπικό προϊόν|Local product|Regionales Produkt|Prodotto locale|Produit local|Producto local|Lokaal product|Produkt lokalny|Местный продукт|Lokal produkt"
+};
+var ALG={
+ wheat:"Γλουτένη|Gluten|Gluten|Glutine|Gluten|Gluten|Gluten|Gluten|Глютен|Gluten",
+ shrimp:"Καρκινοειδή|Crustaceans|Krebstiere|Crostacei|Crustacés|Crustáceos|Schaaldieren|Skorupiaki|Ракообразные|Kräftdjur",
+ egg:"Αυγά|Eggs|Eier|Uova|Œufs|Huevos|Eieren|Jaja|Яйца|Ägg",
+ fish:"Ψάρι|Fish|Fisch|Pesce|Poisson|Pescado|Vis|Ryby|Рыба|Fisk",
+ peanut:"Φιστίκια|Peanuts|Erdnüsse|Arachidi|Arachides|Cacahuetes|Pinda's|Orzeszki ziemne|Арахис|Jordnötter",
+ soy:"Σόγια|Soy|Soja|Soia|Soja|Soja|Soja|Soja|Соя|Soja",
+ milk:"Γάλα|Milk|Milch|Latte|Lait|Leche|Melk|Mleko|Молоко|Mjölk",
+ nuts:"Ξηροί καρποί|Tree nuts|Schalenfrüchte|Frutta a guscio|Fruits à coque|Frutos secos|Noten|Orzechy|Орехи|Nötter",
+ celery:"Σέλινο|Celery|Sellerie|Sedano|Céleri|Apio|Selderij|Seler|Сельдерей|Selleri",
+ mustard:"Μουστάρδα|Mustard|Senf|Senape|Moutarde|Mostaza|Mosterd|Gorczyca|Горчица|Senap",
+ sesame:"Σουσάμι|Sesame|Sesam|Sesamo|Sésame|Sésamo|Sesam|Sezam|Кунжут|Sesam",
+ sulph:"Θειώδη|Sulphites|Sulfite|Solfiti|Sulfites|Sulfitos|Sulfieten|Siarczyny|Сульфиты|Sulfiter",
+ lupin:"Λούπινο|Lupin|Lupinen|Lupini|Lupin|Altramuces|Lupine|Łubin|Люпин|Lupin",
+ mollusc:"Μαλάκια|Molluscs|Weichtiere|Molluschi|Mollusques|Moluscos|Weekdieren|Mięczaki|Моллюски|Blötdjur"
+};
+var SECTIONS=[
+ {id:"p",name:"Πίτσες|Pizzas|Pizzen|Pizze|Pizzas|Pizzas|Pizza's|Pizze|Пиццы|Pizzor"},
+ {id:"s",name:"Ορεκτικά|Starters|Vorspeisen|Antipasti|Entrées|Entrantes|Voorgerechten|Przystawki|Закуски|Förrätter"},
+ {id:"d",name:"Γλυκά|Desserts|Desserts|Dolci|Desserts|Postres|Desserts|Desery|Десерты|Efterrätter"}
+];
+var SM="Μικρή|Small|Klein|Piccola|Petite|Pequeña|Klein|Mała|Маленькая|Liten", RG="Κανονική|Regular|Normal|Normale|Normale|Normal|Normaal|Standardowa|Обычная|Normal";
+var DISHES=[
+ {s:"p",def:1,tags:["veg","flame","star"],alg:["wheat","milk"],time:12,
+  sizes:[{n:SM,cm:26,price:8,serves:"1",weight:300,kcal:560},{n:RG,cm:33,price:9.5,serves:"1-2",weight:450,kcal:820,glb:"pizza-margherita.glb",usdz:"pizza-margherita.usdz"}],
+  n:"Μαργαρίτα|Margherita|Margherita|Margherita|Margherita|Margarita|Margherita|Margherita|Маргарита|Margherita",
+  d:"Ντομάτα San Marzano, φιορ ντι λάτε, βασιλικός|San Marzano tomato, fior di latte, basil|San-Marzano-Tomate, Fior di Latte, Basilikum|Pomodoro San Marzano, fior di latte, basilico|Tomate San Marzano, fior di latte, basilic|Tomate San Marzano, fior di latte, albahaca|San Marzano-tomaat, fior di latte, basilicum|Pomidor San Marzano, fior di latte, bazylia|Помидоры Сан-Марцано, фиор ди латте, базилик|San Marzano-tomat, fior di latte, basilika"},
+ {s:"p",price:11,cm:33,serves:"1-2",weight:480,kcal:950,time:12,tags:["spicy","flame"],alg:["wheat","milk"],glb:"pizza-pepperoni.glb",usdz:"pizza-pepperoni.usdz",
+  n:"Πεπερόνι|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Пепперони|Pepperoni",
+  d:"Μοτσαρέλα, πικάντικο πεπερόνι|Mozzarella, spicy pepperoni|Mozzarella, scharfe Pepperoni-Salami|Mozzarella, salame piccante|Mozzarella, pepperoni piquant|Mozzarella, pepperoni picante|Mozzarella, pittige pepperoni|Mozzarella, pikantne pepperoni|Моцарелла, острая пепперони|Mozzarella, stark pepperoni"},
+ {s:"p",price:12,cm:33,serves:"1-2",weight:520,kcal:1050,time:12,tags:["veg","flame"],alg:["wheat","milk"],
+  n:"Κουάτρο Φορμάτζι|Quattro Formaggi|Quattro Formaggi|Quattro Formaggi|Quatre Fromages|Cuatro Quesos|Quattro Formaggi|Cztery sery|Четыре сыра|Fyra ostar",
+  d:"Μοτσαρέλα, γκοργκονζόλα, παρμεζάνα, προβολόνε|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, Gorgonzola, Parmesan, Provolone|Mozzarella, gorgonzola, parmigiano, provolone|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, gorgonzola, parmesano, provolone|Mozzarella, gorgonzola, parmezaan, provolone|Mozzarella, gorgonzola, parmezan, provolone|Моцарелла, горгонзола, пармезан, проволоне|Mozzarella, gorgonzola, parmesan, provolone"},
+ {s:"p",price:12.5,cm:33,serves:"1-2",weight:500,kcal:900,time:12,tags:["flame"],alg:["wheat","milk"],
+  n:"Προσούτο & Μανιτάρια|Prosciutto & Mushroom|Prosciutto & Pilze|Prosciutto e Funghi|Jambon & Champignons|Jamón y Champiñones|Ham & Champignons|Szynka i Pieczarki|Ветчина и шампиньоны|Skinka & Champinjoner",
+  d:"Ζαμπόν, μανιτάρια, μοτσαρέλα|Ham, mushrooms, mozzarella|Schinken, Pilze, Mozzarella|Prosciutto cotto, funghi, mozzarella|Jambon, champignons, mozzarella|Jamón, champiñones, mozzarella|Ham, champignons, mozzarella|Szynka, pieczarki, mozzarella|Ветчина, шампиньоны, моцарелла|Skinka, champinjoner, mozzarella"},
+ {s:"s",price:5,cm:22,serves:"2",weight:180,kcal:520,time:8,tags:["veg","share"],alg:["wheat","milk"],
+  n:"Σκορδόψωμο|Garlic bread|Knoblauchbrot|Pane all'aglio|Pain à l'ail|Pan de ajo|Knoflookbrood|Chleb czosnkowy|Чесночный хлеб|Vitlöksbröd",
+  d:"Βούτυρο, σκόρδο, μαϊντανός|Butter, garlic, parsley|Butter, Knoblauch, Petersilie|Burro, aglio, prezzemolo|Beurre, ail, persil|Mantequilla, ajo, perejil|Boter, knoflook, peterselie|Masło, czosnek, pietruszka|Масло, чеснок, петрушка|Smör, vitlök, persilja"},
+ {s:"s",price:6.5,cm:20,serves:"1-2",weight:160,kcal:280,time:6,tags:["vegan","fasting"],alg:["wheat"],
+  n:"Μπρουσκέτα|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Брускетта|Bruschetta",
+  d:"Ντομάτα, βασιλικός, ελαιόλαδο|Tomato, basil, olive oil|Tomate, Basilikum, Olivenöl|Pomodoro, basilico, olio d'oliva|Tomate, basilic, huile d'olive|Tomate, albahaca, aceite de oliva|Tomaat, basilicum, olijfolie|Pomidor, bazylia, oliwa z oliwek|Помидор, базилик, оливковое масло|Tomat, basilika, olivolja"},
+ {s:"s",price:8,cm:22,serves:"1-2",weight:220,kcal:350,time:5,tags:["veg","glutenfree"],alg:["milk"],
+  n:"Καπρέζε|Caprese|Caprese|Caprese|Caprese|Caprese|Caprese|Caprese|Капрезе|Caprese",
+  d:"Μοτσαρέλα, ντομάτα, βασιλικός|Mozzarella, tomato, basil|Mozzarella, Tomate, Basilikum|Mozzarella, pomodoro, basilico|Mozzarella, tomate, basilic|Mozzarella, tomate, albahaca|Mozzarella, tomaat, basilicum|Mozzarella, pomidor, bazylia|Моцарелла, помидор, базилик|Mozzarella, tomat, basilika"},
+ {s:"d",price:6,cm:12,serves:"1",weight:150,kcal:420,time:3,tags:["veg"],alg:["wheat","egg","milk"],
+  n:"Τιραμισού|Tiramisu|Tiramisu|Tiramisù|Tiramisu|Tiramisú|Tiramisu|Tiramisu|Тирамису|Tiramisu",
+  d:"Μασκαρπόνε, εσπρέσο, κακάο|Mascarpone, espresso, cocoa|Mascarpone, Espresso, Kakao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, kakao|Маскарпоне, эспрессо, какао|Mascarpone, espresso, kakao"},
+ {s:"d",price:5.5,cm:10,serves:"1",weight:140,kcal:310,time:3,tags:["veg","glutenfree"],alg:["milk"],
+  n:"Πάνα κότα|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Панна-котта|Panna cotta",
+  d:"Κρέμα βανίλιας, φρούτα του δάσους|Vanilla cream, berries|Vanillecreme, Beeren|Crema alla vaniglia, frutti di bosco|Crème vanille, fruits rouges|Crema de vainilla, frutos rojos|Vanillecrème, bosvruchten|Krem waniliowy, owoce leśne|Ванильный крем, лесные ягоды|Vaniljkräm, bär"}
+];
+/* ==== end of editable part ==== */
+
+/* ==== ANALYTICS: paste your Umami website ID between the quotes (leave empty = no tracking) ==== */
+var UMAMI_ID="";
+if(UMAMI_ID){var sc=document.createElement("script");sc.defer=true;sc.src="https://cloud.umami.is/script.js";sc.setAttribute("data-website-id",UMAMI_ID);document.head.appendChild(sc);}
+var currentDish="";
+function track(ev,data){try{if(window.umami)window.umami.track(ev,data);}catch(e){}}
+
+var LI={};LANGS.forEach(function(l,i){LI[l.c]=i;});
+var nav=((navigator.language||"en")+"").slice(0,2);
+var lang=LANGS_ENABLED.indexOf(nav)>=0?nav:(LANGS_ENABLED.indexOf("en")>=0?"en":LANGS_ENABLED[0]);
+function pick(s){var a=String(s).split("|");return a[LI[lang]]||a[1]||a[0];}
+function getT(){var t={};for(var k in UIS)t[k]=pick(UIS[k]);return t;}
+function nm(map,k){return pick(map[k]);}
+
+/* ---- icons (same set as the PDF) ---- */
+function lf(x,y,a,l,w){return '<path transform="translate('+x+' '+y+') rotate('+a+')" d="M0 0C'+l*.25+' '+w+' '+l*.75+' '+w+' '+l+' 0C'+l*.75+' '+(-w)+' '+l*.25+' '+(-w)+' 0 0Z"/>';}
+function pt(d,f){return '<path d="'+d+'"'+(f?' fill="currentColor" stroke="none"':'')+'/>';}
+function ln(a,b,c,d){return pt('M'+a+' '+b+'L'+c+' '+d);}
+function ci(x,y,r,f){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'"'+(f?' fill="currentColor" stroke="none"':'')+'/>';}
+function el(cx,cy,rx,ry){return '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"/>';}
+function slash(){return '<path d="M-6.4 6.4L6.4 -6.4" stroke="#11161C" stroke-width="3.6"/><path d="M-6.4 6.4L6.4 -6.4" stroke-width="1.3"/>';}
+function wheat(){var s=ln(0,-6.5,0,4),i,y;for(i=0;i<3;i++){y=-3.2+i*2.6;s+=lf(0,y,42,3.9,.95)+lf(0,y,138,3.9,.95);}return s+lf(0,3.6,90,3.4,.9);}
+function drop(){return pt('M0 6.2C2 3.4 4.5 1 4.5 -1.7C4.5 -4.3 2.5 -6.2 0 -6.2C-2.5 -6.2 -4.5 -4.3 -4.5 -1.7C-4.5 1 -2 3.4 0 6.2Z');}
+function spark(k,ox,oy){var p=[[0,6.6],[1.4,1.4],[6.6,0],[1.4,-1.4],[0,-6.6],[-1.4,-1.4],[-6.6,0],[-1.4,1.4]];return pt('M'+p.map(function(q){return (ox+q[0]*k)+' '+(oy+q[1]*k);}).join('L')+'Z');}
+var ICONS={
+ wheat:wheat,
+ glutenfree:function(){return wheat()+slash();},
+ veg:function(){return lf(-4.6,-4.6,45,11.5,4.4)+ln(-4.6,-4.6,3.4,3.4)+ln(-6.2,-6.2,-4.6,-4.6);},
+ vegan:function(){return pt('M-4.8 4L0 -4.8L4.8 4')+lf(2.6,3.2,55,3.8,1.4);},
+ lactosefree:function(){return drop()+slash();},
+ spicy:function(){return pt('M2.4 4.6C5.6 3 5 -1 0 -3.8C-2.6 -5.4 -5 -6 -6.2 -5.6C-4 -4.4 -3.6 -2 -2.2 .6C-1.1 2.6 0 4 2.4 4.6Z')+ln(2.4,4.6,3.2,6.6)+ln(3.2,6.6,5,6);},
+ fasting:function(){var s=ln(-5.8,-5.8,4.6,4.6),k=[-3.2,0,3.2],i;for(i=0;i<3;i++)s+=lf(k[i],k[i],95,3.7,1.2)+lf(k[i],k[i],-5,3.7,1.2);return s+lf(4.6,4.6,45,2.8,1);},
+ star:function(){var a=[],k,r,an;for(k=0;k<10;k++){an=Math.PI/2+k*Math.PI/5;r=k%2?2.9:6.8;a.push((r*Math.cos(an)).toFixed(2)+' '+(r*Math.sin(an)).toFixed(2));}return pt('M'+a.join('L')+'Z');},
+ new:function(){return spark(.78,-1,-1)+spark(.32,4.6,4.8);},
+ flame:function(){return pt('M.5 6.8C-.5 3.5 -4.5 2 -4.5 -2.2C-4.5 -5 -2.5 -6.8 0 -6.8C2.6 -6.8 4.5 -5 4.5 -2C4.5 0 3.2 1.2 2.4 2.2C2.2 .5 1.4 -.2 .8 -.5C1.6 1.8 1.4 4.5 .5 6.8Z')+pt('M0 -1.2C1.7 -2.5 1.9 -4 0 -5.2C-1.9 -4 -1.7 -2.5 0 -1.2Z');},
+ share:function(){return ci(-2.5,0,4)+ci(2.5,0,4);},
+ pin:function(){return pt('M0 -6.6C-1 -4.6 -4.6 -1.6 -4.6 1.5C-4.6 4.3 -2.6 6.2 0 6.2C2.6 6.2 4.6 4.3 4.6 1.5C4.6 -1.6 1 -4.6 0 -6.6Z')+ci(0,1.6,1.7);},
+ shrimp:function(){return pt('M3.2 5.2C-1 6.6 -6.2 2.5 -4.5 -2.8C-3.6 -5 -.8 -5.4 1.4 -3.6C-.2 -3.4 -2.2 -2.6 -1.8 .2C-1.4 2.6 1.2 3.4 3.2 5.2Z')+pt('M1.4 -3.6L3.9 -5.5L4.7 -3.2L3.2 -2.2')+ln(3.2,5.2,5.6,6.6)+ln(-3.3,3.1,-1.6,3.5)+ln(-4.6,.6,-2.6,.7);},
+ egg:function(){return pt('M0 6.3C3.7 6.3 5 2 5 -1.2C5 -4.6 2.8 -6.5 0 -6.5C-2.8 -6.5 -5 -4.6 -5 -1.2C-5 2 -3.7 6.3 0 6.3Z')+ci(0,-1.6,2.2);},
+ fish:function(){return el(-1.9,0,5.1,3.6)+pt('M3 0L6.8 3.6L6.8 -3.6Z')+ci(-3.8,.9,.55,1);},
+ peanut:function(){return '<g transform="rotate(40)">'+pt('M-3 2.8C-6.4 2.8 -6.4 -2.8 -3 -2.8C-1.5 -2.8 -1 -1.6 0 -1.6C1 -1.6 1.5 -2.8 3 -2.8C6.4 -2.8 6.4 2.8 3 2.8C1.5 2.8 1 1.6 0 1.6C-1 1.6 -1.5 2.8 -3 2.8Z')+ci(-3.5,.6,.35,1)+ci(-2.4,-.9,.35,1)+ci(3,.7,.35,1)+ci(3.8,-.6,.35,1)+'</g>';},
+ soy:function(){var s=lf(-6.8,-3.2,28,13.6,3.8),t=[3.6,6.8,10],i;for(i=0;i<3;i++)s+=ci((Math.cos(.489)*t[i]-6.8).toFixed(2),(Math.sin(.489)*t[i]-3.2).toFixed(2),1.15,1);return s;},
+ milk:function(){return pt('M-3.5 -6.5L3.5 -6.5L3.5 2L0 5.8L-3.5 2Z')+ln(-3.5,2,3.5,2)+ln(-3.5,-2,3.5,-2);},
+ nuts:function(){return el(0,-2.1,4.2,4.5)+pt('M-4.8 1.6C-4.8 6.6 4.8 6.6 4.8 1.6L-4.8 1.6Z')+ln(-2,1.6,-1.2,5.3)+ln(2,1.6,1.2,5.3)+ln(0,1.6,0,5.8);},
+ celery:function(){return ln(0,-6.5,0,3)+ln(-1,-6.5,-3.6,2.6)+ln(1,-6.5,3.6,2.6)+ln(-2,-6.5,2,-6.5)+lf(0,3,90,3.3,1.3)+lf(-3.6,2.6,115,3.1,1.2)+lf(3.6,2.6,65,3.1,1.2);},
+ mustard:function(){return '<rect x="-3.8" y="-6.2" width="7.6" height="9.2" rx="1.2"/><rect x="-4.3" y="3" width="8.6" height="2.6" rx=".8"/>'+el(0,-1.8,2,2.4);},
+ sesame:function(){return lf(-4.2,2.6,20,3.4,1.1)+lf(.6,4.2,-30,3.4,1.1)+lf(1.8,-.6,50,3.4,1.1)+lf(-3.8,-3.8,-20,3.4,1.1)+lf(2.4,-5.2,10,3.4,1.1);},
+ sulph:function(){var f=' font-family="Manrope,sans-serif" font-weight="700" fill="currentColor" stroke="none"';return '<text transform="scale(1 -1)" x="-6.6" y="2.6" font-size="7.6"'+f+'>SO</text><text transform="scale(1 -1)" x="3.6" y="4.2" font-size="4.6"'+f+'>2</text>';},
+ lupin:function(){var s=ln(0,-6.5,0,5.2),y=[-3.6,-1.6,.4,2.4],i;for(i=0;i<4;i++)s+=ci(i%2?1.7:-1.7,y[i],1.15);return s+ci(0,6.2,1);},
+ mollusc:function(){var s=pt('M0 -6.2C-7.6 -2 -6.6 4.6 0 5.6C6.6 4.6 7.6 -2 0 -6.2Z'),p=[[-4.3,3.6],[-2.2,5],[0,5.6],[2.2,5],[4.3,3.6]],i;for(i=0;i<5;i++)s+=ln(0,-6.2,p[i][0],p[i][1]);return s;}
+};
+var VF='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg>';
+var EYE='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+var XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+function badge(k,size,label){return '<span class="bd" style="--s:'+size+'px" role="img" title="'+label+'" aria-label="'+label+'"><svg viewBox="-8 -8 16 16" aria-hidden="true"><g transform="scale(1 -1)" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">'+ICONS[k]()+'</g></svg></span>';}
+function fmt(n){return "€"+n.toFixed(2).replace(".",",");}
+function sizesOf(d){return d.sizes||[{n:null,cm:d.cm,price:d.price,serves:d.serves,weight:d.weight,kcal:d.kcal,glb:d.glb,usdz:d.usdz}];}
+function $(id){return document.getElementById(id);}
+
+/* ---- scroll reveal ---- */
+var io=null;
+function reveal(){
+  var items=document.querySelectorAll(".rv");
+  if(!("IntersectionObserver" in window)){items.forEach(function(e){e.classList.add("in");});return;}
+  if(io)io.disconnect();
+  io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12,rootMargin:"0px 0px -6% 0px"});
+  items.forEach(function(e){io.observe(e);});
+}
+
+function render(){
+  var t=getT();
+  document.documentElement.lang=lang;
+  $("title").textContent=RESTAURANT;
+  document.title=RESTAURANT+" – "+t.eyebrow;
+  $("eyebrow").textContent=t.eyebrow;
+  $("intro").innerHTML=t.intro.replace("{3D}",'<span class="chip">'+EYE+'3D</span>');
+  $("cuetxt").textContent=t.enter;
+  $("lgcode").textContent=lang.toUpperCase();
+  var html="",k=0;
+  SECTIONS.forEach(function(sec){
+    html+='<h2 class="rv">'+pick(sec.name)+'</h2>';
+    DISHES.forEach(function(d,i){
+      if(d.s!==sec.id) return;
+      var S=sizesOf(d),def=S[d.def||0],has=S.some(function(x){return x.glb;});
+      html+='<button class="dish rv" style="transition-delay:'+((k++%3)*70)+'ms" data-i="'+i+'"><span class="t"><b>'+pick(d.n)+'</b><small>'+pick(d.d)+'</small>'+(has?'<span class="tag">'+EYE+'3D</span>':'')+'</span><span class="price">'+fmt(def.price)+'</span></button>';
+    });
+  });
+  $("menu").innerHTML=html;
+  reveal();
+  buildLangBox();
+}
+
+/* ---- language picker ---- */
+function buildLangBox(){
+  var box=$("lgbox");
+  box.innerHTML=LANGS.filter(function(l){return LANGS_ENABLED.indexOf(l.c)>=0;}).map(function(l){return '<button role="option" data-l="'+l.c+'" aria-selected="'+(l.c===lang)+'">'+l.n+'</button>';}).join("");
+  $("lgbtn").style.display=LANGS_ENABLED.length>1?"flex":"none";
+}
+function toggleLang(open){
+  var box=$("lgbox");if(open===undefined)open=box.hidden;
+  box.hidden=!open;$("lgbtn").setAttribute("aria-expanded",String(open));
+}
+
+/* ---- sheet with scroll lock ---- */
+var savedY=0;
+function lockPage(){
+  savedY=window.pageYOffset||0;
+  document.body.style.top=(-savedY)+"px";document.body.classList.add("lock");
+  ["page","lgbtn"].forEach(function(id){$(id).setAttribute("inert","");});
+  toggleLang(false);
+}
+function unlockPage(){
+  document.body.classList.remove("lock");document.body.style.top="";
+  ["page","lgbtn"].forEach(function(id){$(id).removeAttribute("inert");});
+  window.scrollTo(0,savedY);
+}
+function openDish(i,si){
+  var d=DISHES[i],t=getT(),S=sizesOf(d),first=(si==null);
+  if(first)si=d.def||0;
+  var s=S[si];
+  currentDish=pick(d.n)+(S.length>1?" / "+pick(s.n):"");
+  if(first)track("dish_open",{dish:d.n.split("|")[1]});
+  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+' ar ar-modes="scene-viewer webxr quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+' · '+s.cm+' '+t.cm+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
+  var tags=(d.tags||[]).map(function(k){return '<figure>'+badge(k,36,nm(TAGS,k))+nm(TAGS,k)+'</figure>';}).join("");
+  var pills=S.length>1?'<div class="pills">'+S.map(function(x,j){return '<button class="pill" data-si="'+j+'" aria-pressed="'+(j===si)+'">'+pick(x.n)+' · '+x.cm+' '+t.cm+'</button>';}).join("")+'</div>':'';
+  var facts=[[t.size,s.cm+" "+t.cm],[t.serves,s.serves],[t.weight,s.weight+" "+t.g],[t.kcal,s.kcal+" kcal"],[t.time,d.time+" "+t.min],[t.price,fmt(s.price)]];
+  var alg=(d.alg&&d.alg.length)?'<div class="alg"><h4>'+t.alg+'</h4><div class="row">'+d.alg.map(function(k){return '<figure>'+badge(k,44,nm(ALG,k))+nm(ALG,k)+'</figure>';}).join("")+'</div></div>':'';
+  $("panel").innerHTML=
+    '<div class="bar"><span class="grab"></span><button class="x" id="cl" aria-label="'+t.close+'">'+XI+'</button></div>'+
+    '<h3 id="sh-name">'+pick(d.n)+'</h3><p>'+pick(d.d)+'</p>'+
+    (tags?'<div class="tags">'+tags+'</div>':'')+model+pills+
+    '<div class="facts">'+facts.map(function(f){return '<div>'+f[0]+'<b>'+f[1]+'</b></div>';}).join("")+'</div>'+alg+
+    '<button class="ar" id="arbtn"><span class="ic">'+VF+'</span><span class="tx"><b>'+t.ar+'</b><small>'+t.arsub+'</small></span></button>'+
+    (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>';
+  if(first){lockPage();$("sheet").classList.add("open");}
+  $("panel").scrollTop=0;
+  var mv=$("mv"),loaded=false;
+  if(mv)mv.addEventListener("load",function(){loaded=true;mv.classList.add("ok");});
+  $("cl").onclick=closeSheet;
+  $("arbtn").onclick=function(){
+    if(mv&&loaded){try{mv.activateAR();return;}catch(e){}}
+    $("arnote").hidden=false;
+  };
+  document.querySelectorAll("#panel .pill").forEach(function(b){b.onclick=function(){openDish(i,+b.dataset.si);};});
+}
+function closeSheet(){
+  if(!$("sheet").classList.contains("open"))return;
+  $("sheet").classList.remove("open");unlockPage();
+}
+
+/* ---- events ---- */
+$("lgbtn").addEventListener("click",function(e){e.stopPropagation();toggleLang();});
+$("lgbox").addEventListener("click",function(e){var b=e.target.closest("button");if(b){lang=b.dataset.l;render();toggleLang(false);}});
+document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest(".lg,.lgbox"))toggleLang(false);});
+$("menu").addEventListener("click",function(e){var b=e.target.closest(".dish");if(b)openDish(+b.dataset.i);});
+$("sheet").addEventListener("click",function(e){if(e.target.id==="sheet")closeSheet();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeSheet();toggleLang(false);}});
+document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".ar"))track("ar_click",{dish:currentDish});});
+$("cue").addEventListener("click",function(){var m=$("menu");try{m.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){m.scrollIntoView();}});
+window.addEventListener("scroll",function(){
+  var y=window.pageYOffset||0,h=window.innerHeight||700,p=Math.min(1,y/(h*.7));
+  $("hc").style.opacity=String(1-p);$("hc").style.transform="translateY("+(-y*.25)+"px)";
+},{passive:true});
+render();
+</script>
+</body>
+</html>
