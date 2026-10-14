@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#0A0D11">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Forno – Pizzeria</title>
+<title>Forno – Πιτσαρία</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -143,27 +143,24 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 </div>
 
 <script>
-/* ==== EDIT HERE: restaurant name, enabled languages, dishes ==== */
-var RESTAURANT = "Forno";
-var LANGS_ENABLED = ["el","en","de","it","fr","es","nl","pl","ru","sv"];   /* remove a code to hide that language */
-/* WhatsApp number for the "message us" button at the end of the menu: country code + number, digits only,
-   e.g. "306912345678". Leave empty to hide the button. */
-var CONTACT_WHATSAPP = "";
-/* Personal demo link: add ?name=Restaurant%20Name to the URL (optionally &type=Ταβέρνα).
-   The page then shows that name, the type line only if given, and a "sample, not the official menu" label. */
+/* ==== Restaurant data: filled in by tools/build.py from restaurants/<name>/menu.xlsx. Do not edit here. ==== */
+var M = {"name":"Forno","kind":"Πιτσαρία|Pizzeria|Pizzeria|Pizzeria|Pizzeria|Pizzería|Pizzeria|Pizzeria|Пиццерия|Pizzeria","langs":["el","en","de","it","fr","es","nl","pl","ru","sv"],"whatsapp":"","umami":"b49166c5-dda3-45fe-865e-98a994b74bd2","trackDomain":"gerasimosde1.github.io","demo":true,"accent":"","sections":[{"id":"pitses","name":"Πίτσες|Pizzas|Pizzen|Pizze|Pizzas|Pizzas|Pizza&#x27;s|Pizze|Пиццы|Pizzor"},{"id":"orektika","name":"Ορεκτικά|Starters|Vorspeisen|Antipasti|Entrées|Entrantes|Voorgerechten|Przystawki|Закуски|Förrätter"},{"id":"glyka","name":"Γλυκά|Desserts|Desserts|Dolci|Desserts|Postres|Desserts|Desery|Десерты|Efterrätter"}],"dishes":[{"s":"pitses","n":"Μαργαρίτα|Margherita|Margherita|Margherita|Margherita|Margarita|Margherita|Margherita|Маргарита|Margherita","d":"Ντομάτα San Marzano, φιορ ντι λάτε, βασιλικός|San Marzano tomato, fior di latte, basil|San-Marzano-Tomate, Fior di Latte, Basilikum|Pomodoro San Marzano, fior di latte, basilico|Tomate San Marzano, fior di latte, basilic|Tomate San Marzano, fior di latte, albahaca|San Marzano-tomaat, fior di latte, basilicum|Pomidor San Marzano, fior di latte, bazylia|Помидоры Сан-Марцано, фиор ди латте, базилик|San Marzano-tomat, fior di latte, basilika","tags":["veg","star","flame"],"alg":["wheat","milk"],"time":12,"ext":[{"n":"Επιπλέον μοτσαρέλα|Extra mozzarella|Extra Mozzarella|Mozzarella extra|Supplément mozzarella|Mozzarella extra|Extra mozzarella|Dodatkowa mozzarella|Дополнительная моцарелла|Extra mozzarella","price":1.5},{"n":"Ελιές Καλαμών|Kalamata olives|Kalamata-Oliven|Olive Kalamata|Olives de Kalamata|Aceitunas Kalamata|Kalamata-olijven|Oliwki Kalamata|Оливки Каламата|Kalamataoliver","price":1},{"n":"Μανιτάρια|Mushrooms|Pilze|Funghi|Champignons|Champiñones|Champignons|Pieczarki|Грибы|Champinjoner","price":1},{"n":"Ρόκα|Rocket|Rucola|Rucola|Roquette|Rúcula|Rucola|Rukola|Руккола|Ruccola","price":1},{"n":"Προσούτο|Prosciutto|Prosciutto|Prosciutto crudo|Prosciutto|Prosciutto|Prosciutto|Prosciutto|Прошутто|Prosciutto","price":2.5},{"n":"Λάδι τσίλι|Chilli oil|Chiliöl|Olio piccante|Huile pimentée|Aceite picante|Chili-olie|Oliwa chili|Масло чили|Chiliolja","price":0.5}],"sizes":[{"n":"Μικρή|Small|Klein|Piccola|Petite|Pequeña|Klein|Mała|Маленькая|Liten","price":8,"cm":26,"serves":"1","weight":300,"kcal":560},{"n":"Κανονική|Regular|Normal|Normale|Normale|Normal|Normaal|Standardowa|Обычная|Normal","price":9.5,"cm":33,"serves":"1-2","weight":450,"kcal":820,"glb":"pizza-margherita.glb","usdz":"pizza-margherita.usdz","poster":"pizza-margherita-poster.webp"}],"def":1},{"s":"pitses","n":"Πεπερόνι|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Пепперони|Pepperoni","d":"Μοτσαρέλα, πικάντικο πεπερόνι|Mozzarella, spicy pepperoni|Mozzarella, scharfe Pepperoni-Salami|Mozzarella, salame piccante|Mozzarella, pepperoni piquant|Mozzarella, pepperoni picante|Mozzarella, pittige pepperoni|Mozzarella, pikantne pepperoni|Моцарелла, острая пепперони|Mozzarella, stark pepperoni","tags":["spicy","flame"],"alg":["wheat","milk"],"time":12,"ext":[{"n":"Επιπλέον μοτσαρέλα|Extra mozzarella|Extra Mozzarella|Mozzarella extra|Supplément mozzarella|Mozzarella extra|Extra mozzarella|Dodatkowa mozzarella|Дополнительная моцарелла|Extra mozzarella","price":1.5},{"n":"Ελιές Καλαμών|Kalamata olives|Kalamata-Oliven|Olive Kalamata|Olives de Kalamata|Aceitunas Kalamata|Kalamata-olijven|Oliwki Kalamata|Оливки Каламата|Kalamataoliver","price":1},{"n":"Μανιτάρια|Mushrooms|Pilze|Funghi|Champignons|Champiñones|Champignons|Pieczarki|Грибы|Champinjoner","price":1},{"n":"Ρόκα|Rocket|Rucola|Rucola|Roquette|Rúcula|Rucola|Rukola|Руккола|Ruccola","price":1},{"n":"Προσούτο|Prosciutto|Prosciutto|Prosciutto crudo|Prosciutto|Prosciutto|Prosciutto|Prosciutto|Прошутто|Prosciutto","price":2.5},{"n":"Λάδι τσίλι|Chilli oil|Chiliöl|Olio piccante|Huile pimentée|Aceite picante|Chili-olie|Oliwa chili|Масло чили|Chiliolja","price":0.5}],"price":11,"cm":33,"serves":"1-2","weight":480,"kcal":950,"glb":"pizza-pepperoni.glb","usdz":"pizza-pepperoni.usdz","poster":"pizza-pepperoni-poster.webp"},{"s":"pitses","n":"Κουάτρο Φορμάτζι|Quattro Formaggi|Quattro Formaggi|Quattro Formaggi|Quatre Fromages|Cuatro Quesos|Quattro Formaggi|Cztery sery|Четыре сыра|Fyra ostar","d":"Μοτσαρέλα, γκοργκονζόλα, παρμεζάνα, προβολόνε|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, Gorgonzola, Parmesan, Provolone|Mozzarella, gorgonzola, parmigiano, provolone|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, gorgonzola, parmesano, provolone|Mozzarella, gorgonzola, parmezaan, provolone|Mozzarella, gorgonzola, parmezan, provolone|Моцарелла, горгонзола, пармезан, проволоне|Mozzarella, gorgonzola, parmesan, provolone","tags":["veg","flame"],"alg":["wheat","milk"],"time":12,"ext":[{"n":"Επιπλέον μοτσαρέλα|Extra mozzarella|Extra Mozzarella|Mozzarella extra|Supplément mozzarella|Mozzarella extra|Extra mozzarella|Dodatkowa mozzarella|Дополнительная моцарелла|Extra mozzarella","price":1.5},{"n":"Ελιές Καλαμών|Kalamata olives|Kalamata-Oliven|Olive Kalamata|Olives de Kalamata|Aceitunas Kalamata|Kalamata-olijven|Oliwki Kalamata|Оливки Каламата|Kalamataoliver","price":1},{"n":"Μανιτάρια|Mushrooms|Pilze|Funghi|Champignons|Champiñones|Champignons|Pieczarki|Грибы|Champinjoner","price":1},{"n":"Ρόκα|Rocket|Rucola|Rucola|Roquette|Rúcula|Rucola|Rukola|Руккола|Ruccola","price":1},{"n":"Προσούτο|Prosciutto|Prosciutto|Prosciutto crudo|Prosciutto|Prosciutto|Prosciutto|Prosciutto|Прошутто|Prosciutto","price":2.5},{"n":"Λάδι τσίλι|Chilli oil|Chiliöl|Olio piccante|Huile pimentée|Aceite picante|Chili-olie|Oliwa chili|Масло чили|Chiliolja","price":0.5}],"price":12,"cm":33,"serves":"1-2","weight":520,"kcal":1050},{"s":"pitses","n":"Προσούτο &amp; Μανιτάρια|Prosciutto &amp; Mushroom|Prosciutto &amp; Pilze|Prosciutto e Funghi|Jambon &amp; Champignons|Jamón y Champiñones|Ham &amp; Champignons|Szynka i Pieczarki|Ветчина и шампиньоны|Skinka &amp; Champinjoner","d":"Ζαμπόν, μανιτάρια, μοτσαρέλα|Ham, mushrooms, mozzarella|Schinken, Pilze, Mozzarella|Prosciutto cotto, funghi, mozzarella|Jambon, champignons, mozzarella|Jamón, champiñones, mozzarella|Ham, champignons, mozzarella|Szynka, pieczarki, mozzarella|Ветчина, шампиньоны, моцарелла|Skinka, champinjoner, mozzarella","tags":["flame"],"alg":["wheat","milk"],"time":12,"ext":[{"n":"Επιπλέον μοτσαρέλα|Extra mozzarella|Extra Mozzarella|Mozzarella extra|Supplément mozzarella|Mozzarella extra|Extra mozzarella|Dodatkowa mozzarella|Дополнительная моцарелла|Extra mozzarella","price":1.5},{"n":"Ελιές Καλαμών|Kalamata olives|Kalamata-Oliven|Olive Kalamata|Olives de Kalamata|Aceitunas Kalamata|Kalamata-olijven|Oliwki Kalamata|Оливки Каламата|Kalamataoliver","price":1},{"n":"Μανιτάρια|Mushrooms|Pilze|Funghi|Champignons|Champiñones|Champignons|Pieczarki|Грибы|Champinjoner","price":1},{"n":"Ρόκα|Rocket|Rucola|Rucola|Roquette|Rúcula|Rucola|Rukola|Руккола|Ruccola","price":1},{"n":"Προσούτο|Prosciutto|Prosciutto|Prosciutto crudo|Prosciutto|Prosciutto|Prosciutto|Prosciutto|Прошутто|Prosciutto","price":2.5},{"n":"Λάδι τσίλι|Chilli oil|Chiliöl|Olio piccante|Huile pimentée|Aceite picante|Chili-olie|Oliwa chili|Масло чили|Chiliolja","price":0.5}],"price":12.5,"cm":33,"serves":"1-2","weight":500,"kcal":900},{"s":"orektika","n":"Σκορδόψωμο|Garlic bread|Knoblauchbrot|Pane all&#x27;aglio|Pain à l&#x27;ail|Pan de ajo|Knoflookbrood|Chleb czosnkowy|Чесночный хлеб|Vitlöksbröd","d":"Βούτυρο, σκόρδο, μαϊντανός|Butter, garlic, parsley|Butter, Knoblauch, Petersilie|Burro, aglio, prezzemolo|Beurre, ail, persil|Mantequilla, ajo, perejil|Boter, knoflook, peterselie|Masło, czosnek, pietruszka|Масло, чеснок, петрушка|Smör, vitlök, persilja","tags":["veg","share"],"alg":["wheat","milk"],"time":8,"price":5,"cm":22,"serves":"2","weight":180,"kcal":520},{"s":"orektika","n":"Μπρουσκέτα|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Брускетта|Bruschetta","d":"Ντομάτα, βασιλικός, ελαιόλαδο|Tomato, basil, olive oil|Tomate, Basilikum, Olivenöl|Pomodoro, basilico, olio d&#x27;oliva|Tomate, basilic, huile d&#x27;olive|Tomate, albahaca, aceite de oliva|Tomaat, basilicum, olijfolie|Pomidor, bazylia, oliwa z oliwek|Помидор, базилик, оливковое масло|Tomat, basilika, olivolja","tags":["vegan","fasting"],"alg":["wheat"],"time":6,"price":6.5,"cm":20,"serves":"1-2","weight":160,"kcal":280},{"s":"orektika","n":"Καπρέζε|Caprese|Caprese|Caprese|Caprese|Caprese|Caprese|Caprese|Капрезе|Caprese","d":"Μοτσαρέλα, ντομάτα, βασιλικός|Mozzarella, tomato, basil|Mozzarella, Tomate, Basilikum|Mozzarella, pomodoro, basilico|Mozzarella, tomate, basilic|Mozzarella, tomate, albahaca|Mozzarella, tomaat, basilicum|Mozzarella, pomidor, bazylia|Моцарелла, помидор, базилик|Mozzarella, tomat, basilika","tags":["veg","glutenfree"],"alg":["milk"],"time":5,"price":8,"cm":22,"serves":"1-2","weight":220,"kcal":350},{"s":"glyka","n":"Τιραμισού|Tiramisu|Tiramisu|Tiramisù|Tiramisu|Tiramisú|Tiramisu|Tiramisu|Тирамису|Tiramisu","d":"Μασκαρπόνε, εσπρέσο, κακάο|Mascarpone, espresso, cocoa|Mascarpone, Espresso, Kakao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, kakao|Маскарпоне, эспрессо, какао|Mascarpone, espresso, kakao","tags":["veg"],"alg":["wheat","egg","milk"],"time":3,"price":6,"cm":12,"serves":"1","weight":150,"kcal":420},{"s":"glyka","n":"Πάνα κότα|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Панна-котта|Panna cotta","d":"Κρέμα βανίλιας, φρούτα του δάσους|Vanilla cream, berries|Vanillecreme, Beeren|Crema alla vaniglia, frutti di bosco|Crème vanille, fruits rouges|Crema de vainilla, frutos rojos|Vanillecrème, bosvruchten|Krem waniliowy, owoce leśne|Ванильный крем, лесные ягоды|Vaniljkräm, bär","tags":["veg","glutenfree"],"alg":["milk"],"time":3,"price":5.5,"cm":10,"serves":"1","weight":140,"kcal":310}]};
+var RESTAURANT = M.name, KIND = M.kind || "", LANGS_ENABLED = M.langs, CONTACT_WHATSAPP = M.whatsapp || "",
+    UMAMI_ID = M.umami || "", TRACK_DOMAIN = M.trackDomain || "", SECTIONS = M.sections, DISHES = M.dishes;
+/* Demo restaurants only: ?name=Restaurant%20Name (optionally &type=Ταβέρνα) shows that name
+   with a "sample, not the official menu" label. */
 var DEMO_FOR = "", DEMO_TYPE = "";
-try {
+if (M.demo) try {
   var QS = new URLSearchParams(location.search);
   DEMO_FOR = (QS.get("name") || "").replace(/\s+/g, " ").trim().slice(0, 40);
   DEMO_TYPE = (QS.get("type") || "").replace(/\s+/g, " ").trim().slice(0, 30);
 } catch (e) {}
 if (DEMO_FOR) RESTAURANT = DEMO_FOR;
-/* 3D files per dish: glb + usdz in the same folder, e.g. "pizza-pepperoni.glb" / "pizza-pepperoni.usdz" */
+if (M.accent) document.documentElement.style.setProperty("--gold", M.accent);
 
 /* All texts below: 10 languages separated by |  in this order: el|en|de|it|fr|es|nl|pl|ru|sv */
 var LANGS=[{c:"el",n:"Ελληνικά"},{c:"en",n:"English"},{c:"de",n:"Deutsch"},{c:"it",n:"Italiano"},{c:"fr",n:"Français"},{c:"es",n:"Español"},{c:"nl",n:"Nederlands"},{c:"pl",n:"Polski"},{c:"ru",n:"Русский"},{c:"sv",n:"Svenska"}];
 var UIS={
- eyebrow:"Πιτσαρία|Pizzeria|Pizzeria|Pizzeria|Pizzeria|Pizzería|Pizzeria|Pizzeria|Пиццерия|Pizzeria",
  intro:"Ανακαλύψτε το μενού μας και δείτε τα πιάτα με το σύμβολο {3D} σε πραγματικό μέγεθος μπροστά σας.|Discover our menu and see the dishes marked {3D} at real size right in front of you.|Entdecken Sie unsere Speisekarte und sehen Sie die Gerichte mit {3D} in Originalgröße direkt vor sich.|Scopri il nostro menu e guarda i piatti con il simbolo {3D} a grandezza reale davanti a te.|Découvrez notre carte et voyez les plats marqués {3D} en taille réelle devant vous.|Descubre nuestra carta y mira los platos con el símbolo {3D} a tamaño real frente a ti.|Ontdek ons menu en zie de gerechten met {3D} op ware grootte vlak voor je.|Odkryj nasze menu i zobacz dania z symbolem {3D} w prawdziwym rozmiarze tuż przed sobą.|Откройте для себя наше меню и посмотрите блюда со значком {3D} в реальном размере прямо перед вами.|Upptäck vår meny och se rätterna med {3D} i verklig storlek rakt framför dig.",
  enter:"Μενού|Menu|Speisekarte|Menu|La carte|Carta|Menu|Menu|Меню|Meny",
  size:"Διάμετρος|Diameter|Durchmesser|Diametro|Diamètre|Diámetro|Diameter|Średnica|Диаметр|Diameter",
@@ -218,56 +215,7 @@ var ALG={
  lupin:"Λούπινο|Lupin|Lupinen|Lupini|Lupin|Altramuces|Lupine|Łubin|Люпин|Lupin",
  mollusc:"Μαλάκια|Molluscs|Weichtiere|Molluschi|Mollusques|Moluscos|Weekdieren|Mięczaki|Моллюски|Blötdjur"
 };
-var SECTIONS=[
- {id:"p",name:"Πίτσες|Pizzas|Pizzen|Pizze|Pizzas|Pizzas|Pizza's|Pizze|Пиццы|Pizzor"},
- {id:"s",name:"Ορεκτικά|Starters|Vorspeisen|Antipasti|Entrées|Entrantes|Voorgerechten|Przystawki|Закуски|Förrätter"},
- {id:"d",name:"Γλυκά|Desserts|Desserts|Dolci|Desserts|Postres|Desserts|Desery|Десерты|Efterrätter"}
-];
-var SM="Μικρή|Small|Klein|Piccola|Petite|Pequeña|Klein|Mała|Маленькая|Liten", RG="Κανονική|Regular|Normal|Normale|Normale|Normal|Normaal|Standardowa|Обычная|Normal";
-/* Extras: name in 10 languages + price. Give a dish  ext:PIZZA_EXTRAS  (or its own list) to show them. */
-var PIZZA_EXTRAS=[
- {n:"Επιπλέον μοτσαρέλα|Extra mozzarella|Extra Mozzarella|Mozzarella extra|Supplément mozzarella|Mozzarella extra|Extra mozzarella|Dodatkowa mozzarella|Дополнительная моцарелла|Extra mozzarella",price:1.5},
- {n:"Ελιές Καλαμών|Kalamata olives|Kalamata-Oliven|Olive Kalamata|Olives de Kalamata|Aceitunas Kalamata|Kalamata-olijven|Oliwki Kalamata|Оливки Каламата|Kalamataoliver",price:1},
- {n:"Μανιτάρια|Mushrooms|Pilze|Funghi|Champignons|Champiñones|Champignons|Pieczarki|Грибы|Champinjoner",price:1},
- {n:"Ρόκα|Rocket|Rucola|Rucola|Roquette|Rúcula|Rucola|Rukola|Руккола|Ruccola",price:1},
- {n:"Προσούτο|Prosciutto|Prosciutto|Prosciutto crudo|Prosciutto|Prosciutto|Prosciutto|Prosciutto|Прошутто|Prosciutto",price:2.5},
- {n:"Λάδι τσίλι|Chilli oil|Chiliöl|Olio piccante|Huile pimentée|Aceite picante|Chili-olie|Oliwa chili|Масло чили|Chiliolja",price:0.5}
-];
-var DISHES=[
- {s:"p",def:1,tags:["veg","flame","star"],alg:["wheat","milk"],time:12,ext:PIZZA_EXTRAS,
-  sizes:[{n:SM,cm:26,price:8,serves:"1",weight:300,kcal:560},{n:RG,cm:33,price:9.5,serves:"1-2",weight:450,kcal:820,glb:"pizza-margherita.glb",usdz:"pizza-margherita.usdz",poster:"pizza-margherita-poster.webp"}],
-  n:"Μαργαρίτα|Margherita|Margherita|Margherita|Margherita|Margarita|Margherita|Margherita|Маргарита|Margherita",
-  d:"Ντομάτα San Marzano, φιορ ντι λάτε, βασιλικός|San Marzano tomato, fior di latte, basil|San-Marzano-Tomate, Fior di Latte, Basilikum|Pomodoro San Marzano, fior di latte, basilico|Tomate San Marzano, fior di latte, basilic|Tomate San Marzano, fior di latte, albahaca|San Marzano-tomaat, fior di latte, basilicum|Pomidor San Marzano, fior di latte, bazylia|Помидоры Сан-Марцано, фиор ди латте, базилик|San Marzano-tomat, fior di latte, basilika"},
- {s:"p",price:11,cm:33,serves:"1-2",weight:480,kcal:950,time:12,tags:["spicy","flame"],alg:["wheat","milk"],ext:PIZZA_EXTRAS,glb:"pizza-pepperoni.glb",usdz:"pizza-pepperoni.usdz",poster:"pizza-pepperoni-poster.webp",
-  n:"Πεπερόνι|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Пепперони|Pepperoni",
-  d:"Μοτσαρέλα, πικάντικο πεπερόνι|Mozzarella, spicy pepperoni|Mozzarella, scharfe Pepperoni-Salami|Mozzarella, salame piccante|Mozzarella, pepperoni piquant|Mozzarella, pepperoni picante|Mozzarella, pittige pepperoni|Mozzarella, pikantne pepperoni|Моцарелла, острая пепперони|Mozzarella, stark pepperoni"},
- {s:"p",price:12,cm:33,serves:"1-2",weight:520,kcal:1050,time:12,tags:["veg","flame"],alg:["wheat","milk"],ext:PIZZA_EXTRAS,
-  n:"Κουάτρο Φορμάτζι|Quattro Formaggi|Quattro Formaggi|Quattro Formaggi|Quatre Fromages|Cuatro Quesos|Quattro Formaggi|Cztery sery|Четыре сыра|Fyra ostar",
-  d:"Μοτσαρέλα, γκοργκονζόλα, παρμεζάνα, προβολόνε|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, Gorgonzola, Parmesan, Provolone|Mozzarella, gorgonzola, parmigiano, provolone|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, gorgonzola, parmesano, provolone|Mozzarella, gorgonzola, parmezaan, provolone|Mozzarella, gorgonzola, parmezan, provolone|Моцарелла, горгонзола, пармезан, проволоне|Mozzarella, gorgonzola, parmesan, provolone"},
- {s:"p",price:12.5,cm:33,serves:"1-2",weight:500,kcal:900,time:12,tags:["flame"],alg:["wheat","milk"],ext:PIZZA_EXTRAS,
-  n:"Προσούτο & Μανιτάρια|Prosciutto & Mushroom|Prosciutto & Pilze|Prosciutto e Funghi|Jambon & Champignons|Jamón y Champiñones|Ham & Champignons|Szynka i Pieczarki|Ветчина и шампиньоны|Skinka & Champinjoner",
-  d:"Ζαμπόν, μανιτάρια, μοτσαρέλα|Ham, mushrooms, mozzarella|Schinken, Pilze, Mozzarella|Prosciutto cotto, funghi, mozzarella|Jambon, champignons, mozzarella|Jamón, champiñones, mozzarella|Ham, champignons, mozzarella|Szynka, pieczarki, mozzarella|Ветчина, шампиньоны, моцарелла|Skinka, champinjoner, mozzarella"},
- {s:"s",price:5,cm:22,serves:"2",weight:180,kcal:520,time:8,tags:["veg","share"],alg:["wheat","milk"],
-  n:"Σκορδόψωμο|Garlic bread|Knoblauchbrot|Pane all'aglio|Pain à l'ail|Pan de ajo|Knoflookbrood|Chleb czosnkowy|Чесночный хлеб|Vitlöksbröd",
-  d:"Βούτυρο, σκόρδο, μαϊντανός|Butter, garlic, parsley|Butter, Knoblauch, Petersilie|Burro, aglio, prezzemolo|Beurre, ail, persil|Mantequilla, ajo, perejil|Boter, knoflook, peterselie|Masło, czosnek, pietruszka|Масло, чеснок, петрушка|Smör, vitlök, persilja"},
- {s:"s",price:6.5,cm:20,serves:"1-2",weight:160,kcal:280,time:6,tags:["vegan","fasting"],alg:["wheat"],
-  n:"Μπρουσκέτα|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Bruschetta|Брускетта|Bruschetta",
-  d:"Ντομάτα, βασιλικός, ελαιόλαδο|Tomato, basil, olive oil|Tomate, Basilikum, Olivenöl|Pomodoro, basilico, olio d'oliva|Tomate, basilic, huile d'olive|Tomate, albahaca, aceite de oliva|Tomaat, basilicum, olijfolie|Pomidor, bazylia, oliwa z oliwek|Помидор, базилик, оливковое масло|Tomat, basilika, olivolja"},
- {s:"s",price:8,cm:22,serves:"1-2",weight:220,kcal:350,time:5,tags:["veg","glutenfree"],alg:["milk"],
-  n:"Καπρέζε|Caprese|Caprese|Caprese|Caprese|Caprese|Caprese|Caprese|Капрезе|Caprese",
-  d:"Μοτσαρέλα, ντομάτα, βασιλικός|Mozzarella, tomato, basil|Mozzarella, Tomate, Basilikum|Mozzarella, pomodoro, basilico|Mozzarella, tomate, basilic|Mozzarella, tomate, albahaca|Mozzarella, tomaat, basilicum|Mozzarella, pomidor, bazylia|Моцарелла, помидор, базилик|Mozzarella, tomat, basilika"},
- {s:"d",price:6,cm:12,serves:"1",weight:150,kcal:420,time:3,tags:["veg"],alg:["wheat","egg","milk"],
-  n:"Τιραμισού|Tiramisu|Tiramisu|Tiramisù|Tiramisu|Tiramisú|Tiramisu|Tiramisu|Тирамису|Tiramisu",
-  d:"Μασκαρπόνε, εσπρέσο, κακάο|Mascarpone, espresso, cocoa|Mascarpone, Espresso, Kakao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, cacao|Mascarpone, espresso, kakao|Маскарпоне, эспрессо, какао|Mascarpone, espresso, kakao"},
- {s:"d",price:5.5,cm:10,serves:"1",weight:140,kcal:310,time:3,tags:["veg","glutenfree"],alg:["milk"],
-  n:"Πάνα κότα|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Panna cotta|Панна-котта|Panna cotta",
-  d:"Κρέμα βανίλιας, φρούτα του δάσους|Vanilla cream, berries|Vanillecreme, Beeren|Crema alla vaniglia, frutti di bosco|Crème vanille, fruits rouges|Crema de vainilla, frutos rojos|Vanillecrème, bosvruchten|Krem waniliowy, owoce leśne|Ванильный крем, лесные ягоды|Vaniljkräm, bär"}
-];
-/* ==== end of editable part ==== */
-
-/* ==== ANALYTICS: paste your Umami website ID between the quotes (leave empty = no tracking) ==== */
-var UMAMI_ID="b49166c5-dda3-45fe-865e-98a994b74bd2";
-if(UMAMI_ID){var sc=document.createElement("script");sc.defer=true;sc.src="https://cloud.umami.is/script.js";sc.setAttribute("data-website-id",UMAMI_ID);sc.setAttribute("data-domains","gerasimosde1.github.io");document.head.appendChild(sc);}
+if(UMAMI_ID){var sc=document.createElement("script");sc.defer=true;sc.src="https://cloud.umami.is/script.js";sc.setAttribute("data-website-id",UMAMI_ID);if(TRACK_DOMAIN)sc.setAttribute("data-domains",TRACK_DOMAIN);document.head.appendChild(sc);}
 var currentDish="";
 function track(ev,data){try{if(window.umami)window.umami.track(ev,data);}catch(e){}}
 
@@ -346,9 +294,9 @@ function render(){
   $("demo").hidden=!DEMO_FOR;
   if(DEMO_FOR)$("demotxt").textContent=t.demo.replace("{n}",DEMO_FOR);
   $("cta").innerHTML=CONTACT_WHATSAPP?'<div class="cta rv"><p>'+t.cta+'</p><a href="'+waLink()+'" target="_blank" rel="noopener">'+WA+t.ctabtn+'</a></div>':'';
-  var kind=DEMO_FOR?DEMO_TYPE:t.eyebrow;
+  var kind=DEMO_FOR?DEMO_TYPE:(KIND?pick(KIND):"");
   document.title=RESTAURANT+(kind?" – "+kind:"");
-  $("eyebrow").textContent=DEMO_FOR?DEMO_TYPE:t.eyebrow;
+  $("eyebrow").textContent=kind;
   $("eyebrow").hidden=!$("eyebrow").textContent;
   $("intro").innerHTML=t.intro.replace("{3D}",'<span class="chip">'+EYE+'3D</span>');
   $("cuetxt").textContent=t.enter;
@@ -398,18 +346,20 @@ function openDish(i,si){
   var s=S[si],X=d.ext||[];
   currentDish=pick(d.n)+(S.length>1?" / "+pick(s.n):"");
   if(first)track("dish_open",{dish:d.n.split("|")[1]});
-  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+(s.poster?' poster="'+s.poster+'" class="ok"':'')+' ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+' · '+s.cm+' '+t.cm+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
+  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+(s.poster?' poster="'+s.poster+'" class="ok"':'')+' ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+(s.cm?' · '+s.cm+' '+t.cm:'')+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
   var tags=(d.tags||[]).map(function(k){return '<figure>'+badge(k,36,nm(TAGS,k))+nm(TAGS,k)+'</figure>';}).join("");
-  var pills=S.length>1?'<div class="pills">'+S.map(function(x,j){return '<button class="pill" data-si="'+j+'" aria-pressed="'+(j===si)+'"><b>'+pick(x.n)+'</b><small>'+x.cm+' '+t.cm+'</small></button>';}).join("")+'</div>':'';
+  var pills=S.length>1?'<div class="pills">'+S.map(function(x,j){return '<button class="pill" data-si="'+j+'" aria-pressed="'+(j===si)+'"><b>'+pick(x.n)+'</b>'+(x.cm?'<small>'+x.cm+' '+t.cm+'</small>':'')+'</button>';}).join("")+'</div>':'';
   var ext=X.length?'<details class="ext"'+(extOpen?' open':'')+'><summary>'+t.extras+'</summary><ul>'+X.map(function(x){return '<li>'+pick(x.n)+'<span>+'+fmt(x.price)+'</span></li>';}).join("")+'</ul></details>':'';
-  var facts=[[t.size,s.cm+" "+t.cm],[t.serves,s.serves],[t.weight,s.weight+" "+t.g],[t.kcal,s.kcal+" kcal"],[t.time,d.time+" "+t.min],[t.price,fmt(s.price)]];
+  function has(v){return v!=null&&v!=="";}   /* facts left empty in the Excel are simply not shown */
+  var facts=[[t.size,has(s.cm)?s.cm+" "+t.cm:""],[t.serves,s.serves],[t.weight,has(s.weight)?s.weight+" "+t.g:""],[t.kcal,has(s.kcal)?s.kcal+" kcal":""],[t.time,has(d.time)?d.time+" "+t.min:""],[t.price,fmt(s.price)]].filter(function(f){return has(f[1]);});
   var alg=(d.alg&&d.alg.length)?'<div class="alg"><h4>'+t.alg+'</h4><div class="row">'+d.alg.map(function(k){return '<figure>'+badge(k,44,nm(ALG,k))+nm(ALG,k)+'</figure>';}).join("")+'</div></div>':'';
   $("panel").innerHTML=
     '<div class="bar"><span class="grab"></span><button class="x" id="cl" aria-label="'+t.close+'">'+XI+'</button></div>'+
     '<h3 id="sh-name">'+pick(d.n)+'</h3><p>'+pick(d.d)+'</p>'+
     (tags?'<div class="tags">'+tags+'</div>':'')+model+
-    '<button class="ar" id="arbtn"><span class="ic">'+VF+'</span><span class="tx"><b>'+t.ar+'</b><small>'+t.arsub+'</small></span></button>'+
-    (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>'+pills+ext+
+    (S.some(function(x){return x.glb;})?   /* the AR button only on dishes that have a 3D model (in some size) */
+      '<button class="ar" id="arbtn"><span class="ic">'+VF+'</span><span class="tx"><b>'+t.ar+'</b><small>'+t.arsub+'</small></span></button>'+
+      (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>':'')+pills+ext+
     '<div class="facts">'+facts.map(function(f){return '<div>'+f[0]+'<b>'+f[1]+'</b></div>';}).join("")+'</div>'+alg;
   if(first){lockPage();$("sheet").classList.add("open");}
   $("panel").scrollTop=keepY;
@@ -420,7 +370,7 @@ function openDish(i,si){
   }
   if(mv)mv.addEventListener("load",function(){loaded=true;mv.classList.add("ok");if(wantAR){wantAR=false;startAR();}});
   $("cl").onclick=closeSheet;
-  $("arbtn").onclick=function(){
+  if($("arbtn"))$("arbtn").onclick=function(){
     if(mv&&(loaded||mv.canActivateAR)){startAR();return;}   /* AR apps load the file themselves: no need to wait */
     if(mv){wantAR=true;return;}   /* support not known yet: decide as soon as the 3D is ready */
     $("arnote").hidden=false;
