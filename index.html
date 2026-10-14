@@ -350,10 +350,10 @@ function openDish(i,si){
   $("panel").innerHTML=
     '<div class="bar"><span class="grab"></span><button class="x" id="cl" aria-label="'+t.close+'">'+XI+'</button></div>'+
     '<h3 id="sh-name">'+pick(d.n)+'</h3><p>'+pick(d.d)+'</p>'+
-    (tags?'<div class="tags">'+tags+'</div>':'')+model+pills+
-    '<div class="facts">'+facts.map(function(f){return '<div>'+f[0]+'<b>'+f[1]+'</b></div>';}).join("")+'</div>'+alg+
+    (tags?'<div class="tags">'+tags+'</div>':'')+model+
     '<button class="ar" id="arbtn"><span class="ic">'+VF+'</span><span class="tx"><b>'+t.ar+'</b><small>'+t.arsub+'</small></span></button>'+
-    (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>';
+    (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>'+pills+
+    '<div class="facts">'+facts.map(function(f){return '<div>'+f[0]+'<b>'+f[1]+'</b></div>';}).join("")+'</div>'+alg;
   if(first){lockPage();$("sheet").classList.add("open");}
   $("panel").scrollTop=0;
   var mv=$("mv"),loaded=false;
