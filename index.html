@@ -94,6 +94,9 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 @keyframes shine{0%,55%{left:-80px}100%{left:130%}}
 .hint{margin:10px 2px 0;font-size:12.5px;color:var(--mute);line-height:1.4}
 .note{font-size:13px;color:var(--gold2);margin-top:10px}
+.notice{position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;display:none;padding:14px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--gold);color:var(--ink);font:600 13.5px/1.45 Manrope,sans-serif;box-shadow:0 16px 40px rgba(0,0,0,.55)}
+.notice.on{display:block}
+.notice a.nb{display:inline-block;margin-top:10px;padding:9px 16px;border-radius:99px;background:var(--gold);color:#17110A;font-weight:700;text-decoration:none}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}.eyebrow,.hc h1,.intro,.cue{opacity:1}.rule{width:140px}}
 </style>
 </head>
@@ -115,6 +118,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
   <div class="wrap"><div id="menu"></div></div>
 </div>
 
+<div class="notice" id="notice" role="status"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-name">
   <div class="panel" id="panel"></div>
 </div>
@@ -145,7 +149,10 @@ var UIS={
  arsub:"Άνοιξε την κάμερα · πραγματικό μέγεθος|Open your camera · real size|Kamera öffnen · Originalgröße|Apri la fotocamera · grandezza reale|Ouvrez la caméra · taille réelle|Abre la cámara · tamaño real|Open je camera · ware grootte|Otwórz aparat · rozmiar rzeczywisty|Откройте камеру · реальный размер|Öppna kameran · verklig storlek",
  hint:"Κράτα το κινητό κοντά πάνω από το τραπέζι και σκόπευσε προς τα κάτω.|Hold your phone close above the table and aim down.|Halten Sie das Handy nah über den Tisch und zielen Sie nach unten.|Tieni il telefono vicino al tavolo e inquadra verso il basso.|Tenez le téléphone près de la table et visez vers le bas.|Mantén el móvil cerca de la mesa y apunta hacia abajo.|Houd je telefoon dicht boven de tafel en richt naar beneden.|Trzymaj telefon blisko stołu i skieruj go w dół.|Держите телефон близко к столу и направьте камеру вниз.|Håll telefonen nära bordet och rikta den nedåt.",
  noar:"Το 3D μοντέλο θα προστεθεί σύντομα.|The 3D model will be added soon.|Das 3D-Modell folgt in Kürze.|Il modello 3D sarà aggiunto presto.|Le modèle 3D sera bientôt ajouté.|El modelo 3D se añadirá pronto.|Het 3D-model komt binnenkort.|Model 3D zostanie dodany wkrótce.|3D-модель скоро появится.|3D-modellen läggs till snart.",
- close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng"
+ close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng",
+ openb:"Άνοιξε τη σελίδα στον browser σου (Chrome ή Safari) για να δεις το πιάτο στον χώρο σου.|Open this page in your browser (Chrome or Safari) to view the dish in your space.|Öffnen Sie diese Seite in Ihrem Browser (Chrome oder Safari), um das Gericht in Ihrem Raum zu sehen.|Apri questa pagina nel browser (Chrome o Safari) per vedere il piatto nel tuo spazio.|Ouvrez cette page dans votre navigateur (Chrome ou Safari) pour voir le plat dans votre espace.|Abre esta página en tu navegador (Chrome o Safari) para ver el plato en tu espacio.|Open deze pagina in je browser (Chrome of Safari) om het gerecht in je ruimte te bekijken.|Otwórz tę stronę w przeglądarce (Chrome lub Safari), aby zobaczyć danie w swojej przestrzeni.|Откройте эту страницу в браузере (Chrome или Safari), чтобы увидеть блюдо в пространстве.|Öppna sidan i din webbläsare (Chrome eller Safari) för att se rätten i ditt rum.",
+ openbtn:"Άνοιγμα στο Chrome|Open in Chrome|In Chrome öffnen|Apri in Chrome|Ouvrir dans Chrome|Abrir en Chrome|Openen in Chrome|Otwórz w Chrome|Открыть в Chrome|Öppna i Chrome",
+ noxr:"Η προβολή στον χώρο δεν υποστηρίζεται σε αυτή τη συσκευή ή στον browser.|Viewing in your space is not supported on this device or browser.|Die Ansicht im Raum wird auf diesem Gerät oder Browser nicht unterstützt.|La vista nello spazio non è supportata su questo dispositivo o browser.|La vue dans votre espace n'est pas prise en charge sur cet appareil ou navigateur.|La vista en tu espacio no es compatible con este dispositivo o navegador.|Weergave in je ruimte wordt niet ondersteund op dit apparaat of in deze browser.|Widok w przestrzeni nie jest obsługiwany na tym urządzeniu lub w tej przeglądarce.|Просмотр в пространстве не поддерживается на этом устройстве или в этом браузере.|Visning i ditt rum stöds inte på den här enheten eller webbläsaren."
 };
 var TAGS={
  veg:"Χορτοφαγικό|Vegetarian|Vegetarisch|Vegetariano|Végétarien|Vegetariano|Vegetarisch|Wegetariańskie|Вегетарианское|Vegetariskt",
@@ -187,7 +194,7 @@ var DISHES=[
   sizes:[{n:SM,cm:26,price:8,serves:"1",weight:300,kcal:560},{n:RG,cm:33,price:9.5,serves:"1-2",weight:450,kcal:820,glb:"pizza-margherita.glb",usdz:"pizza-margherita.usdz"}],
   n:"Μαργαρίτα|Margherita|Margherita|Margherita|Margherita|Margarita|Margherita|Margherita|Маргарита|Margherita",
   d:"Ντομάτα San Marzano, φιορ ντι λάτε, βασιλικός|San Marzano tomato, fior di latte, basil|San-Marzano-Tomate, Fior di Latte, Basilikum|Pomodoro San Marzano, fior di latte, basilico|Tomate San Marzano, fior di latte, basilic|Tomate San Marzano, fior di latte, albahaca|San Marzano-tomaat, fior di latte, basilicum|Pomidor San Marzano, fior di latte, bazylia|Помидоры Сан-Марцано, фиор ди латте, базилик|San Marzano-tomat, fior di latte, basilika"},
- {s:"p",price:11,cm:33,serves:"1-2",weight:480,kcal:950,time:12,tags:["spicy","flame"],alg:["wheat","milk"],glb:"pizza-pepperoni.glb",usdz:"pizza-pepperoni.usdz",
+ {s:"p",price:11,cm:33,serves:"1-2",weight:480,kcal:950,time:12,tags:["spicy","flame"],alg:["wheat","milk"],
   n:"Πεπερόνι|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Пепперони|Pepperoni",
   d:"Μοτσαρέλα, πικάντικο πεπερόνι|Mozzarella, spicy pepperoni|Mozzarella, scharfe Pepperoni-Salami|Mozzarella, salame piccante|Mozzarella, pepperoni piquant|Mozzarella, pepperoni picante|Mozzarella, pittige pepperoni|Mozzarella, pikantne pepperoni|Моцарелла, острая пепперони|Mozzarella, stark pepperoni"},
  {s:"p",price:12,cm:33,serves:"1-2",weight:520,kcal:1050,time:12,tags:["veg","flame"],alg:["wheat","milk"],
@@ -353,7 +360,10 @@ function openDish(i,si){
   if(mv)mv.addEventListener("load",function(){loaded=true;mv.classList.add("ok");});
   $("cl").onclick=closeSheet;
   $("arbtn").onclick=function(){
-    if(mv&&loaded){try{mv.activateAR();return;}catch(e){}}
+    if(mv&&loaded){
+      if(mv.canActivateAR){try{mv.activateAR();return;}catch(e){}}
+      $("arnote").textContent=t.noxr;$("arnote").hidden=false;return;
+    }
     $("arnote").hidden=false;
   };
   document.querySelectorAll("#panel .pill").forEach(function(b){b.onclick=function(){openDish(i,+b.dataset.si);};});
@@ -376,7 +386,19 @@ window.addEventListener("scroll",function(){
   var y=window.pageYOffset||0,h=window.innerHeight||700,p=Math.min(1,y/(h*.7));
   $("hc").style.opacity=String(1-p);$("hc").style.transform="translateY("+(-y*.25)+"px)";
 },{passive:true});
+/* ---- in-app browsers (Facebook, Instagram, Messenger...) cannot run AR: show how to open in a real browser ---- */
+var UA=navigator.userAgent||"";
+var INAPP=/FBAN|FBAV|Instagram|Messenger|Line\/|MicroMessenger|Snapchat|TikTok|GSA\//i.test(UA);
+var ANDROID=/Android/i.test(UA);
+function chromeLink(){return "intent://"+location.href.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;end";}
+function checkInApp(){
+  if(!INAPP)return;
+  var t=getT(),n=$("notice");
+  n.innerHTML='<span>'+t.openb+'</span>'+(ANDROID?'<br><a class="nb" href="'+chromeLink()+'">'+t.openbtn+'</a>':'');
+  n.classList.add("on");
+}
 render();
+checkInApp();
 </script>
 </body>
 </html>
