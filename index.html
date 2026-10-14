@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="theme-color" content="#0A0D11">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
 <title>Forno – Pizzeria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,8 +74,24 @@ body.lock{position:fixed;width:100%;overflow:hidden}
 model-viewer{display:block;width:100%;height:2px;margin-top:0;opacity:0;background:transparent;--poster-color:transparent;transition:height .35s,opacity .35s,margin .35s}
 model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 .pills{display:flex;gap:8px;margin:14px 0 4px}
-.pill{flex:1;padding:10px 8px;border:1px solid var(--gold);border-radius:99px;background:none;color:var(--gold2);font:700 12.5px Manrope,sans-serif;cursor:pointer}
+.pill{flex:1;min-width:0;padding:8px 6px;border:1px solid var(--gold);border-radius:16px;background:none;color:var(--gold2);font:700 12.5px/1.25 Manrope,sans-serif;cursor:pointer}
+.pill b{display:block;font-weight:700}
+.pill small{display:block;font-weight:600;font-size:11px;opacity:.75}
 .pill[aria-pressed="true"]{background:var(--gold);color:#17110A}
+.ext{margin:16px 0 4px}
+.ext h4{margin:0 0 10px;font:700 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.ext .row{display:flex;flex-wrap:wrap;gap:8px}
+.xb{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:99px;background:var(--bg);color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer}
+.xb em{font-style:normal;color:var(--gold2)}
+.xb[aria-pressed="true"]{border-color:var(--gold);background:rgba(217,184,119,.14)}
+.xb[aria-pressed="true"]::before{content:"✓";color:var(--gold)}
+.demo{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));left:14px;right:90px;z-index:2;margin:0;text-align:left;font:600 11.5px/1.35 Manrope,sans-serif;color:var(--gold2);opacity:0;animation:rise .9s .1s forwards}
+.demo span{display:inline-block;padding:5px 10px;border:1px dashed var(--gold);border-radius:10px;background:rgba(10,13,17,.6)}
+.hc h1.long{font-size:clamp(38px,11.5vw,64px);overflow-wrap:anywhere}
+.cta{margin:56px 0 0;padding:26px 22px;border:1px solid rgba(217,184,119,.35);border-radius:22px;background:var(--surface);text-align:center}
+.cta p{margin:0 0 16px;font:400 21px/1.3 Literata,Georgia,serif}
+.cta a{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:99px;background:linear-gradient(135deg,var(--gold2),var(--gold) 55%,#B8944F);color:#17110A;font:700 15px Manrope,sans-serif;text-decoration:none}
+.cta a svg{width:20px;height:20px}
 .facts{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin:16px 0 6px}
 .facts div{padding:12px 0;border-bottom:1px solid var(--line);font:700 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 .facts b{display:block;font:400 21px Literata,Georgia,serif;letter-spacing:0;text-transform:none;color:var(--ink);margin-top:5px}
@@ -107,6 +124,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 <div id="page">
   <section class="hero" id="hero">
     <div class="glow"></div>
+    <p class="demo" id="demo" hidden><span id="demotxt"></span></p>
     <div class="hc" id="hc">
       <p class="eyebrow" id="eyebrow"></p>
       <h1 id="title"></h1>
@@ -115,7 +133,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
     </div>
     <button class="cue" id="cue" aria-label="Scroll"><span id="cuetxt"></span><span class="arrows"><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg></span></button>
   </section>
-  <div class="wrap"><div id="menu"></div></div>
+  <div class="wrap"><div id="menu"></div><div id="cta"></div></div>
 </div>
 
 <div class="notice" id="notice" role="status"></div>
@@ -127,6 +145,18 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 /* ==== EDIT HERE: restaurant name, enabled languages, dishes ==== */
 var RESTAURANT = "Forno";
 var LANGS_ENABLED = ["el","en","de","it","fr","es","nl","pl","ru","sv"];   /* remove a code to hide that language */
+/* WhatsApp number for the "message us" button at the end of the menu: country code + number, digits only,
+   e.g. "306912345678". Leave empty to hide the button. */
+var CONTACT_WHATSAPP = "";
+/* Personal demo link: add ?name=Restaurant%20Name to the URL (optionally &type=Ταβέρνα).
+   The page then shows that name, the type line only if given, and a "sample, not the official menu" label. */
+var DEMO_FOR = "", DEMO_TYPE = "";
+try {
+  var QS = new URLSearchParams(location.search);
+  DEMO_FOR = (QS.get("name") || "").replace(/\s+/g, " ").trim().slice(0, 40);
+  DEMO_TYPE = (QS.get("type") || "").replace(/\s+/g, " ").trim().slice(0, 30);
+} catch (e) {}
+if (DEMO_FOR) RESTAURANT = DEMO_FOR;
 /* 3D files per dish: glb + usdz in the same folder, e.g. "pizza-pepperoni.glb" / "pizza-pepperoni.usdz" */
 
 /* All texts below: 10 languages separated by |  in this order: el|en|de|it|fr|es|nl|pl|ru|sv */
@@ -150,6 +180,10 @@ var UIS={
  hint:"Κράτα το κινητό κοντά πάνω από το τραπέζι και σκόπευσε προς τα κάτω.|Hold your phone close above the table and aim down.|Halten Sie das Handy nah über den Tisch und zielen Sie nach unten.|Tieni il telefono vicino al tavolo e inquadra verso il basso.|Tenez le téléphone près de la table et visez vers le bas.|Mantén el móvil cerca de la mesa y apunta hacia abajo.|Houd je telefoon dicht boven de tafel en richt naar beneden.|Trzymaj telefon blisko stołu i skieruj go w dół.|Держите телефон близко к столу и направьте камеру вниз.|Håll telefonen nära bordet och rikta den nedåt.",
  noar:"Το 3D μοντέλο θα προστεθεί σύντομα.|The 3D model will be added soon.|Das 3D-Modell folgt in Kürze.|Il modello 3D sarà aggiunto presto.|Le modèle 3D sera bientôt ajouté.|El modelo 3D se añadirá pronto.|Het 3D-model komt binnenkort.|Model 3D zostanie dodany wkrótce.|3D-модель скоро появится.|3D-modellen läggs till snart.",
  close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng",
+ extras:"Έξτρα υλικά|Extras|Extras|Extra|Suppléments|Extras|Extra's|Dodatki|Добавки|Tillbehör",
+ demo:"Δείγμα για «{n}» · δεν είναι το επίσημο μενού|Sample for “{n}” · not the official menu|Muster für „{n}“ · nicht die offizielle Speisekarte|Esempio per «{n}» · non è il menu ufficiale|Exemple pour « {n} » · pas la carte officielle|Ejemplo para «{n}» · no es la carta oficial|Voorbeeld voor “{n}” · niet het officiële menu|Przykład dla „{n}” · to nie jest oficjalne menu|Пример для «{n}» · не официальное меню|Exempel för ”{n}” · inte den officiella menyn",
+ cta:"Θέλεις ένα τέτοιο μενού για το μαγαζί σου;|Want a menu like this for your restaurant?|Möchten Sie so eine Speisekarte für Ihr Restaurant?|Vuoi un menu così per il tuo locale?|Envie d'une carte comme celle-ci pour votre restaurant ?|¿Quieres una carta así para tu restaurante?|Wil je zo'n menu voor je restaurant?|Chcesz takie menu dla swojej restauracji?|Хотите такое меню для своего ресторана?|Vill du ha en sådan meny för din restaurang?",
+ ctabtn:"Στείλε μας μήνυμα|Message us|Schreiben Sie uns|Scrivici|Écrivez-nous|Escríbenos|Stuur ons een bericht|Napisz do nas|Напишите нам|Skriv till oss",
  openb:"Άνοιξε τη σελίδα στον browser σου (Chrome ή Safari) για να δεις το πιάτο στον χώρο σου.|Open this page in your browser (Chrome or Safari) to view the dish in your space.|Öffnen Sie diese Seite in Ihrem Browser (Chrome oder Safari), um das Gericht in Ihrem Raum zu sehen.|Apri questa pagina nel browser (Chrome o Safari) per vedere il piatto nel tuo spazio.|Ouvrez cette page dans votre navigateur (Chrome ou Safari) pour voir le plat dans votre espace.|Abre esta página en tu navegador (Chrome o Safari) para ver el plato en tu espacio.|Open deze pagina in je browser (Chrome of Safari) om het gerecht in je ruimte te bekijken.|Otwórz tę stronę w przeglądarce (Chrome lub Safari), aby zobaczyć danie w swojej przestrzeni.|Откройте эту страницу в браузере (Chrome или Safari), чтобы увидеть блюдо в пространстве.|Öppna sidan i din webbläsare (Chrome eller Safari) för att se rätten i ditt rum.",
  openbtn:"Άνοιγμα στο Chrome|Open in Chrome|In Chrome öffnen|Apri in Chrome|Ouvrir dans Chrome|Abrir en Chrome|Openen in Chrome|Otwórz w Chrome|Открыть в Chrome|Öppna i Chrome",
  noxr:"Η προβολή στον χώρο δεν υποστηρίζεται σε αυτή τη συσκευή ή στον browser.|Viewing in your space is not supported on this device or browser.|Die Ansicht im Raum wird auf diesem Gerät oder Browser nicht unterstützt.|La vista nello spazio non è supportata su questo dispositivo o browser.|La vue dans votre espace n'est pas prise en charge sur cet appareil ou navigateur.|La vista en tu espacio no es compatible con este dispositivo o navegador.|Weergave in je ruimte wordt niet ondersteund op dit apparaat of in deze browser.|Widok w przestrzeni nie jest obsługiwany na tym urządzeniu lub w tej przeglądarce.|Просмотр в пространстве не поддерживается на этом устройстве или в этом браузере.|Visning i ditt rum stöds inte på den här enheten eller webbläsaren."
@@ -188,19 +222,28 @@ var SECTIONS=[
  {id:"s",name:"Ορεκτικά|Starters|Vorspeisen|Antipasti|Entrées|Entrantes|Voorgerechten|Przystawki|Закуски|Förrätter"},
  {id:"d",name:"Γλυκά|Desserts|Desserts|Dolci|Desserts|Postres|Desserts|Desery|Десерты|Efterrätter"}
 ];
-var SM="Μικρή|Small|Klein|Piccola|Petite|Pequeña|Klein|Mała|Маленькая|Liten", RG="Κανονική|Regular|Normal|Normale|Normale|Normal|Normaal|Standardowa|Обычная|Normal";
+var SM="Μικρή|Small|Klein|Piccola|Petite|Pequeña|Klein|Mała|Маленькая|Liten", RG="Κανονική|Regular|Normal|Normale|Normale|Normal|Normaal|Standardowa|Обычная|Normal", FM="Οικογενειακή|Family|Familie|Famiglia|Familiale|Familiar|Familie|Rodzinna|Семейная|Familj";
+/* Extras: name in 10 languages + price. Give a dish  ext:PIZZA_EXTRAS  (or its own list) to show them. */
+var PIZZA_EXTRAS=[
+ {n:"Επιπλέον μοτσαρέλα|Extra mozzarella|Extra Mozzarella|Mozzarella extra|Supplément mozzarella|Mozzarella extra|Extra mozzarella|Dodatkowa mozzarella|Дополнительная моцарелла|Extra mozzarella",price:1.5},
+ {n:"Ελιές Καλαμών|Kalamata olives|Kalamata-Oliven|Olive Kalamata|Olives de Kalamata|Aceitunas Kalamata|Kalamata-olijven|Oliwki Kalamata|Оливки Каламата|Kalamataoliver",price:1},
+ {n:"Μανιτάρια|Mushrooms|Pilze|Funghi|Champignons|Champiñones|Champignons|Pieczarki|Грибы|Champinjoner",price:1},
+ {n:"Ρόκα|Rocket|Rucola|Rucola|Roquette|Rúcula|Rucola|Rukola|Руккола|Ruccola",price:1},
+ {n:"Προσούτο|Prosciutto|Prosciutto|Prosciutto crudo|Prosciutto|Prosciutto|Prosciutto|Prosciutto|Прошутто|Prosciutto",price:2.5},
+ {n:"Λάδι τσίλι|Chilli oil|Chiliöl|Olio piccante|Huile pimentée|Aceite picante|Chili-olie|Oliwa chili|Масло чили|Chiliolja",price:0.5}
+];
 var DISHES=[
- {s:"p",def:1,tags:["veg","flame","star"],alg:["wheat","milk"],time:12,
-  sizes:[{n:SM,cm:26,price:8,serves:"1",weight:300,kcal:560},{n:RG,cm:33,price:9.5,serves:"1-2",weight:450,kcal:820,glb:"pizza-margherita.glb",usdz:"pizza-margherita.usdz"}],
+ {s:"p",def:1,tags:["veg","flame","star"],alg:["wheat","milk"],time:12,ext:PIZZA_EXTRAS,
+  sizes:[{n:SM,cm:26,price:8,serves:"1",weight:300,kcal:560},{n:RG,cm:33,price:9.5,serves:"1-2",weight:450,kcal:820,glb:"pizza-margherita.glb",usdz:"pizza-margherita.usdz",poster:"pizza-margherita-poster.webp"},{n:FM,cm:40,price:13.5,serves:"3-4",weight:700,kcal:1250}],
   n:"Μαργαρίτα|Margherita|Margherita|Margherita|Margherita|Margarita|Margherita|Margherita|Маргарита|Margherita",
   d:"Ντομάτα San Marzano, φιορ ντι λάτε, βασιλικός|San Marzano tomato, fior di latte, basil|San-Marzano-Tomate, Fior di Latte, Basilikum|Pomodoro San Marzano, fior di latte, basilico|Tomate San Marzano, fior di latte, basilic|Tomate San Marzano, fior di latte, albahaca|San Marzano-tomaat, fior di latte, basilicum|Pomidor San Marzano, fior di latte, bazylia|Помидоры Сан-Марцано, фиор ди латте, базилик|San Marzano-tomat, fior di latte, basilika"},
- {s:"p",price:11,cm:33,serves:"1-2",weight:480,kcal:950,time:12,tags:["spicy","flame"],alg:["wheat","milk"],
+ {s:"p",price:11,cm:33,serves:"1-2",weight:480,kcal:950,time:12,tags:["spicy","flame"],alg:["wheat","milk"],ext:PIZZA_EXTRAS,
   n:"Πεπερόνι|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Pepperoni|Пепперони|Pepperoni",
   d:"Μοτσαρέλα, πικάντικο πεπερόνι|Mozzarella, spicy pepperoni|Mozzarella, scharfe Pepperoni-Salami|Mozzarella, salame piccante|Mozzarella, pepperoni piquant|Mozzarella, pepperoni picante|Mozzarella, pittige pepperoni|Mozzarella, pikantne pepperoni|Моцарелла, острая пепперони|Mozzarella, stark pepperoni"},
- {s:"p",price:12,cm:33,serves:"1-2",weight:520,kcal:1050,time:12,tags:["veg","flame"],alg:["wheat","milk"],
+ {s:"p",price:12,cm:33,serves:"1-2",weight:520,kcal:1050,time:12,tags:["veg","flame"],alg:["wheat","milk"],ext:PIZZA_EXTRAS,
   n:"Κουάτρο Φορμάτζι|Quattro Formaggi|Quattro Formaggi|Quattro Formaggi|Quatre Fromages|Cuatro Quesos|Quattro Formaggi|Cztery sery|Четыре сыра|Fyra ostar",
   d:"Μοτσαρέλα, γκοργκονζόλα, παρμεζάνα, προβολόνε|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, Gorgonzola, Parmesan, Provolone|Mozzarella, gorgonzola, parmigiano, provolone|Mozzarella, gorgonzola, parmesan, provolone|Mozzarella, gorgonzola, parmesano, provolone|Mozzarella, gorgonzola, parmezaan, provolone|Mozzarella, gorgonzola, parmezan, provolone|Моцарелла, горгонзола, пармезан, проволоне|Mozzarella, gorgonzola, parmesan, provolone"},
- {s:"p",price:12.5,cm:33,serves:"1-2",weight:500,kcal:900,time:12,tags:["flame"],alg:["wheat","milk"],
+ {s:"p",price:12.5,cm:33,serves:"1-2",weight:500,kcal:900,time:12,tags:["flame"],alg:["wheat","milk"],ext:PIZZA_EXTRAS,
   n:"Προσούτο & Μανιτάρια|Prosciutto & Mushroom|Prosciutto & Pilze|Prosciutto e Funghi|Jambon & Champignons|Jamón y Champiñones|Ham & Champignons|Szynka i Pieczarki|Ветчина и шампиньоны|Skinka & Champinjoner",
   d:"Ζαμπόν, μανιτάρια, μοτσαρέλα|Ham, mushrooms, mozzarella|Schinken, Pilze, Mozzarella|Prosciutto cotto, funghi, mozzarella|Jambon, champignons, mozzarella|Jamón, champiñones, mozzarella|Ham, champignons, mozzarella|Szynka, pieczarki, mozzarella|Ветчина, шампиньоны, моцарелла|Skinka, champinjoner, mozzarella"},
  {s:"s",price:5,cm:22,serves:"2",weight:180,kcal:520,time:8,tags:["veg","share"],alg:["wheat","milk"],
@@ -276,7 +319,12 @@ var EYE='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="cur
 var XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 function badge(k,size,label){return '<span class="bd" style="--s:'+size+'px" role="img" title="'+label+'" aria-label="'+label+'"><svg viewBox="-8 -8 16 16" aria-hidden="true"><g transform="scale(1 -1)" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">'+ICONS[k]()+'</g></svg></span>';}
 function fmt(n){return "€"+n.toFixed(2).replace(".",",");}
-function sizesOf(d){return d.sizes||[{n:null,cm:d.cm,price:d.price,serves:d.serves,weight:d.weight,kcal:d.kcal,glb:d.glb,usdz:d.usdz}];}
+function sizesOf(d){return d.sizes||[{n:null,cm:d.cm,price:d.price,serves:d.serves,weight:d.weight,kcal:d.kcal,glb:d.glb,usdz:d.usdz,poster:d.poster}];}
+var WA='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2A9.8 9.8 0 0 0 3.6 17l-1.3 4.8 4.9-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.9c-1.5 0-2.9-.4-4.2-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8.1 8.1 0 1 1 12 20.1Zm4.5-6c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg>';
+function waLink(){
+  var txt=(lang==="el"?"Γεια σας! Είδα το 3D μενού":"Hi! I saw the 3D menu demo")+(DEMO_FOR?" ("+DEMO_FOR+")":"")+(lang==="el"?" και θα ήθελα πληροφορίες.":" and would like more information.");
+  return "https://wa.me/"+CONTACT_WHATSAPP.replace(/\D/g,"")+"?text="+encodeURIComponent(txt);
+}
 function $(id){return document.getElementById(id);}
 
 /* ---- scroll reveal ---- */
@@ -293,8 +341,14 @@ function render(){
   var t=getT();
   document.documentElement.lang=lang;
   $("title").textContent=RESTAURANT;
-  document.title=RESTAURANT+" – "+t.eyebrow;
-  $("eyebrow").textContent=t.eyebrow;
+  $("title").classList.toggle("long",RESTAURANT.length>9);
+  $("demo").hidden=!DEMO_FOR;
+  if(DEMO_FOR)$("demotxt").textContent=t.demo.replace("{n}",DEMO_FOR);
+  $("cta").innerHTML=CONTACT_WHATSAPP?'<div class="cta rv"><p>'+t.cta+'</p><a href="'+waLink()+'" target="_blank" rel="noopener">'+WA+t.ctabtn+'</a></div>':'';
+  var kind=DEMO_FOR?DEMO_TYPE:t.eyebrow;
+  document.title=RESTAURANT+(kind?" – "+kind:"");
+  $("eyebrow").textContent=DEMO_FOR?DEMO_TYPE:t.eyebrow;
+  $("eyebrow").hidden=!$("eyebrow").textContent;
   $("intro").innerHTML=t.intro.replace("{3D}",'<span class="chip">'+EYE+'3D</span>');
   $("cuetxt").textContent=t.enter;
   $("lgcode").textContent=lang.toUpperCase();
@@ -336,37 +390,45 @@ function unlockPage(){
   ["page","lgbtn"].forEach(function(id){$(id).removeAttribute("inert");});
   window.scrollTo(0,savedY);
 }
+var picked={};
 function openDish(i,si){
-  var d=DISHES[i],t=getT(),S=sizesOf(d),first=(si==null);
-  if(first)si=d.def||0;
-  var s=S[si];
+  var d=DISHES[i],t=getT(),S=sizesOf(d),first=(si==null),keepY=first?0:$("panel").scrollTop;
+  if(first){si=d.def||0;picked={};}
+  var s=S[si],X=d.ext||[];
   currentDish=pick(d.n)+(S.length>1?" / "+pick(s.n):"");
   if(first)track("dish_open",{dish:d.n.split("|")[1]});
-  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+' ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+' · '+s.cm+' '+t.cm+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
+  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+(s.poster?' poster="'+s.poster+'" class="ok"':'')+' ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+' · '+s.cm+' '+t.cm+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
   var tags=(d.tags||[]).map(function(k){return '<figure>'+badge(k,36,nm(TAGS,k))+nm(TAGS,k)+'</figure>';}).join("");
-  var pills=S.length>1?'<div class="pills">'+S.map(function(x,j){return '<button class="pill" data-si="'+j+'" aria-pressed="'+(j===si)+'">'+pick(x.n)+' · '+x.cm+' '+t.cm+'</button>';}).join("")+'</div>':'';
-  var facts=[[t.size,s.cm+" "+t.cm],[t.serves,s.serves],[t.weight,s.weight+" "+t.g],[t.kcal,s.kcal+" kcal"],[t.time,d.time+" "+t.min],[t.price,fmt(s.price)]];
+  var pills=S.length>1?'<div class="pills">'+S.map(function(x,j){return '<button class="pill" data-si="'+j+'" aria-pressed="'+(j===si)+'"><b>'+pick(x.n)+'</b><small>'+x.cm+' '+t.cm+'</small></button>';}).join("")+'</div>':'';
+  var ext=X.length?'<div class="ext"><h4>'+t.extras+'</h4><div class="row">'+X.map(function(x,j){return '<button class="xb" data-x="'+j+'" aria-pressed="'+!!picked[j]+'">'+pick(x.n)+' <em>+'+fmt(x.price)+'</em></button>';}).join("")+'</div></div>':'';
+  function total(){var p=s.price;X.forEach(function(x,j){if(picked[j])p+=x.price;});return fmt(p);}
+  var facts=[[t.size,s.cm+" "+t.cm],[t.serves,s.serves],[t.weight,s.weight+" "+t.g],[t.kcal,s.kcal+" kcal"],[t.time,d.time+" "+t.min],[t.price,'<span id="pf">'+total()+'</span>']];
   var alg=(d.alg&&d.alg.length)?'<div class="alg"><h4>'+t.alg+'</h4><div class="row">'+d.alg.map(function(k){return '<figure>'+badge(k,44,nm(ALG,k))+nm(ALG,k)+'</figure>';}).join("")+'</div></div>':'';
   $("panel").innerHTML=
     '<div class="bar"><span class="grab"></span><button class="x" id="cl" aria-label="'+t.close+'">'+XI+'</button></div>'+
     '<h3 id="sh-name">'+pick(d.n)+'</h3><p>'+pick(d.d)+'</p>'+
     (tags?'<div class="tags">'+tags+'</div>':'')+model+
     '<button class="ar" id="arbtn"><span class="ic">'+VF+'</span><span class="tx"><b>'+t.ar+'</b><small>'+t.arsub+'</small></span></button>'+
-    (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>'+pills+
+    (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>'+pills+ext+
     '<div class="facts">'+facts.map(function(f){return '<div>'+f[0]+'<b>'+f[1]+'</b></div>';}).join("")+'</div>'+alg;
   if(first){lockPage();$("sheet").classList.add("open");}
-  $("panel").scrollTop=0;
-  var mv=$("mv"),loaded=false;
-  if(mv)mv.addEventListener("load",function(){loaded=true;mv.classList.add("ok");});
+  $("panel").scrollTop=keepY;
+  var mv=$("mv"),loaded=false,wantAR=false;
+  function startAR(){
+    if(mv.canActivateAR){try{mv.activateAR();return;}catch(e){}}
+    $("arnote").textContent=t.noxr;$("arnote").hidden=false;
+  }
+  if(mv)mv.addEventListener("load",function(){loaded=true;mv.classList.add("ok");if(wantAR){wantAR=false;startAR();}});
   $("cl").onclick=closeSheet;
   $("arbtn").onclick=function(){
-    if(mv&&loaded){
-      if(mv.canActivateAR){try{mv.activateAR();return;}catch(e){}}
-      $("arnote").textContent=t.noxr;$("arnote").hidden=false;return;
-    }
+    if(mv&&(loaded||mv.canActivateAR)){startAR();return;}   /* AR apps load the file themselves: no need to wait */
+    if(mv){wantAR=true;return;}   /* support not known yet: decide as soon as the 3D is ready */
     $("arnote").hidden=false;
   };
   document.querySelectorAll("#panel .pill").forEach(function(b){b.onclick=function(){openDish(i,+b.dataset.si);};});
+  document.querySelectorAll("#panel .xb").forEach(function(b){b.onclick=function(){
+    var j=+b.dataset.x;picked[j]=!picked[j];b.setAttribute("aria-pressed",String(picked[j]));$("pf").textContent=total();
+  };});
 }
 function closeSheet(){
   if(!$("sheet").classList.contains("open"))return;
