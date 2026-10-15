@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#0A0D11;--surface:#11161C;--ink:#EDEAE3;--mute:#85909A;--gold:#D9B877;--gold2:#F0D9A4;--line:#1D252D}
@@ -79,6 +80,8 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 .cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cam model-viewer{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:1;background:transparent}
 .cam .x{top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:2;background:rgba(10,13,17,.7)}
+.cam canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;pointer-events:none}
+.cam canvas.on{pointer-events:auto}
 .camhint{position:absolute;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));margin:0;padding:12px 14px;border-radius:14px;background:rgba(10,13,17,.72);color:var(--ink);font:600 13.5px/1.45 Manrope,sans-serif;text-align:center}
 .pills{display:flex;gap:8px;margin:14px 0 4px}
 .pill{flex:1;min-width:0;padding:8px 6px;border:1px solid var(--gold);border-radius:16px;background:none;color:var(--gold2);font:700 12.5px/1.25 Manrope,sans-serif;cursor:pointer}
@@ -146,6 +149,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
   <model-viewer id="cammv" camera-controls disable-pan disable-zoom touch-action="none" interaction-prompt="none" shadow-intensity="1" shadow-softness="0.7"
     field-of-view="65deg" min-field-of-view="65deg" max-field-of-view="65deg" camera-orbit="0deg 30deg 0.462m"
     min-camera-orbit="auto 0deg 0.1m" max-camera-orbit="auto 88deg 3m" interpolation-decay="80"></model-viewer>
+  <canvas id="camgl"></canvas>
   <button class="x" id="camx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <p class="camhint" id="camhint"></p>
 </div>
@@ -190,6 +194,8 @@ var UIS={
  noar:"Το 3D μοντέλο θα προστεθεί σύντομα.|The 3D model will be added soon.|Das 3D-Modell folgt in Kürze.|Il modello 3D sarà aggiunto presto.|Le modèle 3D sera bientôt ajouté.|El modelo 3D se añadirá pronto.|Het 3D-model komt binnenkort.|Model 3D zostanie dodany wkrótce.|3D-модель скоро появится.|3D-modellen läggs till snart.",
  close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng",
  camhint:"Κράτα το κινητό περίπου 40 εκ. πάνω από το τραπέζι και γείρε το προς τα κάτω|Hold your phone about 40 cm above the table and tilt it down|Halten Sie das Handy etwa 40 cm über den Tisch und neigen Sie es nach unten|Tieni il telefono a circa 40 cm sopra il tavolo e inclinalo verso il basso|Tenez le téléphone à environ 40 cm au-dessus de la table et inclinez-le vers le bas|Sostén el móvil a unos 40 cm sobre la mesa e inclínalo hacia abajo|Houd je telefoon ongeveer 40 cm boven de tafel en kantel hem naar beneden|Trzymaj telefon około 40 cm nad stołem i pochyl go w dół|Держите телефон примерно в 40 см над столом и наклоните его вниз|Håll telefonen cirka 40 cm ovanför bordet och luta den nedåt",
+ camqr:"Στόχευσε με την κάμερα το QR που είναι πάνω στο τραπέζι|Point the camera at the QR code on the table|Richten Sie die Kamera auf den QR-Code auf dem Tisch|Inquadra il codice QR sul tavolo|Visez le code QR posé sur la table|Apunta la cámara al código QR de la mesa|Richt de camera op de QR-code op tafel|Skieruj aparat na kod QR na stole|Наведите камеру на QR-код на столе|Rikta kameran mot QR-koden på bordet",
+ camdrag:"Σύρε το πιάτο με το δάχτυλο για να το μετακινήσεις|Drag the dish with your finger to move it|Ziehen Sie das Gericht mit dem Finger, um es zu verschieben|Trascina il piatto con il dito per spostarlo|Faites glisser le plat du doigt pour le déplacer|Arrastra el plato con el dedo para moverlo|Sleep het gerecht met je vinger om het te verplaatsen|Przeciągnij danie palcem, aby je przesunąć|Перетащите блюдо пальцем, чтобы переместить его|Dra rätten med fingret för att flytta den",
  camno:"Δεν δόθηκε άδεια για την κάμερα. Επίτρεψέ την από τις ρυθμίσεις του browser.|Camera permission was not granted. Allow it in your browser settings.|Keine Kameraberechtigung. Bitte in den Browser-Einstellungen erlauben.|Permesso fotocamera non concesso. Consentilo nelle impostazioni del browser.|Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.|No se concedió permiso para la cámara. Actívalo en los ajustes del navegador.|Geen toestemming voor de camera. Sta dit toe in je browserinstellingen.|Brak dostępu do aparatu. Zezwól na to w ustawieniach przeglądarki.|Нет доступа к камере. Разрешите его в настройках браузера.|Kameraåtkomst nekades. Tillåt den i webbläsarens inställningar.",
  extras:"Έξτρα υλικά|Extras|Extras|Extra|Suppléments|Extras|Extra's|Dodatki|Добавки|Tillbehör",
  demo:"Δείγμα για «{n}» · δεν είναι το επίσημο μενού|Sample for “{n}” · not the official menu|Muster für „{n}“ · nicht die offizielle Speisekarte|Esempio per «{n}» · non è il menu ufficiale|Exemple pour « {n} » · pas la carte officielle|Ejemplo para «{n}» · no es la carta oficial|Voorbeeld voor “{n}” · niet het officiële menu|Przykład dla „{n}” · to nie jest oficjalne menu|Пример для «{n}» · не официальное меню|Exempel för ”{n}” · inte den officiella menyn",
@@ -426,16 +432,26 @@ function onTilt(e){   /* phone flat over the table = view from above; upright = 
   var m=$("cammv");
   m.cameraOrbit=camOrbit(m.getCameraOrbit().theta+"rad",Math.abs(e.beta));
 }
+/* Camera view: first looks for the table QR (window.markerAR: dish anchored on the table, real size).
+   If no QR shows up within a few seconds, or the AR part cannot load, it falls back to the simple view
+   (model-viewer over the camera, size from an assumed 40 cm height). */
 function openCam(src,alt,t){
   var m=$("cammv");
-  $("camhint").textContent=t.camhint;
+  $("camhint").textContent=t.camqr;
   m.setAttribute("alt",alt);
   if(m.getAttribute("src")!==src)m.setAttribute("src",src);
   m.cameraOrbit=camOrbit("0deg",30);    /* until the first tilt reading arrives */
   camFov();
+  m.style.visibility=window.markerAR?"hidden":"";   /* simple view only as the fallback */
+  if(!window.markerAR)$("camhint").textContent=t.camhint;
   $("cam").hidden=false;
-  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false}).then(function(st){
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false}).then(function(st){
     camStream=st;var v=$("camv");v.srcObject=st;var p=v.play();if(p&&p.catch)p.catch(function(){});
+    if(window.markerAR)window.markerAR.start({video:v,canvas:$("camgl"),src:src,onState:function(state){
+      if(state==="found"){m.style.visibility="hidden";$("camhint").textContent=t.camdrag;}
+      else if(state==="lost")$("camhint").textContent=t.camqr;
+      else if(state==="nomarker"||state==="error"){m.style.visibility="";$("camhint").textContent=t.camhint;}
+    }});
   },function(){$("camhint").textContent=t.camno;});
   window.addEventListener("deviceorientation",onTilt);
   track("cam_view",{dish:currentDish});
@@ -443,6 +459,7 @@ function openCam(src,alt,t){
 function closeCam(){
   if($("cam").hidden)return;
   $("cam").hidden=true;
+  if(window.markerAR)window.markerAR.stop();
   window.removeEventListener("deviceorientation",onTilt);
   if(camStream){camStream.getTracks().forEach(function(x){x.stop();});camStream=null;}
   $("camv").srcObject=null;
@@ -467,6 +484,276 @@ window.addEventListener("scroll",function(){
   $("hc").style.opacity=String(1-p);$("hc").style.transform="translateY("+(-y*.25)+"px)";
 },{passive:true});
 render();
+</script>
+<script type="module">
+/* ---- AR with the table QR, for phones without Google AR ----
+   A QR sticker of known size (QR_SIZE) lies flat on the table. In every camera frame we find its 4 corners;
+   from how big and how skewed they look we compute where the table is (a "pose": rotation + position),
+   and draw the dish with three.js on that table, at real size, next to the QR. The pose comes from the camera
+   image itself, so the dish stays put while the phone moves, as long as the QR stays in view.
+   Exposed to the page as window.markerAR = {start, stop}. three.js and the QR reader load only when used. */
+const QR_SIZE = 0.065;     // printed QR symbol side in metres: must match QR_MM in tools/qr.py
+const LONG_FOV = 65;       // assumed camera field of view along the long side of the video (errors largely
+                           // cancel: the dish is drawn with the same camera that measured the QR)
+const FIND_LIMIT = 8000;   // ms without any QR before the page falls back to the simple camera view
+let S = null;              // the running session
+
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],
+      dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2], scl=(a,k)=>[a[0]*k,a[1]*k,a[2]*k],
+      cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],
+      len=a=>Math.hypot(a[0],a[1],a[2]), unit=a=>scl(a,1/len(a));
+
+function solve(A, b) {               // small linear system, Gauss-Jordan with partial pivoting
+  const n = b.length, M = A.map((r, i) => r.concat([b[i]]));
+  for (let c = 0; c < n; c++) {
+    let p = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    if (Math.abs(M[p][c]) < 1e-12) return null;
+    [M[c], M[p]] = [M[p], M[c]];
+    for (let r = 0; r < n; r++) if (r !== c) {
+      const k = M[r][c] / M[c][c];
+      for (let j = c; j <= n; j++) M[r][j] -= k * M[c][j];
+    }
+  }
+  return M.map((r, i) => r[n] / r[i]);
+}
+
+/* Pose of the QR in camera axes (x right, y down, z forward). corners: TL, TR, BR, BL in video pixels.
+   Marker axes: x along the QR's top edge, y down its left edge, z into the table. */
+function poseFrom(corners, vw, vh, f) {
+  const h = QR_SIZE / 2, obj = [[-h, -h], [h, -h], [h, h], [-h, h]];
+  const img = corners.map(p => [(p.x - vw / 2) / f, (p.y - vh / 2) / f]);
+  const A = [], b = [];
+  for (let i = 0; i < 4; i++) {
+    const [X, Y] = obj[i], [x, y] = img[i];
+    A.push([X, Y, 1, 0, 0, 0, -x * X, -x * Y]); b.push(x);
+    A.push([0, 0, 0, X, Y, 1, -y * X, -y * Y]); b.push(y);
+  }
+  const g = solve(A, b);
+  if (!g) return null;
+  const b1 = [g[0], g[3], g[6]], b2 = [g[1], g[4], g[7]], b3 = [g[2], g[5], 1];
+  let lam = 2 / (len(b1) + len(b2));
+  if (b3[2] * lam < 0) lam = -lam;                         // the QR is in front of the camera
+  const x0 = unit(b1), y0 = unit(b2), u = unit(add(x0, y0)), v = unit(sub(x0, y0));
+  const rx = scl(add(u, v), Math.SQRT1_2), ry = scl(sub(u, v), Math.SQRT1_2);   // nearest true rotation
+  const rz = cross(rx, ry), t = scl(b3, lam);
+  // reject bad reads: the 4 corners must reproject close to where they were seen
+  let err = 0;
+  obj.forEach(([X, Y], i) => {
+    const p = add(add(scl(rx, X), scl(ry, Y)), t);
+    err = Math.max(err, Math.hypot(p[0] / p[2] - img[i][0], p[1] / p[2] - img[i][1]));
+  });
+  const size = Math.hypot(img[1][0] - img[0][0], img[1][1] - img[0][1]);
+  if (!(t[2] > 0.05 && err < 0.08 * size)) return null;
+  return { rx, ry, rz, t };
+}
+
+async function loadLibs() {
+  const [THREE, { GLTFLoader }, { DRACOLoader }] = await Promise.all([
+    import("three"), import("three/addons/loaders/GLTFLoader.js"), import("three/addons/loaders/DRACOLoader.js")]);
+  return { THREE, GLTFLoader, DRACOLoader };
+}
+function loadJsQR() {
+  if (window.jsQR) return Promise.resolve();
+  return new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"; s.onload = ok; s.onerror = no;
+    document.head.appendChild(s);
+  });
+}
+
+/* QR corners in the current video frame, in the QR's own order (TL, TR, BR, BL of the QR, whichever way the
+   phone is turned), or null. The order matters: it decides which side of the QR the dish is on.
+   jsQR finds the 3 big finder squares, so its corners are always in the QR's order; it is the authority.
+   The phone's built-in reader (when present) is better at finding a small or slanted QR, but may list the
+   corners from the screen's top-left, so it is only used to tell jsQR where to look, or, for a moment when
+   jsQR misses, matched to the last known corners by position. */
+function bbox(c) {
+  const xs = c.map(p => p.x), ys = c.map(p => p.y);
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+}
+function matchOrder(c, prev) {           // cyclic order of c closest to prev (both in image pixels)
+  let best = null, bd = Infinity;
+  for (let k = 0; k < 4; k++) {
+    const r = c.slice(k).concat(c.slice(0, k));
+    const d = r.reduce((a, p, i) => a + Math.hypot(p.x - prev[i].x, p.y - prev[i].y), 0);
+    if (d < bd) { bd = d; best = r; }
+  }
+  return best;
+}
+async function findCorners(s) {
+  const v = s.video;
+  if (!window.jsQR) return null;
+  const VW = v.videoWidth, VH = v.videoHeight;
+  if (!VW || !VH) return null;
+  // jsQR on a region of the frame (sharper and faster), or on the whole frame
+  const read = (x0, y0, cw, ch, maxSide) => {
+    const k = Math.min(1, maxSide / Math.max(cw, ch)), w = Math.round(cw * k), h = Math.round(ch * k);
+    if (w < 40 || h < 40) return null;
+    s.cv.width = w; s.cv.height = h;
+    s.cx.drawImage(v, x0, y0, cw, ch, 0, 0, w, h);
+    const q = window.jsQR(s.cx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: "dontInvert" });
+    if (!q) return null;
+    const L = q.location;
+    return [L.topLeftCorner, L.topRightCorner, L.bottomRightCorner, L.bottomLeftCorner].map(p => ({ x: x0 + p.x / k, y: y0 + p.y / k }));
+  };
+  const around = (q, grow) => {          // jsQR on the area around corners q
+    const [minX, minY, maxX, maxY] = bbox(q), m = Math.max(maxX - minX, maxY - minY) * grow;
+    const x0 = Math.max(0, minX - m), y0 = Math.max(0, minY - m), x1 = Math.min(VW, maxX + m), y1 = Math.min(VH, maxY + m);
+    return read(x0, y0, x1 - x0, y1 - y0, 640);
+  };
+  const now = performance.now();
+  let c = s.last ? around(s.last, 0.9) : null;
+  if (!c && s.detector) {
+    let d = null;
+    try { const r = await s.detector.detect(v); d = r && r[0] && r[0].cornerPoints; }
+    catch (e) { s.detector = null; }     // the built-in reader failed: jsQR only from now on
+    if (d && d.length === 4) {
+      d = d.map(p => ({ x: p.x, y: p.y }));
+      c = around(d, 0.25);
+      if (!c && s.last && now - s.lastAt < 400) c = matchOrder(d, s.last);   // brief gap: keep the known order
+    }
+  }
+  if (!c && (!s.detector || (s.miss = (s.miss || 0) + 1) % 3 === 0)) c = read(0, 0, VW, VH, 960);   // whole frame (every 3rd miss when the built-in reader is searching too)
+  if (c) { s.last = c; s.lastAt = now; }
+  else if (now - (s.lastAt || 0) > 400) s.last = null;
+  return c;
+}
+
+async function start(opt) {
+  stop();
+  const s = S = { video: opt.video, canvas: opt.canvas, onState: opt.onState || (() => {}), alive: true,
+                  pose: null, seen: 0, place: null, everFound: false, t0: performance.now() };
+  s.onState("searching");
+  let L;
+  try {
+    if ("BarcodeDetector" in window) {
+      const f = await BarcodeDetector.getSupportedFormats();
+      if (f.includes("qr_code")) s.detector = new BarcodeDetector({ formats: ["qr_code"] });
+    }
+    [L] = await Promise.all([loadLibs(), loadJsQR()]);
+  } catch (e) { if (s.alive) s.onState("error"); return; }
+  if (!s.alive) return;
+  const { THREE, GLTFLoader, DRACOLoader } = L;
+  s.cv = document.createElement("canvas"); s.cx = s.cv.getContext("2d", { willReadFrequently: true });
+
+  const renderer = s.renderer = new THREE.WebGLRenderer({ canvas: s.canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.shadowMap.enabled = true;
+  const scene = new THREE.Scene(), camera = s.camera = new THREE.PerspectiveCamera(50, 1, 0.01, 30);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6b5a48, 2.2));
+  const table = s.table = new THREE.Group(); table.matrixAutoUpdate = false; table.visible = false; scene.add(table);
+  const spot = new THREE.Group(); table.add(spot);                 // where the dish sits, in table axes
+  const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+  sun.position.set(0.15, -0.1, -0.8); sun.castShadow = true;       // above the table (table z points down into it)
+  sun.shadow.mapSize.set(1024, 1024);
+  Object.assign(sun.shadow.camera, { left: -0.4, right: 0.4, top: 0.4, bottom: -0.4, near: 0.1, far: 2 });
+  spot.add(sun); spot.add(sun.target);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShadowMaterial({ opacity: 0.35, side: THREE.DoubleSide }));
+  ground.receiveShadow = true; spot.add(ground);
+
+  const loader = new GLTFLoader(), draco = new DRACOLoader();
+  draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.6/");
+  loader.setDRACOLoader(draco);
+  let radius = 0.17;
+  loader.load(opt.src, gltf => {
+    if (!s.alive) return;
+    const dish = gltf.scene, box = new THREE.Box3().setFromObject(dish), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
+    dish.position.set(-c.x, -box.min.y, -c.z);                     // centred, resting on the table
+    dish.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    const holder = new THREE.Group(); holder.rotation.x = -Math.PI / 2;   // glTF "up" -> out of the table
+    holder.add(dish); spot.add(holder);
+    radius = Math.max(sz.x, sz.z) / 2;
+    ground.scale.set(radius * 3, radius * 3, 1);
+  }, undefined, () => { if (s.alive) s.onState("error"); });
+
+  const focal = () => Math.max(s.video.videoWidth, s.video.videoHeight) / 2 / Math.tan(LONG_FOV * Math.PI / 360);
+  const coverScale = () => Math.max(innerWidth / s.video.videoWidth, innerHeight / s.video.videoHeight);
+
+  // a screen point -> point on the table (table axes), using the current pose; null if it misses the table
+  function onTable(sx, sy) {
+    if (!s.pose) return null;
+    const F = focal() * coverScale(), d = [(sx - innerWidth / 2) / F, (sy - innerHeight / 2) / F, 1];
+    const { rx, ry, rz, t } = s.pose;
+    const o = [-dot(rx, t), -dot(ry, t), -dot(rz, t)], dm = [dot(rx, d), dot(ry, d), dot(rz, d)];   // camera & ray in table axes
+    if (Math.abs(dm[2]) < 1e-6) return null;
+    const k = -o[2] / dm[2];
+    return k > 0 ? [o[0] + k * dm[0], o[1] + k * dm[1]] : null;
+  }
+  function keepClear(p) {           // the dish must not cover the QR, or the camera loses it
+    const need = QR_SIZE * 0.75 + radius + 0.01, n = Math.hypot(p[0], p[1]);
+    if (n >= need) return p;
+    let dir = n > 1e-3 ? [p[0] / n, p[1] / n] : null;
+    if (!dir) { const { rx, ry, t } = s.pose, o = [-dot(rx, t), -dot(ry, t)], m = Math.hypot(o[0], o[1]) || 1; dir = [o[0] / m, o[1] / m]; }
+    return [dir[0] * need, dir[1] * need];
+  }
+  function setPlace(p) { s.place = keepClear(p); spot.position.set(s.place[0], s.place[1], 0); }
+
+  // drag the dish along the table
+  let drag = false;
+  s.canvas.onpointerdown = e => { drag = true; s.canvas.setPointerCapture(e.pointerId); };
+  s.canvas.onpointermove = e => { if (!drag) return; const p = onTable(e.clientX, e.clientY); if (p) setPlace(p); };
+  s.canvas.onpointerup = s.canvas.onpointercancel = () => { drag = false; };
+
+  const smooth = { p: new THREE.Vector3(), q: new THREE.Quaternion(), ok: false }, m4 = new THREE.Matrix4();
+  function usePose(P) {
+    s.pose = P;
+    // camera axes (x right, y down, z forward) -> three.js (x right, y up, z back)
+    const X = [P.rx[0], -P.rx[1], -P.rx[2]], Y = [P.ry[0], -P.ry[1], -P.ry[2]], Z = [P.rz[0], -P.rz[1], -P.rz[2]];
+    m4.set(X[0], Y[0], Z[0], P.t[0], X[1], Y[1], Z[1], -P.t[1], X[2], Y[2], Z[2], -P.t[2], 0, 0, 0, 1);
+    const p = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+    m4.decompose(p, q, sc);
+    if (!smooth.ok || p.distanceTo(smooth.p) > 0.25) { smooth.p.copy(p); smooth.q.copy(q); smooth.ok = true; }
+    else { smooth.p.lerp(p, 0.45); smooth.q.slerp(q, 0.45); }
+    table.matrix.compose(smooth.p, smooth.q, new THREE.Vector3(1, 1, 1));
+    table.matrixWorldNeedsUpdate = true;
+    if (!s.place) setPlace(onTable(innerWidth / 2, innerHeight * 0.55) || [0, 0]);
+    table.visible = true;
+  }
+
+  function bestPose(c) {          // corners already in the QR's own order (see findCorners)
+    return poseFrom(c, s.video.videoWidth, s.video.videoHeight, focal());
+  }
+
+  async function seek() {
+    if (!s.alive) return;
+    if (s.video.readyState >= 2) {
+      const c = await findCorners(s);
+      const P = c && bestPose(c);
+      if (!s.alive) return;
+      if (P) {
+        usePose(P); s.seen = performance.now();
+        if (!s.everFound) { s.everFound = true; s.canvas.classList.add("on"); }
+        s.onState("found");
+      } else if (s.everFound && performance.now() - s.seen > 1200) s.onState("lost");
+      else if (!s.everFound && performance.now() - s.t0 > FIND_LIMIT) s.onState("nomarker");
+    }
+    s.timer = setTimeout(seek, 50);
+  }
+  seek();
+
+  (function frame() {
+    if (!s.alive) return;
+    if (s.video.videoWidth) {
+      const W = innerWidth, H = innerHeight, F = focal() * coverScale();
+      renderer.setSize(W, H, false);
+      camera.aspect = W / H; camera.fov = 2 * Math.atan(H / 2 / F) * 180 / Math.PI; camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    }
+    s.raf = requestAnimationFrame(frame);
+  })();
+}
+
+function stop() {
+  const s = S; S = null;
+  if (!s) return;
+  s.alive = false; clearTimeout(s.timer); cancelAnimationFrame(s.raf);
+  s.canvas.classList.remove("on"); s.canvas.onpointerdown = s.canvas.onpointermove = s.canvas.onpointerup = s.canvas.onpointercancel = null;
+  if (s.renderer) { s.renderer.clear(); s.renderer.dispose(); }
+}
+
+window.markerAR = { start, stop, _poseFrom: poseFrom, _session: () => S };   // _ = for testing
 </script>
 </body>
 </html>
