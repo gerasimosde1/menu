@@ -79,6 +79,9 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 .cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cam model-viewer{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:1;background:transparent}
 .cam .x{top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:2;background:rgba(10,13,17,.7)}
+.cam .rc{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;z-index:2;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:rgba(10,13,17,.7);color:var(--ink);cursor:pointer}
+.cam .rc svg{width:22px;height:22px}
+.cam model-viewer{will-change:transform}
 .camhint{position:absolute;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));margin:0;padding:12px 14px;border-radius:14px;background:rgba(10,13,17,.72);color:var(--ink);font:600 13.5px/1.45 Manrope,sans-serif;text-align:center}
 .pills{display:flex;gap:8px;margin:14px 0 4px}
 .pill{flex:1;min-width:0;padding:8px 6px;border:1px solid var(--gold);border-radius:16px;background:none;color:var(--gold2);font:700 12.5px/1.25 Manrope,sans-serif;cursor:pointer}
@@ -146,6 +149,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
   <model-viewer id="cammv" camera-controls disable-pan disable-zoom touch-action="none" interaction-prompt="none" shadow-intensity="1" shadow-softness="0.7"
     field-of-view="65deg" min-field-of-view="65deg" max-field-of-view="65deg" camera-orbit="0deg 30deg 0.462m"
     min-camera-orbit="auto 0deg 0.1m" max-camera-orbit="auto 88deg 3m" interpolation-decay="80"></model-viewer>
+  <button class="rc" id="camrc" aria-label="Recenter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
   <button class="x" id="camx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <p class="camhint" id="camhint"></p>
 </div>
@@ -421,16 +425,66 @@ function camOrbit(theta,phiDeg){
   var phi=Math.max(5,Math.min(78,phiDeg));
   return theta+" "+phi+"deg "+(CAM_H/Math.cos(phi*Math.PI/180)).toFixed(3)+"m";
 }
-function onTilt(e){   /* phone flat over the table = view from above; upright = view from the side */
-  if(e.beta==null)return;
+/* Keep the dish fixed on the table while the phone turns.
+   Without real AR the page cannot see the table, so: the phone is the centre of the world, the table is a plane
+   CAM_H below it, and the dish is pinned at the spot the phone pointed at when the camera opened. On every gyroscope
+   reading we work out where that spot is on screen and move the 3D layer there. Turning the phone keeps the dish
+   in place; walking around with the phone is not tracked (only real AR can do that), so the recenter button
+   puts the dish back in front of the camera. Phones without a compass/gyro reading fall back to the old tilt view. */
+var anc=null,camRAF=0,camTgt=null,camCur=null,legacyTilt=false;
+function rotM(a,b,g){   /* W3C device orientation: device axes -> earth axes */
+  var d=Math.PI/180;a*=d;b*=d;g*=d;
+  var ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cg=Math.cos(g),sg=Math.sin(g);
+  return [[ca*cg-sa*sb*sg,-sa*cb,ca*sg+sa*sb*cg],[sa*cg+ca*sb*sg,ca*cb,sa*sg-ca*sb*cg],[-cb*sg,sb,cb*cg]];
+}
+function col(R,k){return [R[0][k],R[1][k],R[2][k]];}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function camFocal(){return Math.max(window.innerWidth,window.innerHeight)/2/Math.tan(CAM_LONG_FOV*Math.PI/360);}
+function anchorAt(R){
+  var f=col(R,2);f=[-f[0],-f[1],-f[2]];                       /* where the back camera points */
+  var phi=Math.acos(Math.max(-1,Math.min(1,-f[2])))*180/Math.PI;  /* 0 = straight down */
+  phi=Math.max(15,Math.min(65,phi));
+  var hx=f[0],hy=f[1];
+  if(Math.hypot(hx,hy)<1e-3){var u=col(R,1);hx=u[0];hy=u[1];}
+  var h=Math.atan2(hx,hy),dist=CAM_H*Math.tan(phi*Math.PI/180);
+  anc={D:[dist*Math.sin(h),dist*Math.cos(h),-CAM_H]};
   var m=$("cammv");
-  m.cameraOrbit=camOrbit(m.getCameraOrbit().theta+"rad",Math.abs(e.beta));
+  m.cameraOrbit=camOrbit(m.getCameraOrbit().theta+"rad",phi);
+}
+function onTilt(e){
+  if(e.alpha==null||e.beta==null||e.gamma==null){   /* no gyro heading in this reading: old behaviour.
+       Decided per reading, not for good: many phones send one empty reading before the gyroscope starts. */
+    if(e.beta==null)return;
+    var m=$("cammv");m.cameraOrbit=camOrbit(m.getCameraOrbit().theta+"rad",Math.abs(e.beta));return;
+  }
+  var R=rotM(e.alpha,e.beta,e.gamma);
+  if(!anc)anchorAt(R);
+  var D=anc.D,x=dot(col(R,0),D),y=dot(col(R,1),D),z=dot(col(R,2),D);   /* dish in phone axes */
+  if(z>-0.03){camTgt={hide:true};return;}                              /* dish is behind the phone */
+  var F=camFocal(),n=Math.hypot(D[0],D[1],D[2]),dv=[D[0]/n,D[1]/n,D[2]/n];
+  var up=[-dv[2]*dv[0],-dv[2]*dv[1],1-dv[2]*dv[2]],ul=Math.hypot(up[0],up[1],up[2])||1;
+  up=[up[0]/ul,up[1]/ul,up[2]/ul];
+  camTgt={x:F*x/(-z),y:-F*y/(-z),r:Math.atan2(dot(up,col(R,0)),dot(up,col(R,1)))*180/Math.PI};
+  if(!camRAF)camRAF=requestAnimationFrame(camFrame);
+}
+function camFrame(){
+  camRAF=0;var m=$("cammv"),t=camTgt;if(!t)return;
+  if(t.hide){m.style.opacity="0";camCur=null;return;}
+  m.style.opacity="";
+  if(!camCur)camCur={x:t.x,y:t.y,r:t.r};
+  else{
+    var k=.45,dr=((t.r-camCur.r+540)%360)-180;
+    camCur.x+=(t.x-camCur.x)*k;camCur.y+=(t.y-camCur.y)*k;camCur.r+=dr*k;
+  }
+  m.style.transform="translate("+camCur.x.toFixed(1)+"px,"+camCur.y.toFixed(1)+"px) rotate("+camCur.r.toFixed(2)+"deg)";
+  if(Math.abs(t.x-camCur.x)>.5||Math.abs(t.y-camCur.y)>.5)camRAF=requestAnimationFrame(camFrame);
 }
 function openCam(src,alt,t){
   var m=$("cammv");
   $("camhint").textContent=t.camhint;
   m.setAttribute("alt",alt);
   if(m.getAttribute("src")!==src)m.setAttribute("src",src);
+  anc=null;camTgt=null;camCur=null;legacyTilt=false;m.style.transform="";m.style.opacity="";
   m.cameraOrbit=camOrbit("0deg",30);    /* until the first tilt reading arrives */
   camFov();
   $("cam").hidden=false;
@@ -444,6 +498,7 @@ function closeCam(){
   if($("cam").hidden)return;
   $("cam").hidden=true;
   window.removeEventListener("deviceorientation",onTilt);
+  if(camRAF){cancelAnimationFrame(camRAF);camRAF=0;}
   if(camStream){camStream.getTracks().forEach(function(x){x.stop();});camStream=null;}
   $("camv").srcObject=null;
 }
@@ -460,6 +515,7 @@ $("menu").addEventListener("click",function(e){var b=e.target.closest(".dish");i
 $("sheet").addEventListener("click",function(e){if(e.target.id==="sheet")closeSheet();});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(!$("cam").hidden){closeCam();return;}closeSheet();toggleLang(false);}});
 $("camx").addEventListener("click",closeCam);
+$("camrc").addEventListener("click",function(){anc=null;camCur=null;});
 document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".ar"))track("ar_click",{dish:currentDish});});
 $("cue").addEventListener("click",function(){var m=$("menu");try{m.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){m.scrollIntoView();}});
 window.addEventListener("scroll",function(){
