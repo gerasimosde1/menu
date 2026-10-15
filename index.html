@@ -20,6 +20,8 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-rad
 /* language picker */
 .lg{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:15;display:flex;align-items:center;gap:7px;padding:9px 13px;border:1px solid var(--line);border-radius:99px;background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--ink);font:700 12px Manrope,sans-serif;letter-spacing:.1em;cursor:pointer}
 .lg svg{width:15px;height:15px}
+.lg{transition:opacity .25s,transform .25s}
+.lg.away{opacity:0;transform:translateY(-12px);pointer-events:none}   /* only at the top of the page */
 .lgbox{position:fixed;top:calc(62px + env(safe-area-inset-top,0px));right:14px;z-index:16;width:min(300px,calc(100vw - 28px));display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 18px 50px rgba(0,0,0,.55);animation:pop .22s ease}
 .lgbox[hidden]{display:none}
 .lgbox button{padding:11px 12px;border:0;border-radius:11px;background:none;color:var(--ink);font:600 14px Manrope,sans-serif;text-align:left;cursor:pointer}
@@ -50,8 +52,8 @@ h2{font:600 13px Manrope,sans-serif;letter-spacing:.28em;text-transform:uppercas
 .rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1;transform:none}
 /* category bar: appears at the top once the menu starts, follows the scroll, tap to jump */
-.cats{position:fixed;top:0;left:0;right:0;z-index:14;padding:calc(12px + env(safe-area-inset-top,0px)) 92px 12px 0;background:var(--glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transform:translateY(-110%);transition:transform .3s ease}
-.cats div{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 14px;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+.cats{position:fixed;top:0;left:0;right:0;z-index:14;padding:calc(12px + env(safe-area-inset-top,0px)) 0 12px;background:var(--glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transform:translateY(-110%);transition:transform .3s ease}
+.cats div{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 14px;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
 .cats div::-webkit-scrollbar{display:none}
 .cats.on{transform:none}
 .cats button{flex:none;padding:8px 14px;border:1px solid var(--a35);border-radius:99px;background:none;color:var(--ink);font:700 11.5px Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s}
@@ -523,6 +525,7 @@ window.addEventListener("scroll",function(){
   var y=window.pageYOffset||0,h=window.innerHeight||700,p=Math.min(1,y/(h*.7));
   $("hc").style.opacity=String(1-p);$("hc").style.transform="translateY("+(-y*.25)+"px)";
   onCats();
+  var away=y>60;if(away!==$("lgbtn").classList.contains("away")){$("lgbtn").classList.toggle("away",away);if(away)toggleLang(false);}
 },{passive:true});
 window.addEventListener("resize",function(){catAct=-1;onCats();});
 render();
