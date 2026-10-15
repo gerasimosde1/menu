@@ -99,6 +99,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 .demo{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));left:14px;right:90px;z-index:2;margin:0;text-align:left;font:600 11.5px/1.35 Manrope,sans-serif;color:var(--gold2);opacity:0;animation:rise .9s .1s forwards}
 .demo span{display:inline-block;padding:5px 10px;border:1px dashed var(--gold);border-radius:10px;background:var(--glass2)}
 .hc h1.long{font-size:clamp(38px,11.5vw,64px);overflow-wrap:anywhere}
+.smp{margin:48px 0 0;text-align:center;font-size:12px;line-height:1.5;color:var(--mute)}
 .cta{margin:56px 0 0;padding:26px 22px;border:1px solid var(--a35);border-radius:22px;background:var(--surface);text-align:center}
 .cta p{margin:0 0 16px;font:400 21px/1.3 Literata,Georgia,serif}
 .cta a{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:99px;background:linear-gradient(135deg,var(--gold2),var(--gold) 55%,var(--gold3));color:var(--on-accent);font:700 15px Manrope,sans-serif;text-decoration:none}
@@ -142,7 +143,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
     </div>
     <button class="cue" id="cue" aria-label="Scroll"><span id="cuetxt"></span><span class="arrows"><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg></span></button>
   </section>
-  <div class="wrap"><div id="menu"></div><div id="cta"></div></div>
+  <div class="wrap"><div id="menu"></div><div id="cta"></div><p class="smp" id="smp" hidden></p></div>
 </div>
 
 <div class="cam" id="cam" hidden>
@@ -198,6 +199,7 @@ var UIS={
  camqr:"Στόχευσε με την κάμερα το QR που είναι πάνω στο τραπέζι|Point the camera at the QR code on the table|Richten Sie die Kamera auf den QR-Code auf dem Tisch|Inquadra il codice QR sul tavolo|Visez le code QR posé sur la table|Apunta la cámara al código QR de la mesa|Richt de camera op de QR-code op tafel|Skieruj aparat na kod QR na stole|Наведите камеру на QR-код на столе|Rikta kameran mot QR-koden på bordet",
  camdrag:"Σύρε το πιάτο με το δάχτυλο για να το μετακινήσεις|Drag the dish with your finger to move it|Ziehen Sie das Gericht mit dem Finger, um es zu verschieben|Trascina il piatto con il dito per spostarlo|Faites glisser le plat du doigt pour le déplacer|Arrastra el plato con el dedo para moverlo|Sleep het gerecht met je vinger om het te verplaatsen|Przeciągnij danie palcem, aby je przesunąć|Перетащите блюдо пальцем, чтобы переместить его|Dra rätten med fingret för att flytta den",
  camno:"Δεν δόθηκε άδεια για την κάμερα. Επίτρεψέ την από τις ρυθμίσεις του browser.|Camera permission was not granted. Allow it in your browser settings.|Keine Kameraberechtigung. Bitte in den Browser-Einstellungen erlauben.|Permesso fotocamera non concesso. Consentilo nelle impostazioni del browser.|Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.|No se concedió permiso para la cámara. Actívalo en los ajustes del navegador.|Geen toestemming voor de camera. Sta dit toe in je browserinstellingen.|Brak dostępu do aparatu. Zezwól na to w ustawieniach przeglądarki.|Нет доступа к камере. Разрешите его в настройках браузера.|Kameraåtkomst nekades. Tillåt den i webbläsarens inställningar.",
+ sample:"Δείγμα παρουσίασης · τα πιάτα, οι τιμές, τα αλλεργιογόνα και τα υπόλοιπα στοιχεία είναι ενδεικτικά|Presentation sample · dishes, prices, allergens and other details are indicative|Präsentationsmuster · Gerichte, Preise, Allergene und weitere Angaben sind unverbindlich|Esempio di presentazione · piatti, prezzi, allergeni e altri dati sono indicativi|Exemple de présentation · plats, prix, allergènes et autres informations à titre indicatif|Ejemplo de presentación · platos, precios, alérgenos y demás datos son orientativos|Presentatievoorbeeld · gerechten, prijzen, allergenen en andere gegevens zijn indicatief|Przykład prezentacji · dania, ceny, alergeny i inne dane są orientacyjne|Демонстрационный пример · блюда, цены, аллергены и другие данные ориентировочные|Presentationsexempel · rätter, priser, allergener och övriga uppgifter är vägledande",
  extras:"Έξτρα υλικά|Extras|Extras|Extra|Suppléments|Extras|Extra's|Dodatki|Добавки|Tillbehör",
  demo:"Δείγμα για «{n}» · δεν είναι το επίσημο μενού|Sample for “{n}” · not the official menu|Muster für „{n}“ · nicht die offizielle Speisekarte|Esempio per «{n}» · non è il menu ufficiale|Exemple pour « {n} » · pas la carte officielle|Ejemplo para «{n}» · no es la carta oficial|Voorbeeld voor “{n}” · niet het officiële menu|Przykład dla „{n}” · to nie jest oficjalne menu|Пример для «{n}» · не официальное меню|Exempel för ”{n}” · inte den officiella menyn",
  cta:"Θέλεις ένα τέτοιο μενού για το μαγαζί σου;|Want a menu like this for your restaurant?|Möchten Sie so eine Speisekarte für Ihr Restaurant?|Vuoi un menu così per il tuo locale?|Envie d'une carte comme celle-ci pour votre restaurant ?|¿Quieres una carta así para tu restaurante?|Wil je zo'n menu voor je restaurant?|Chcesz takie menu dla swojej restauracji?|Хотите такое меню для своего ресторана?|Vill du ha en sådan meny för din restaurang?",
@@ -215,7 +217,9 @@ var TAGS={
  new:"Νέο|New|Neu|Novità|Nouveau|Novedad|Nieuw|Nowość|Новинка|Nyhet",
  flame:"Ξυλόφουρνο|Wood-fired|Holzofen|Forno a legna|Au feu de bois|Horno de leña|Houtoven|Z pieca opalanego drewnem|Дровяная печь|Vedugn",
  share:"Για μοιρασιά|To share|Zum Teilen|Da condividere|À partager|Para compartir|Om te delen|Do dzielenia|Для компании|Att dela",
- pin:"Τοπικό προϊόν|Local product|Regionales Produkt|Prodotto locale|Produit local|Producto local|Lokaal product|Produkt lokalny|Местный продукт|Lokal produkt"
+ pin:"Τοπικό προϊόν|Local product|Regionales Produkt|Prodotto locale|Produit local|Producto local|Lokaal product|Produkt lokalny|Местный продукт|Lokal produkt",
+ best:"Best seller|Best seller|Bestseller|Più venduto|Best-seller|Más vendido|Bestseller|Bestseller|Хит продаж|Bästsäljare",
+ beef:"100% μοσχάρι|100% beef|100 % Rind|100% manzo|100 % bœuf|100% ternera|100% rundvlees|100% wołowina|100% говядина|100 % nötkött"
 };
 var ALG={
  wheat:"Γλουτένη|Gluten|Gluten|Glutine|Gluten|Gluten|Gluten|Gluten|Глютен|Gluten",
@@ -267,6 +271,8 @@ var ICONS={
  flame:function(){return pt('M.5 6.8C-.5 3.5 -4.5 2 -4.5 -2.2C-4.5 -5 -2.5 -6.8 0 -6.8C2.6 -6.8 4.5 -5 4.5 -2C4.5 0 3.2 1.2 2.4 2.2C2.2 .5 1.4 -.2 .8 -.5C1.6 1.8 1.4 4.5 .5 6.8Z')+pt('M0 -1.2C1.7 -2.5 1.9 -4 0 -5.2C-1.9 -4 -1.7 -2.5 0 -1.2Z');},
  share:function(){return ci(-2.5,0,4)+ci(2.5,0,4);},
  pin:function(){return pt('M0 -6.6C-1 -4.6 -4.6 -1.6 -4.6 1.5C-4.6 4.3 -2.6 6.2 0 6.2C2.6 6.2 4.6 4.3 4.6 1.5C4.6 -1.6 1 -4.6 0 -6.6Z')+ci(0,1.6,1.7);},
+ best:function(){return pt('M-4.2 5.6L4.2 5.6L3.7 0.6C3.3 -1.9 1.6 -3 0 -3C-1.6 -3 -3.3 -1.9 -3.7 0.6Z')+pt('M4.1 4.2C6.4 4.2 6.5 0.9 3.8 0.5')+pt('M-4.1 4.2C-6.4 4.2 -6.5 0.9 -3.8 0.5')+ln(0,-3,0,-5)+ln(-2.8,-5.6,2.8,-5.6);},
+ beef:function(){var f=' font-family="Manrope,sans-serif" font-weight="700" fill="currentColor" stroke="none" text-anchor="middle"';return '<text transform="scale(1 -1)" x="-0.6" y="2.1" font-size="5.6"'+f+'>100</text><text transform="scale(1 -1)" x="5.4" y="-1.2" font-size="3.6"'+f+'>%</text>';},
  shrimp:function(){return pt('M3.2 5.2C-1 6.6 -6.2 2.5 -4.5 -2.8C-3.6 -5 -.8 -5.4 1.4 -3.6C-.2 -3.4 -2.2 -2.6 -1.8 .2C-1.4 2.6 1.2 3.4 3.2 5.2Z')+pt('M1.4 -3.6L3.9 -5.5L4.7 -3.2L3.2 -2.2')+ln(3.2,5.2,5.6,6.6)+ln(-3.3,3.1,-1.6,3.5)+ln(-4.6,.6,-2.6,.7);},
  egg:function(){return pt('M0 6.3C3.7 6.3 5 2 5 -1.2C5 -4.6 2.8 -6.5 0 -6.5C-2.8 -6.5 -5 -4.6 -5 -1.2C-5 2 -3.7 6.3 0 6.3Z')+ci(0,-1.6,2.2);},
  fish:function(){return el(-1.9,0,5.1,3.6)+pt('M3 0L6.8 3.6L6.8 -3.6Z')+ci(-3.8,.9,.55,1);},
@@ -312,6 +318,7 @@ function render(){
   $("title").setAttribute("aria-label",RESTAURANT);
   $("title").classList.toggle("long",RESTAURANT.length>9);
   $("demo").hidden=!DEMO_FOR;
+  $("smp").hidden=!M.demo; $("smp").textContent=t.sample;   /* demo menus say their details are indicative */
   if(DEMO_FOR)$("demotxt").textContent=t.demo.replace("{n}",DEMO_FOR);
   $("cta").innerHTML=CONTACT_WHATSAPP?'<div class="cta rv"><p>'+t.cta+'</p><a href="'+waLink()+'" target="_blank" rel="noopener">'+WA+t.ctabtn+'</a></div>':'';
   var kind=DEMO_FOR?DEMO_TYPE:(KIND?pick(KIND):"");
