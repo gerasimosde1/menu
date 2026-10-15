@@ -519,6 +519,31 @@ function solve(A, b) {               // small linear system, Gauss-Jordan with p
 
 /* Pose of the QR in camera axes (x right, y down, z forward). corners: TL, TR, BR, BL in video pixels.
    Marker axes: x along the QR's top edge, y down its left edge, z into the table. */
+/* Camera focal length (pixels) seen from one view of the QR. Every phone's camera is different and a wrong
+   focal skews size and tilt. The QR is a square, so in the true focal its two edges come out perpendicular and
+   equally long; with the homography H (QR plane -> centred pixels) that gives two equations for f². They are
+   only informative when the QR is seen at a slant, so flat-on views give nothing. Returns [f, ...] or []. */
+function focalFrom(corners, vw, vh) {
+  const obj = [[-1, -1], [1, -1], [1, 1], [-1, 1]], A = [], b = [];
+  corners.forEach((p, i) => {
+    const [X, Y] = obj[i], x = p.x - vw / 2, y = p.y - vh / 2;
+    A.push([X, Y, 1, 0, 0, 0, -x * X, -x * Y]); b.push(x);
+    A.push([0, 0, 0, X, Y, 1, -y * X, -y * Y]); b.push(y);
+  });
+  const g = solve(A, b);
+  if (!g) return [];
+  const [h11, h12, , h21, h22, , h31, h32] = g, out = [];
+  const scale = Math.max(Math.abs(h11), Math.abs(h12), Math.abs(h21), Math.abs(h22));
+  const tryF = (num, den) => {               // f² = -num/den, only when the slant term is clearly non-zero
+    if (Math.abs(den) * vw * vw < 0.02 * scale * scale) return;
+    const f2 = -num / den;
+    if (f2 > 0) out.push(Math.sqrt(f2));
+  };
+  tryF(h11 * h12 + h21 * h22, h31 * h32);
+  tryF(h11 * h11 + h21 * h21 - h12 * h12 - h22 * h22, h31 * h31 - h32 * h32);
+  return out;
+}
+
 function poseFrom(corners, vw, vh, f) {
   const h = QR_SIZE / 2, obj = [[-h, -h], [h, -h], [h, h], [-h, h]];
   const img = corners.map(p => [(p.x - vw / 2) / f, (p.y - vh / 2) / f]);
@@ -544,7 +569,27 @@ function poseFrom(corners, vw, vh, f) {
   });
   const size = Math.hypot(img[1][0] - img[0][0], img[1][1] - img[0][1]);
   if (!(t[2] > 0.05 && err < 0.08 * size)) return null;
-  return { rx, ry, rz, t };
+  return { rx, ry, rz, t, obj, img };
+}
+
+/* The weak part of a pose from a small square is its tilt, and a tilt error shows up as a size error.
+   The table is level, so its tilt is known from the phone's gravity sensor (which, unlike the gyroscope, does
+   not drift). down: unit "into the table" direction in camera axes. We blend it into the QR's normal, keep the
+   QR's own turn, then re-solve the distance with that rotation fixed (linear least squares on the corners). */
+function levelPose(P, down) {
+  if (dot(down, P.rz) < 0.8) return P;            // they disagree a lot (table not level?): keep the QR's own
+  const rz = unit(add(scl(down, 0.8), scl(P.rz, 0.2)));
+  const rx = unit(sub(P.rx, scl(rz, dot(P.rx, rz)))), ry = cross(rz, rx);
+  const M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], r = [0, 0, 0];
+  P.obj.forEach(([X, Y], i) => {
+    const q = add(scl(rx, X), scl(ry, Y)), [u, v] = P.img[i];
+    // (q + t) projected = (u, v):  t.x - u t.z = u q.z - q.x ;  t.y - v t.z = v q.z - q.y
+    [[[1, 0, -u], u * q[2] - q[0]], [[0, 1, -v], v * q[2] - q[1]]].forEach(([a, bb]) => {
+      for (let j = 0; j < 3; j++) { r[j] += a[j] * bb; for (let k = 0; k < 3; k++) M[j][k] += a[j] * a[k]; }
+    });
+  });
+  const t = solve(M, r);
+  return t && t[2] > 0.05 ? { rx, ry, rz, t, obj: P.obj, img: P.img, level: true } : P;
 }
 
 async function loadLibs() {
@@ -603,24 +648,25 @@ async function findCorners(s) {
   const around = (q, grow) => {          // jsQR on the area around corners q
     const [minX, minY, maxX, maxY] = bbox(q), m = Math.max(maxX - minX, maxY - minY) * grow;
     const x0 = Math.max(0, minX - m), y0 = Math.max(0, minY - m), x1 = Math.min(VW, maxX + m), y1 = Math.min(VH, maxY + m);
-    return read(x0, y0, x1 - x0, y1 - y0, 640);
+    return read(x0, y0, x1 - x0, y1 - y0, 1000);   // around the QR: (almost) full resolution, small QRs need it
   };
-  const now = performance.now();
-  let c = s.last ? around(s.last, 0.9) : null;
-  if (!c && s.detector) {
+  const now = performance.now(), recent = s.last && now - s.lastAt < 1500;
+  let c = null;
+  if (s.detector) {
+    // fast path: the phone's own reader (native, quick) every frame. Its corners are put in the order of the last
+    // known corners; jsQR (slower) is only run to set the order at the start, and every 10th frame to re-check it.
     let d = null;
     try { const r = await s.detector.detect(v); d = r && r[0] && r[0].cornerPoints; }
     catch (e) { s.detector = null; }     // the built-in reader failed: jsQR only from now on
     if (d && d.length === 4) {
       d = d.map(p => ({ x: p.x, y: p.y }));
       s.dbg.builtin = (s.dbg.builtin || 0) + 1;
-      c = around(d, 0.25);
-      // jsQR could not read it (blur, glare): use the built-in reader's corners anyway, kept in the same order
-      // as the last known corners so the dish does not jump sides. The very first time, take them as given.
-      if (!c) c = s.last && now - s.lastAt < 1500 ? matchOrder(d, s.last) : d;
+      s.n = (s.n || 0) + 1;
+      if (!recent || s.n % 10 === 0) c = around(d, 0.25);
+      if (!c) c = recent ? matchOrder(d, s.last) : d;
     }
-  }
-  if (!c && (!s.detector || (s.miss = (s.miss || 0) + 1) % 3 === 0)) c = read(0, 0, VW, VH, 960);   // whole frame (every 3rd miss when the built-in reader is searching too)
+  } else if (s.last) c = around(s.last, 0.9);
+  if (!c && (!s.detector || (s.miss = (s.miss || 0) + 1) % 3 === 0)) c = read(0, 0, VW, VH, 960) || read(0, 0, VW, VH, 1280);   // whole frame (every 3rd miss when the built-in reader is searching too)
   if (c) { s.last = c; s.lastAt = now; }
   else if (now - (s.lastAt || 0) > 400) s.last = null;
   return c;
@@ -687,7 +733,52 @@ async function start(opt) {
     ground.scale.set(radius * 3, radius * 3, 1);
   }, undefined, e => { if (s.alive) s.onState("error", "3D model: " + (e && (e.message || e))); });
 
-  const focal = () => Math.max(s.video.videoWidth, s.video.videoHeight) / 2 / Math.tan(LONG_FOV * Math.PI / 360);
+  const focal0 = () => Math.max(s.video.videoWidth, s.video.videoHeight) / 2 / Math.tan(LONG_FOV * Math.PI / 360);
+  /* Focal length: with the tilt taken from gravity a wrong focal no longer cancels out (it shows as a size error),
+     so each phone's focal is measured: the focal at which the QR's own tilt agrees with gravity. Per view we
+     scan focals, keep the best when the view is slanted enough to tell, and use the median of many views. */
+  s.fg = [];
+  const focal = () => s.fGrav || focal0();
+  function learnFocalFromGravity(c) {
+    if (!s.down || performance.now() - s.downAt > 500) return;
+    const f0 = focal0(), vw = s.video.videoWidth, vh = s.video.videoHeight;
+    let best = null, bestA = 9, worstA = 0;
+    for (let m = 0.6; m <= 1.61; m += 0.025) {
+      const P = poseFrom(c, vw, vh, f0 * m);
+      if (!P) continue;
+      const a = Math.acos(Math.min(1, dot(P.rz, s.down)));
+      if (a < bestA) { bestA = a; best = f0 * m; }
+      if (a > worstA) worstA = a;
+    }
+    if (best && worstA - bestA > 0.05 && bestA < 0.06) {     // informative view (>3° spread) and a good fit (<3.5°)
+      s.fg.push(best); if (s.fg.length > 60) s.fg.shift();
+      if (s.fg.length >= 8) {
+        const srt = s.fg.slice().sort((a, b) => a - b); s.fGrav = srt[srt.length >> 1];
+        s.dbg.fov = (2 * Math.atan(Math.max(vw, vh) / 2 / s.fGrav) * 180 / Math.PI).toFixed(1) + "° (" + s.fg.length + " views, gravity)";
+      }
+    }
+  }
+  // gravity from the phone's tilt sensors -> "into the table" direction in camera axes (see levelPose)
+  const onGrav = e => {
+    if (e.beta == null || e.gamma == null) return;
+    const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
+    s.down = [Math.cos(b) * Math.sin(g), Math.sin(b), Math.cos(b) * Math.cos(g)]; s.downAt = performance.now();
+  };
+  window.addEventListener("deviceorientation", onGrav);
+  s.offGrav = () => window.removeEventListener("deviceorientation", onGrav);
+  s.fs = [];
+  function learnFocal(c) {
+    const f0 = focal0();
+    focalFrom(c, s.video.videoWidth, s.video.videoHeight).forEach(f => {
+      if (f > 0.55 * f0 && f < 1.8 * f0) s.fs.push(f);
+    });
+    if (s.fs.length > 80) s.fs.splice(0, s.fs.length - 80);
+    if (s.fs.length >= 12) {
+      const sorted = s.fs.slice().sort((a, b) => a - b);
+      s.fEst = sorted[sorted.length >> 1];
+      s.dbg.fov = (2 * Math.atan(Math.max(s.video.videoWidth, s.video.videoHeight) / 2 / s.fEst) * 180 / Math.PI).toFixed(1) + "° (" + s.fs.length + " views)";
+    }
+  }
   const coverScale = () => Math.max(innerWidth / s.video.videoWidth, innerHeight / s.video.videoHeight);
 
   // a screen point -> point on the table (table axes), using the current pose; null if it misses the table
@@ -724,7 +815,13 @@ async function start(opt) {
     const p = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
     m4.decompose(p, q, sc);
     if (!smooth.ok || p.distanceTo(smooth.p) > 0.25) { smooth.p.copy(p); smooth.q.copy(q); smooth.ok = true; }
-    else { smooth.p.lerp(p, 0.45); smooth.q.slerp(q, 0.45); }
+    else {
+      // adaptive smoothing: follow quickly when the phone moves (big change), smooth hard when it is still
+      // (small change = mostly noise of the corner detection)
+      const move = p.distanceTo(smooth.p) / 0.015 + smooth.q.angleTo(q) / 0.05;   // 1.5 cm or 3 deg ≈ 1
+      const k = Math.min(0.95, 0.25 + 0.3 * move);
+      smooth.p.lerp(p, k); smooth.q.slerp(q, k);
+    }
     table.matrix.compose(smooth.p, smooth.q, new THREE.Vector3(1, 1, 1));
     table.matrixWorldNeedsUpdate = true;
     if (!s.place) setPlace(onTable(innerWidth / 2, innerHeight * 0.55) || [0, 0]);
@@ -732,7 +829,13 @@ async function start(opt) {
   }
 
   function bestPose(c) {          // corners already in the QR's own order (see findCorners)
-    return poseFrom(c, s.video.videoWidth, s.video.videoHeight, focal());
+    if (!s.fGrav) learnFocal(c);
+    learnFocalFromGravity(c);
+    const P = poseFrom(c, s.video.videoWidth, s.video.videoHeight, focal());
+    // gravity only once this phone's focal is known (with a wrong focal, forcing the tilt makes size worse)
+    const level = P && s.fGrav && s.down && performance.now() - s.downAt < 500;
+    s.dbg.level = level ? "gravity" : "QR only";
+    return level ? levelPose(P, s.down) : P;
   }
 
   async function seek() {
@@ -776,6 +879,7 @@ function showDbg(s) {           // ?debug=1 panel: what the QR tracking is doing
     "video: " + v.videoWidth + "x" + v.videoHeight + "   screen: " + innerWidth + "x" + innerHeight,
     "tries " + (d.tries || 0) + " · built-in saw " + (d.builtin || 0) + " · jsQR read " + (d.jsqr || 0),
     "poses " + (d.poses || 0) + " · rejected " + (d.rejected || 0) + (d.dist ? " · QR at " + d.dist : ""),
+    "tilt from: " + (d.level || "-") + "   camera angle seen: " + (d.fov || "learning"),
     "state: " + (d.state || "") + (d.err ? "\nerror: " + d.err : "")].join("\n");
 }
 
@@ -783,6 +887,7 @@ function stop() {
   const s = S; S = null;
   if (!s) return;
   if (s.dbgEl) s.dbgEl.remove();
+  if (s.offGrav) s.offGrav();
   s.alive = false; clearTimeout(s.timer); cancelAnimationFrame(s.raf);
   s.canvas.classList.remove("on"); s.canvas.onpointerdown = s.canvas.onpointermove = s.canvas.onpointerup = s.canvas.onpointercancel = null;
   if (s.renderer) { s.renderer.clear(); s.renderer.dispose(); }
