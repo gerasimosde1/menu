@@ -143,9 +143,9 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 
 <div class="cam" id="cam" hidden>
   <video id="camv" playsinline muted autoplay></video>
-  <model-viewer id="cammv" camera-controls disable-pan touch-action="none" interaction-prompt="none" shadow-intensity="1" shadow-softness="0.7"
-    field-of-view="60deg" min-field-of-view="60deg" max-field-of-view="60deg" camera-orbit="0deg 25deg 0.45m"
-    min-camera-orbit="auto 0deg 0.15m" max-camera-orbit="auto 88deg 2m" interpolation-decay="80"></model-viewer>
+  <model-viewer id="cammv" camera-controls disable-pan disable-zoom touch-action="none" interaction-prompt="none" shadow-intensity="1" shadow-softness="0.7"
+    field-of-view="65deg" min-field-of-view="65deg" max-field-of-view="65deg" camera-orbit="0deg 30deg 0.462m"
+    min-camera-orbit="auto 0deg 0.1m" max-camera-orbit="auto 88deg 3m" interpolation-decay="80"></model-viewer>
   <button class="x" id="camx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <p class="camhint" id="camhint"></p>
 </div>
@@ -189,7 +189,7 @@ var UIS={
  hint:"Κράτα το κινητό κοντά πάνω από το τραπέζι και σκόπευσε προς τα κάτω.|Hold your phone close above the table and aim down.|Halten Sie das Handy nah über den Tisch und zielen Sie nach unten.|Tieni il telefono vicino al tavolo e inquadra verso il basso.|Tenez le téléphone près de la table et visez vers le bas.|Mantén el móvil cerca de la mesa y apunta hacia abajo.|Houd je telefoon dicht boven de tafel en richt naar beneden.|Trzymaj telefon blisko stołu i skieruj go w dół.|Держите телефон близко к столу и направьте камеру вниз.|Håll telefonen nära bordet och rikta den nedåt.",
  noar:"Το 3D μοντέλο θα προστεθεί σύντομα.|The 3D model will be added soon.|Das 3D-Modell folgt in Kürze.|Il modello 3D sarà aggiunto presto.|Le modèle 3D sera bientôt ajouté.|El modelo 3D se añadirá pronto.|Het 3D-model komt binnenkort.|Model 3D zostanie dodany wkrótce.|3D-модель скоро появится.|3D-modellen läggs till snart.",
  close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng",
- camhint:"Γείρε το κινητό πάνω από το τραπέζι · τσίμπησε με δύο δάχτυλα για το μέγεθος|Tilt your phone over the table · pinch with two fingers to adjust the size|Neigen Sie das Handy über den Tisch · mit zwei Fingern die Größe anpassen|Inclina il telefono sopra il tavolo · pizzica con due dita per regolare la dimensione|Inclinez le téléphone au-dessus de la table · pincez à deux doigts pour ajuster la taille|Inclina el móvil sobre la mesa · pellizca con dos dedos para ajustar el tamaño|Kantel je telefoon boven de tafel · knijp met twee vingers om de grootte aan te passen|Pochyl telefon nad stołem · zsuń dwa palce, aby zmienić rozmiar|Наклоните телефон над столом · сведите два пальца, чтобы изменить размер|Luta telefonen över bordet · nyp med två fingrar för att ändra storleken",
+ camhint:"Κράτα το κινητό περίπου 40 εκ. πάνω από το τραπέζι και γείρε το προς τα κάτω|Hold your phone about 40 cm above the table and tilt it down|Halten Sie das Handy etwa 40 cm über den Tisch und neigen Sie es nach unten|Tieni il telefono a circa 40 cm sopra il tavolo e inclinalo verso il basso|Tenez le téléphone à environ 40 cm au-dessus de la table et inclinez-le vers le bas|Sostén el móvil a unos 40 cm sobre la mesa e inclínalo hacia abajo|Houd je telefoon ongeveer 40 cm boven de tafel en kantel hem naar beneden|Trzymaj telefon około 40 cm nad stołem i pochyl go w dół|Держите телефон примерно в 40 см над столом и наклоните его вниз|Håll telefonen cirka 40 cm ovanför bordet och luta den nedåt",
  camno:"Δεν δόθηκε άδεια για την κάμερα. Επίτρεψέ την από τις ρυθμίσεις του browser.|Camera permission was not granted. Allow it in your browser settings.|Keine Kameraberechtigung. Bitte in den Browser-Einstellungen erlauben.|Permesso fotocamera non concesso. Consentilo nelle impostazioni del browser.|Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.|No se concedió permiso para la cámara. Actívalo en los ajustes del navegador.|Geen toestemming voor de camera. Sta dit toe in je browserinstellingen.|Brak dostępu do aparatu. Zezwól na to w ustawieniach przeglądarki.|Нет доступа к камере. Разрешите его в настройках браузера.|Kameraåtkomst nekades. Tillåt den i webbläsarens inställningar.",
  extras:"Έξτρα υλικά|Extras|Extras|Extra|Suppléments|Extras|Extra's|Dodatki|Добавки|Tillbehör",
  demo:"Δείγμα για «{n}» · δεν είναι το επίσημο μενού|Sample for “{n}” · not the official menu|Muster für „{n}“ · nicht die offizielle Speisekarte|Esempio per «{n}» · non è il menu ufficiale|Exemple pour « {n} » · pas la carte officielle|Ejemplo para «{n}» · no es la carta oficial|Voorbeeld voor “{n}” · niet het officiële menu|Przykład dla „{n}” · to nie jest oficjalne menu|Пример для «{n}» · не официальное меню|Exempel för ”{n}” · inte den officiella menyn",
@@ -405,17 +405,34 @@ try{
     XR_P=navigator.xr.isSessionSupported("immersive-ar").then(function(v){XR_AR=!!v;},function(){XR_AR=false;});
 }catch(e){}
 var camStream=null;
+/* Real size without AR: the camera cannot measure the table, so we assume the phone is held CAM_H above it.
+   Tilt (beta) gives the viewing angle; the distance to the dish along the view is CAM_H / cos(angle).
+   A phone's main camera sees about 65deg along the long side of the screen; the video fills the screen by
+   cropping the short side, and model-viewer applies its field-of-view to the short side, so we set it to
+   the short side's share of those 65deg. */
+var CAM_H=0.40, CAM_LONG_FOV=65;
+function camFov(){
+  var w=window.innerWidth,h=window.innerHeight,
+      f=2*Math.atan(Math.tan(CAM_LONG_FOV*Math.PI/360)*Math.min(w,h)/Math.max(w,h))*180/Math.PI,
+      m=$("cammv");
+  ["field-of-view","min-field-of-view","max-field-of-view"].forEach(function(a){m.setAttribute(a,f.toFixed(1)+"deg");});
+}
+function camOrbit(theta,phiDeg){
+  var phi=Math.max(5,Math.min(78,phiDeg));
+  return theta+" "+phi+"deg "+(CAM_H/Math.cos(phi*Math.PI/180)).toFixed(3)+"m";
+}
 function onTilt(e){   /* phone flat over the table = view from above; upright = view from the side */
   if(e.beta==null)return;
-  var m=$("cammv"),o=m.getCameraOrbit(),phi=Math.max(5,Math.min(85,Math.abs(e.beta)));
-  m.cameraOrbit=o.theta+"rad "+phi+"deg "+o.radius+"m";
+  var m=$("cammv");
+  m.cameraOrbit=camOrbit(m.getCameraOrbit().theta+"rad",Math.abs(e.beta));
 }
 function openCam(src,alt,t){
   var m=$("cammv");
   $("camhint").textContent=t.camhint;
   m.setAttribute("alt",alt);
   if(m.getAttribute("src")!==src)m.setAttribute("src",src);
-  m.cameraOrbit="0deg 25deg 0.45m";     /* about real size when the phone is ~45 cm from the dish */
+  m.cameraOrbit=camOrbit("0deg",30);    /* until the first tilt reading arrives */
+  camFov();
   $("cam").hidden=false;
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false}).then(function(st){
     camStream=st;var v=$("camv");v.srcObject=st;var p=v.play();if(p&&p.catch)p.catch(function(){});
