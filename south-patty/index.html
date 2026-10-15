@@ -49,6 +49,14 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-rad
 h2{font:600 13px Manrope,sans-serif;letter-spacing:.28em;text-transform:uppercase;margin:52px 0 6px;color:var(--gold)}
 .rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1;transform:none}
+/* category bar: appears at the top once the menu starts, follows the scroll, tap to jump */
+.cats{position:fixed;top:0;left:0;right:0;z-index:14;padding:calc(12px + env(safe-area-inset-top,0px)) 92px 12px 0;background:var(--glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transform:translateY(-110%);transition:transform .3s ease}
+.cats div{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 14px;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+.cats div::-webkit-scrollbar{display:none}
+.cats.on{transform:none}
+.cats button{flex:none;padding:8px 14px;border:1px solid var(--a35);border-radius:99px;background:none;color:var(--ink);font:700 11.5px Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s}
+.cats button.act{background:var(--gold);border-color:var(--gold);color:var(--on-accent)}
+h2{scroll-margin-top:74px}
 .dish{display:flex;width:100%;gap:16px;align-items:flex-start;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:24px 0;margin:0;color:inherit;font:inherit;cursor:pointer}
 .dish .t{flex:1;min-width:0}
 .dish b{display:block;font:500 24px/1.25 Literata,Georgia,serif}
@@ -132,6 +140,7 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
 <div class="lgbox" id="lgbox" role="listbox" hidden></div>
 
 <div id="page">
+  <nav class="cats" id="cats" aria-label="Menu"><div id="catsin"></div></nav>
   <section class="hero" id="hero">
     <div class="glow"></div>
     <p class="demo" id="demo" hidden><span id="demotxt"></span></p>
@@ -329,8 +338,8 @@ function render(){
   $("cuetxt").textContent=t.enter;
   $("lgcode").textContent=lang.toUpperCase();
   var html="",k=0;
-  SECTIONS.forEach(function(sec){
-    html+='<h2 class="rv">'+pick(sec.name)+'</h2>';
+  SECTIONS.forEach(function(sec,si){
+    html+='<h2 class="rv" id="sec'+si+'">'+pick(sec.name)+'</h2>';
     DISHES.forEach(function(d,i){
       if(d.s!==sec.id) return;
       var S=sizesOf(d),def=S[d.def||0],has=S.some(function(x){return x.glb;});
@@ -338,6 +347,8 @@ function render(){
     });
   });
   $("menu").innerHTML=html;
+  $("catsin").innerHTML=SECTIONS.length>1?SECTIONS.map(function(sec,si){return '<button data-s="'+si+'">'+pick(sec.name)+'</button>';}).join(""):"";
+  catAct=-1;onCats();
   reveal();
   buildLangBox();
 }
@@ -489,10 +500,31 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(!$("cam"
 $("camx").addEventListener("click",closeCam);
 document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".ar"))track("ar_click",{dish:currentDish});});
 $("cue").addEventListener("click",function(){var m=$("menu");try{m.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){m.scrollIntoView();}});
+/* category bar: shown once the menu reaches the top; the category being read is highlighted */
+var catAct=-1;
+function onCats(){
+  var nav=$("cats"),bar=$("catsin"),hs=document.querySelectorAll("#menu h2");
+  if(!hs.length||!bar.firstChild){nav.classList.remove("on");return;}
+  var line=nav.offsetHeight+24,a=0;
+  nav.classList.toggle("on",$("menu").getBoundingClientRect().top<line);
+  hs.forEach(function(h,i){if(h.getBoundingClientRect().top<line+40)a=i;});
+  if((window.innerHeight+(window.pageYOffset||0))>=document.documentElement.scrollHeight-4)a=hs.length-1;
+  if(a===catAct)return;catAct=a;
+  [].forEach.call(bar.children,function(b,i){b.classList.toggle("act",i===a);});
+  var b=bar.children[a];if(b)bar.scrollTo?bar.scrollTo({left:b.offsetLeft-14,behavior:"smooth"}):(bar.scrollLeft=b.offsetLeft-14);
+}
+$("cats").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  var h=$("sec"+b.dataset.s),y=h.getBoundingClientRect().top+(window.pageYOffset||0)-$("cats").offsetHeight-30;
+  h.classList.add("in");
+  try{window.scrollTo({top:y,behavior:"smooth"});}catch(err){window.scrollTo(0,y);}
+});
 window.addEventListener("scroll",function(){
   var y=window.pageYOffset||0,h=window.innerHeight||700,p=Math.min(1,y/(h*.7));
   $("hc").style.opacity=String(1-p);$("hc").style.transform="translateY("+(-y*.25)+"px)";
+  onCats();
 },{passive:true});
+window.addEventListener("resize",function(){catAct=-1;onCats();});
 render();
 </script>
 <script type="module">
