@@ -73,6 +73,13 @@ body.lock{position:fixed;width:100%;overflow:hidden}
 .tags figure .bd{display:grid;margin:0 auto 7px}
 model-viewer{display:block;width:100%;height:2px;margin-top:0;opacity:0;background:transparent;--poster-color:transparent;transition:height .35s,opacity .35s,margin .35s}
 model-viewer.ok{height:300px;margin-top:12px;opacity:1}
+/* camera view for phones without Google AR (ARCore): live camera with the dish drawn over it */
+.cam{position:fixed;inset:0;z-index:50;background:#000}
+.cam[hidden]{display:none}
+.cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cam model-viewer{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:1;background:transparent}
+.cam .x{top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:2;background:rgba(10,13,17,.7)}
+.camhint{position:absolute;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));margin:0;padding:12px 14px;border-radius:14px;background:rgba(10,13,17,.72);color:var(--ink);font:600 13.5px/1.45 Manrope,sans-serif;text-align:center}
 .pills{display:flex;gap:8px;margin:14px 0 4px}
 .pill{flex:1;min-width:0;padding:8px 6px;border:1px solid var(--gold);border-radius:16px;background:none;color:var(--gold2);font:700 12.5px/1.25 Manrope,sans-serif;cursor:pointer}
 .pill b{display:block;font-weight:700}
@@ -134,6 +141,14 @@ model-viewer.ok{height:300px;margin-top:12px;opacity:1}
   <div class="wrap"><div id="menu"></div><div id="cta"></div></div>
 </div>
 
+<div class="cam" id="cam" hidden>
+  <video id="camv" playsinline muted autoplay></video>
+  <model-viewer id="cammv" camera-controls disable-pan touch-action="none" interaction-prompt="none" shadow-intensity="1" shadow-softness="0.7"
+    field-of-view="60deg" min-field-of-view="60deg" max-field-of-view="60deg" camera-orbit="0deg 25deg 0.45m"
+    min-camera-orbit="auto 0deg 0.15m" max-camera-orbit="auto 88deg 2m" interpolation-decay="80"></model-viewer>
+  <button class="x" id="camx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <p class="camhint" id="camhint"></p>
+</div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-name">
   <div class="panel" id="panel"></div>
 </div>
@@ -174,6 +189,8 @@ var UIS={
  hint:"Κράτα το κινητό κοντά πάνω από το τραπέζι και σκόπευσε προς τα κάτω.|Hold your phone close above the table and aim down.|Halten Sie das Handy nah über den Tisch und zielen Sie nach unten.|Tieni il telefono vicino al tavolo e inquadra verso il basso.|Tenez le téléphone près de la table et visez vers le bas.|Mantén el móvil cerca de la mesa y apunta hacia abajo.|Houd je telefoon dicht boven de tafel en richt naar beneden.|Trzymaj telefon blisko stołu i skieruj go w dół.|Держите телефон близко к столу и направьте камеру вниз.|Håll telefonen nära bordet och rikta den nedåt.",
  noar:"Το 3D μοντέλο θα προστεθεί σύντομα.|The 3D model will be added soon.|Das 3D-Modell folgt in Kürze.|Il modello 3D sarà aggiunto presto.|Le modèle 3D sera bientôt ajouté.|El modelo 3D se añadirá pronto.|Het 3D-model komt binnenkort.|Model 3D zostanie dodany wkrótce.|3D-модель скоро появится.|3D-modellen läggs till snart.",
  close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng",
+ camhint:"Γείρε το κινητό πάνω από το τραπέζι · τσίμπησε με δύο δάχτυλα για το μέγεθος|Tilt your phone over the table · pinch with two fingers to adjust the size|Neigen Sie das Handy über den Tisch · mit zwei Fingern die Größe anpassen|Inclina il telefono sopra il tavolo · pizzica con due dita per regolare la dimensione|Inclinez le téléphone au-dessus de la table · pincez à deux doigts pour ajuster la taille|Inclina el móvil sobre la mesa · pellizca con dos dedos para ajustar el tamaño|Kantel je telefoon boven de tafel · knijp met twee vingers om de grootte aan te passen|Pochyl telefon nad stołem · zsuń dwa palce, aby zmienić rozmiar|Наклоните телефон над столом · сведите два пальца, чтобы изменить размер|Luta telefonen över bordet · nyp med två fingrar för att ändra storleken",
+ camno:"Δεν δόθηκε άδεια για την κάμερα. Επίτρεψέ την από τις ρυθμίσεις του browser.|Camera permission was not granted. Allow it in your browser settings.|Keine Kameraberechtigung. Bitte in den Browser-Einstellungen erlauben.|Permesso fotocamera non concesso. Consentilo nelle impostazioni del browser.|Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.|No se concedió permiso para la cámara. Actívalo en los ajustes del navegador.|Geen toestemming voor de camera. Sta dit toe in je browserinstellingen.|Brak dostępu do aparatu. Zezwól na to w ustawieniach przeglądarki.|Нет доступа к камере. Разрешите его в настройках браузера.|Kameraåtkomst nekades. Tillåt den i webbläsarens inställningar.",
  extras:"Έξτρα υλικά|Extras|Extras|Extra|Suppléments|Extras|Extra's|Dodatki|Добавки|Tillbehör",
  demo:"Δείγμα για «{n}» · δεν είναι το επίσημο μενού|Sample for “{n}” · not the official menu|Muster für „{n}“ · nicht die offizielle Speisekarte|Esempio per «{n}» · non è il menu ufficiale|Exemple pour « {n} » · pas la carte officielle|Ejemplo para «{n}» · no es la carta oficial|Voorbeeld voor “{n}” · niet het officiële menu|Przykład dla „{n}” · to nie jest oficjalne menu|Пример для «{n}» · не официальное меню|Exempel för ”{n}” · inte den officiella menyn",
  cta:"Θέλεις ένα τέτοιο μενού για το μαγαζί σου;|Want a menu like this for your restaurant?|Möchten Sie so eine Speisekarte für Ihr Restaurant?|Vuoi un menu così per il tuo locale?|Envie d'une carte comme celle-ci pour votre restaurant ?|¿Quieres una carta así para tu restaurante?|Wil je zo'n menu voor je restaurant?|Chcesz takie menu dla swojej restauracji?|Хотите такое меню для своего ресторана?|Vill du ha en sådan meny för din restaurang?",
@@ -340,7 +357,7 @@ function openDish(i,si){
   var s=S[si],X=d.ext||[];
   currentDish=pick(d.n)+(S.length>1?" / "+pick(s.n):"");
   if(first)track("dish_open",{dish:d.n.split("|")[1]});
-  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+(s.poster?' poster="'+s.poster+'" class="ok"':'')+' ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+(s.cm?' · '+s.cm+' '+t.cm:'')+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
+  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+(s.poster?' poster="'+s.poster+'" class="ok"':'')+' ar ar-modes="webxr quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+(s.cm?' · '+s.cm+' '+t.cm:'')+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
   var tags=(d.tags||[]).map(function(k){return '<figure>'+badge(k,36,nm(TAGS,k))+nm(TAGS,k)+'</figure>';}).join("");
   var pills=S.length>1?'<div class="pills">'+S.map(function(x,j){return '<button class="pill" data-si="'+j+'" aria-pressed="'+(j===si)+'"><b>'+pick(x.n)+'</b>'+(x.cm?'<small>'+x.cm+' '+t.cm+'</small>':'')+'</button>';}).join("")+'</div>':'';
   var ext=X.length?'<details class="ext"'+(extOpen?' open':'')+'><summary>'+t.extras+'</summary><ul>'+X.map(function(x){return '<li>'+pick(x.n)+'<span>+'+fmt(x.price)+'</span></li>';}).join("")+'</ul></details>':'';
@@ -359,19 +376,59 @@ function openDish(i,si){
   $("panel").scrollTop=keepY;
   var mv=$("mv"),loaded=false,wantAR=false;
   function startAR(){
-    if(mv.canActivateAR){try{mv.activateAR();return;}catch(e){}}
+    if(IOS||XR_AR){                       /* real AR: Quick Look on iPhone, WebXR + Google AR on Android */
+      if(!IOS&&!loaded){wantAR=true;return;}
+      if(mv.canActivateAR){try{mv.activateAR();return;}catch(e){}}
+    }
+    if(!IOS&&MOBILE&&CAM_OK){openCam(s.glb,pick(d.n),t);return;}   /* phones without Google AR: camera view */
     $("arnote").textContent=t.noxr;$("arnote").hidden=false;
   }
   if(mv)mv.addEventListener("load",function(){loaded=true;mv.classList.add("ok");if(wantAR){wantAR=false;startAR();}});
   $("cl").onclick=closeSheet;
   if($("arbtn"))$("arbtn").onclick=function(){
-    if(mv&&(loaded||mv.canActivateAR)){startAR();return;}   /* AR apps load the file themselves: no need to wait */
-    if(mv){wantAR=true;return;}   /* support not known yet: decide as soon as the 3D is ready */
-    $("arnote").hidden=false;
+    if(!mv){$("arnote").hidden=false;return;}       /* this size has no 3D model */
+    XR_P.then(startAR);
   };
   document.querySelectorAll("#panel .pill").forEach(function(b){b.onclick=function(){openDish(i,+b.dataset.si);};});
   var ex=document.querySelector("#panel .ext");
   if(ex)ex.addEventListener("toggle",function(){extOpen=ex.open;});
+}
+/* ---- AR support: real AR where the phone has it, otherwise our own camera view ---- */
+var UA=navigator.userAgent||"";
+var IOS=/iPad|iPhone|iPod/.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+var MOBILE=IOS||/Android|Mobi/i.test(UA);
+var CAM_OK=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+var XR_AR=false;   /* true when Chrome can run real AR (needs Google Play Services for AR on the phone) */
+var XR_P=Promise.resolve();
+try{
+  if(!IOS&&navigator.xr&&navigator.xr.isSessionSupported)
+    XR_P=navigator.xr.isSessionSupported("immersive-ar").then(function(v){XR_AR=!!v;},function(){XR_AR=false;});
+}catch(e){}
+var camStream=null;
+function onTilt(e){   /* phone flat over the table = view from above; upright = view from the side */
+  if(e.beta==null)return;
+  var m=$("cammv"),o=m.getCameraOrbit(),phi=Math.max(5,Math.min(85,Math.abs(e.beta)));
+  m.cameraOrbit=o.theta+"rad "+phi+"deg "+o.radius+"m";
+}
+function openCam(src,alt,t){
+  var m=$("cammv");
+  $("camhint").textContent=t.camhint;
+  m.setAttribute("alt",alt);
+  if(m.getAttribute("src")!==src)m.setAttribute("src",src);
+  m.cameraOrbit="0deg 25deg 0.45m";     /* about real size when the phone is ~45 cm from the dish */
+  $("cam").hidden=false;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false}).then(function(st){
+    camStream=st;var v=$("camv");v.srcObject=st;var p=v.play();if(p&&p.catch)p.catch(function(){});
+  },function(){$("camhint").textContent=t.camno;});
+  window.addEventListener("deviceorientation",onTilt);
+  track("cam_view",{dish:currentDish});
+}
+function closeCam(){
+  if($("cam").hidden)return;
+  $("cam").hidden=true;
+  window.removeEventListener("deviceorientation",onTilt);
+  if(camStream){camStream.getTracks().forEach(function(x){x.stop();});camStream=null;}
+  $("camv").srcObject=null;
 }
 function closeSheet(){
   if(!$("sheet").classList.contains("open"))return;
@@ -384,7 +441,8 @@ $("lgbox").addEventListener("click",function(e){var b=e.target.closest("button")
 document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest(".lg,.lgbox"))toggleLang(false);});
 $("menu").addEventListener("click",function(e){var b=e.target.closest(".dish");if(b)openDish(+b.dataset.i);});
 $("sheet").addEventListener("click",function(e){if(e.target.id==="sheet")closeSheet();});
-document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeSheet();toggleLang(false);}});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(!$("cam").hidden){closeCam();return;}closeSheet();toggleLang(false);}});
+$("camx").addEventListener("click",closeCam);
 document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".ar"))track("ar_click",{dish:currentDish});});
 $("cue").addEventListener("click",function(){var m=$("menu");try{m.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){m.scrollIntoView();}});
 window.addEventListener("scroll",function(){
