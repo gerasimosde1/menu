@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#0A0D11;--surface:#11161C;--ink:#EDEAE3;--mute:#85909A;--gold:#D9B877;--gold2:#F0D9A4;--line:#1D252D}
@@ -550,7 +549,10 @@ function poseFrom(corners, vw, vh, f) {
 
 async function loadLibs() {
   const [THREE, { GLTFLoader }, { DRACOLoader }] = await Promise.all([
-    import("three"), import("three/addons/loaders/GLTFLoader.js"), import("three/addons/loaders/DRACOLoader.js")]);
+    // esm.sh: full URLs (no import map, which older Chrome lacks); it serves code the visiting browser understands,
+    // and the loaders get the same three.js instance
+    import("https://esm.sh/three@0.160.0"), import("https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"),
+    import("https://esm.sh/three@0.160.0/examples/jsm/loaders/DRACOLoader.js")]);
   return { THREE, GLTFLoader, DRACOLoader };
 }
 function loadJsQR() {
@@ -594,6 +596,7 @@ async function findCorners(s) {
     s.cx.drawImage(v, x0, y0, cw, ch, 0, 0, w, h);
     const q = window.jsQR(s.cx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: "dontInvert" });
     if (!q) return null;
+    s.dbg.jsqr = (s.dbg.jsqr || 0) + 1;
     const L = q.location;
     return [L.topLeftCorner, L.topRightCorner, L.bottomRightCorner, L.bottomLeftCorner].map(p => ({ x: x0 + p.x / k, y: y0 + p.y / k }));
   };
@@ -610,8 +613,11 @@ async function findCorners(s) {
     catch (e) { s.detector = null; }     // the built-in reader failed: jsQR only from now on
     if (d && d.length === 4) {
       d = d.map(p => ({ x: p.x, y: p.y }));
+      s.dbg.builtin = (s.dbg.builtin || 0) + 1;
       c = around(d, 0.25);
-      if (!c && s.last && now - s.lastAt < 400) c = matchOrder(d, s.last);   // brief gap: keep the known order
+      // jsQR could not read it (blur, glare): use the built-in reader's corners anyway, kept in the same order
+      // as the last known corners so the dish does not jump sides. The very first time, take them as given.
+      if (!c) c = s.last && now - s.lastAt < 1500 ? matchOrder(d, s.last) : d;
     }
   }
   if (!c && (!s.detector || (s.miss = (s.miss || 0) + 1) % 3 === 0)) c = read(0, 0, VW, VH, 960);   // whole frame (every 3rd miss when the built-in reader is searching too)
@@ -622,8 +628,20 @@ async function findCorners(s) {
 
 async function start(opt) {
   stop();
-  const s = S = { video: opt.video, canvas: opt.canvas, onState: opt.onState || (() => {}), alive: true,
+  const s = S = { video: opt.video, canvas: opt.canvas, alive: true, dbg: { libs: "loading" },
                   pose: null, seen: 0, place: null, everFound: false, t0: performance.now() };
+  // state changes go to the page, to the stats (once per state per session) and to the ?debug=1 panel
+  const told = {};
+  s.onState = (state, err) => {
+    s.dbg.state = state; if (err) s.dbg.err = String(err).slice(0, 160);
+    (opt.onState || (() => {}))(state);
+    if (!told[state] && window.track) { told[state] = 1; window.track("ar_marker", { state, err: s.dbg.err || "", reader: s.detector ? "builtin" : "jsqr" }); }
+  };
+  if (/[?&]debug/.test(location.search)) {
+    s.dbgEl = document.createElement("pre");
+    s.dbgEl.style.cssText = "position:absolute;left:8px;top:64px;z-index:3;margin:0;padding:6px 8px;max-width:70%;white-space:pre-wrap;font:11px/1.35 monospace;color:#0f0;background:rgba(0,0,0,.6);border-radius:6px";
+    s.canvas.parentNode.appendChild(s.dbgEl);
+  }
   s.onState("searching");
   let L;
   try {
@@ -632,7 +650,8 @@ async function start(opt) {
       if (f.includes("qr_code")) s.detector = new BarcodeDetector({ formats: ["qr_code"] });
     }
     [L] = await Promise.all([loadLibs(), loadJsQR()]);
-  } catch (e) { if (s.alive) s.onState("error"); return; }
+    s.dbg.libs = "ok";
+  } catch (e) { s.dbg.libs = "FAILED"; if (s.alive) { s.onState("error", e && (e.message || e)); showDbg(s); } return; }
   if (!s.alive) return;
   const { THREE, GLTFLoader, DRACOLoader } = L;
   s.cv = document.createElement("canvas"); s.cx = s.cv.getContext("2d", { willReadFrequently: true });
@@ -666,7 +685,7 @@ async function start(opt) {
     holder.add(dish); spot.add(holder);
     radius = Math.max(sz.x, sz.z) / 2;
     ground.scale.set(radius * 3, radius * 3, 1);
-  }, undefined, () => { if (s.alive) s.onState("error"); });
+  }, undefined, e => { if (s.alive) s.onState("error", "3D model: " + (e && (e.message || e))); });
 
   const focal = () => Math.max(s.video.videoWidth, s.video.videoHeight) / 2 / Math.tan(LONG_FOV * Math.PI / 360);
   const coverScale = () => Math.max(innerWidth / s.video.videoWidth, innerHeight / s.video.videoHeight);
@@ -722,13 +741,17 @@ async function start(opt) {
       const c = await findCorners(s);
       const P = c && bestPose(c);
       if (!s.alive) return;
+      s.dbg.tries = (s.dbg.tries || 0) + 1;
+      if (c && !P) s.dbg.rejected = (s.dbg.rejected || 0) + 1;
       if (P) {
+        s.dbg.poses = (s.dbg.poses || 0) + 1; s.dbg.dist = Math.round(len(P.t) * 100) + " cm";
         usePose(P); s.seen = performance.now();
         if (!s.everFound) { s.everFound = true; s.canvas.classList.add("on"); }
         s.onState("found");
       } else if (s.everFound && performance.now() - s.seen > 1200) s.onState("lost");
       else if (!s.everFound && performance.now() - s.t0 > FIND_LIMIT) s.onState("nomarker");
     }
+    showDbg(s);
     s.timer = setTimeout(seek, 50);
   }
   seek();
@@ -745,9 +768,21 @@ async function start(opt) {
   })();
 }
 
+function showDbg(s) {           // ?debug=1 panel: what the QR tracking is doing on this phone
+  if (!s.dbgEl) return;
+  const d = s.dbg, v = s.video;
+  s.dbgEl.textContent = [
+    "3D libs: " + d.libs + "   reader: " + (s.detector ? "built-in + jsQR" : "jsQR"),
+    "video: " + v.videoWidth + "x" + v.videoHeight + "   screen: " + innerWidth + "x" + innerHeight,
+    "tries " + (d.tries || 0) + " · built-in saw " + (d.builtin || 0) + " · jsQR read " + (d.jsqr || 0),
+    "poses " + (d.poses || 0) + " · rejected " + (d.rejected || 0) + (d.dist ? " · QR at " + d.dist : ""),
+    "state: " + (d.state || "") + (d.err ? "\nerror: " + d.err : "")].join("\n");
+}
+
 function stop() {
   const s = S; S = null;
   if (!s) return;
+  if (s.dbgEl) s.dbgEl.remove();
   s.alive = false; clearTimeout(s.timer); cancelAnimationFrame(s.raf);
   s.canvas.classList.remove("on"); s.canvas.onpointerdown = s.canvas.onpointermove = s.canvas.onpointerup = s.canvas.onpointercancel = null;
   if (s.renderer) { s.renderer.clear(); s.renderer.dispose(); }
