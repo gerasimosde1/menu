@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#F2B1C9">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>South Patty – Burgers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#0A0D11;--surface:#11161C;--ink:#EDEAE3;--mute:#85909A;--gold:#D9B877;--gold2:#F0D9A4;--gold3:#B8944F;--line:#1D252D;--grab:#2A343D;--on-accent:#17110A;--icon-bg:rgba(20,14,6,.9);--glass:rgba(10,13,17,.72);--glass2:rgba(10,13,17,.6);--surface0:rgba(17,22,28,0);--a15:rgba(217,184,119,.15);--a35:rgba(217,184,119,.35);--a45:rgba(217,184,119,.45);--a0:rgba(217,184,119,0)}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+/* language picker */
+.lg{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:15;display:flex;align-items:center;gap:7px;padding:9px 13px;border:1px solid var(--line);border-radius:99px;background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--ink);font:700 12px Manrope,sans-serif;letter-spacing:.1em;cursor:pointer}
+.lg svg{width:15px;height:15px}
+.lgbox{position:fixed;top:calc(62px + env(safe-area-inset-top,0px));right:14px;z-index:16;width:min(300px,calc(100vw - 28px));display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 18px 50px rgba(0,0,0,.55);animation:pop .22s ease}
+.lgbox[hidden]{display:none}
+.lgbox button{padding:11px 12px;border:0;border-radius:11px;background:none;color:var(--ink);font:600 14px Manrope,sans-serif;text-align:left;cursor:pointer}
+.lgbox button[aria-selected="true"]{background:var(--gold);color:var(--on-accent)}
+@keyframes pop{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+/* hero */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 28px 110px;overflow:hidden}
+.glow{position:absolute;inset:0;background:radial-gradient(60% 42% at 50% 34%,var(--a15),transparent 70%);animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.55}}
+.hc{position:relative;max-width:420px;will-change:transform,opacity}
+.eyebrow{margin:0 0 16px;font:700 11px Manrope,sans-serif;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);opacity:0;animation:rise .9s .1s forwards}
+.hc h1{margin:0;font:400 clamp(56px,17vw,84px)/1 Literata,Georgia,serif;letter-spacing:-.02em;opacity:0;animation:rise .9s .25s forwards}
+.hc h1 img.logo{display:block;margin:0 auto;width:min(260px,64vw);height:auto;max-height:34vh;object-fit:contain}
+.rule{height:1px;width:0;margin:26px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:grow 1.2s .6s forwards}
+@keyframes grow{to{width:140px}}
+.intro{margin:0;color:var(--mute);font-size:16px;line-height:1.6;opacity:0;animation:rise .9s .8s forwards}
+.chip{display:inline-flex;align-items:center;gap:5px;margin:0 2px;padding:1px 9px;border:1px solid var(--gold);border-radius:99px;color:var(--gold);font:700 10.5px Manrope,sans-serif;letter-spacing:.12em;vertical-align:1px}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.cue{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom,0px));left:0;right:0;margin:0 auto;width:max-content;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;color:var(--gold2);font:700 14px Manrope,sans-serif;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;opacity:0;animation:rise .9s 1.3s forwards}
+#cuetxt{padding-left:.28em}
+.arrows{display:flex;flex-direction:column;align-items:center;gap:0}
+.arrows svg{width:30px;height:17px;margin-top:-5px;opacity:0;animation:wave 1.7s ease-in-out infinite}
+.arrows svg:nth-child(2){animation-delay:.22s}.arrows svg:nth-child(3){animation-delay:.44s}
+@keyframes wave{0%{opacity:0;transform:translateY(-6px)}45%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+/* menu */
+.wrap{max-width:580px;margin:0 auto;padding:36px 22px 80px}
+h2{font:600 13px Manrope,sans-serif;letter-spacing:.28em;text-transform:uppercase;margin:52px 0 6px;color:var(--gold)}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.dish{display:flex;width:100%;gap:16px;align-items:flex-start;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:24px 0;margin:0;color:inherit;font:inherit;cursor:pointer}
+.dish .t{flex:1;min-width:0}
+.dish b{display:block;font:500 24px/1.25 Literata,Georgia,serif}
+.dish small{display:block;color:var(--mute);font-size:15.5px;line-height:1.45;margin-top:4px}
+.dish .tag{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:2px 9px;border:1px solid var(--gold);border-radius:99px;color:var(--gold);font:700 11px Manrope,sans-serif;letter-spacing:.14em}
+.price{font:400 21px Literata,Georgia,serif;white-space:nowrap;color:var(--gold2);padding-top:3px}
+/* sheet */
+body.lock{position:fixed;width:100%;overflow:hidden}
+.sheet{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:none;align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.panel{position:relative;background:var(--surface);width:100%;max-width:520px;max-height:93%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:28px 28px 0 0;border-top:1px solid var(--a35);padding:0 22px calc(28px + env(safe-area-inset-bottom,0px));animation:up .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(60px);opacity:.3}to{transform:none;opacity:1}}
+.bar{position:sticky;top:0;z-index:3;display:flex;justify-content:center;padding:12px 0 14px;margin:0 -22px;background:linear-gradient(var(--surface) 65%,var(--surface0))}
+.grab{width:44px;height:4px;border-radius:4px;background:var(--grab)}
+.x{position:absolute;right:16px;top:8px;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--ink);cursor:pointer}
+.x svg{width:16px;height:16px}
+.panel h3{font:400 34px/1.1 Literata,Georgia,serif;margin:6px 0 8px}
+.panel p{margin:0 0 6px;color:var(--mute)}
+.bd{--s:34px;display:inline-grid;place-items:center;width:var(--s);height:var(--s);border:1px solid var(--gold);border-radius:50%;background:var(--surface);color:var(--gold2);flex:none}
+.bd svg{width:62%;height:62%;overflow:visible}
+.tags{display:flex;flex-wrap:wrap;gap:12px 10px;margin:16px 0 2px}
+.tags figure{margin:0;width:72px;text-align:center;font-size:10.5px;line-height:1.25;color:var(--mute)}
+.tags figure .bd{display:grid;margin:0 auto 7px}
+model-viewer{display:block;width:100%;height:2px;margin-top:0;opacity:0;background:transparent;--poster-color:transparent;transition:height .35s,opacity .35s,margin .35s}
+model-viewer.ok{height:300px;margin-top:12px;opacity:1}
+/* camera view for phones without Google AR (ARCore): live camera with the dish drawn over it */
+.cam{position:fixed;inset:0;z-index:50;background:#000}
+.cam[hidden]{display:none}
+.cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cam model-viewer{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:1;background:transparent}
+.cam .x{top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:2;background:rgba(10,13,17,.7);color:#EDEAE3}
+.cam canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;pointer-events:none}
+.cam canvas.on{pointer-events:auto}
+.camhint{position:absolute;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));margin:0;padding:12px 14px;border-radius:14px;background:rgba(10,13,17,.72);color:var(--ink);font:600 13.5px/1.45 Manrope,sans-serif;text-align:center}
+.pills{display:flex;gap:8px;margin:14px 0 4px}
+.pill{flex:1;min-width:0;padding:8px 6px;border:1px solid var(--gold);border-radius:16px;background:none;color:var(--gold2);font:700 12.5px/1.25 Manrope,sans-serif;cursor:pointer}
+.pill b{display:block;font-weight:700}
+.pill small{display:block;font-weight:600;font-size:11px;opacity:.75}
+.pill[aria-pressed="true"]{background:var(--gold);color:var(--on-accent)}
+.ext{margin:14px 0 4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ext summary{display:flex;align-items:center;justify-content:space-between;padding:13px 0;list-style:none;cursor:pointer;font:700 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.ext summary::-webkit-details-marker{display:none}
+.ext summary::after{content:"";width:7px;height:7px;margin-right:4px;border-right:1.6px solid var(--gold);border-bottom:1.6px solid var(--gold);transform:rotate(45deg);transition:transform .2s}
+.ext[open] summary::after{transform:rotate(-135deg)}
+.ext ul{margin:0;padding:0 0 12px;list-style:none}
+.ext li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:14.5px;color:var(--ink)}
+.ext li span{color:var(--gold2);white-space:nowrap}
+.demo{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));left:14px;right:90px;z-index:2;margin:0;text-align:left;font:600 11.5px/1.35 Manrope,sans-serif;color:var(--gold2);opacity:0;animation:rise .9s .1s forwards}
+.demo span{display:inline-block;padding:5px 10px;border:1px dashed var(--gold);border-radius:10px;background:var(--glass2)}
+.hc h1.long{font-size:clamp(38px,11.5vw,64px);overflow-wrap:anywhere}
+.cta{margin:56px 0 0;padding:26px 22px;border:1px solid var(--a35);border-radius:22px;background:var(--surface);text-align:center}
+.cta p{margin:0 0 16px;font:400 21px/1.3 Literata,Georgia,serif}
+.cta a{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:99px;background:linear-gradient(135deg,var(--gold2),var(--gold) 55%,var(--gold3));color:var(--on-accent);font:700 15px Manrope,sans-serif;text-decoration:none}
+.cta a svg{width:20px;height:20px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin:16px 0 6px}
+.facts div{padding:12px 0;border-bottom:1px solid var(--line);font:700 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.facts b{display:block;font:400 21px Literata,Georgia,serif;letter-spacing:0;text-transform:none;color:var(--ink);margin-top:5px}
+.alg{margin:14px 0 6px}
+.alg h4{margin:0 0 12px;font:700 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.alg .row{display:flex;flex-wrap:wrap;gap:18px}
+.alg figure{margin:0;text-align:center;font-size:11px;color:var(--mute)}
+.alg figure .bd{--s:44px;display:grid;margin:0 auto 6px}
+.ar{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;width:100%;margin-top:18px;padding:16px 18px;border:0;border-radius:18px;background:linear-gradient(135deg,var(--gold2),var(--gold) 55%,var(--gold3));color:var(--on-accent);text-align:left;cursor:pointer;animation:pulse 2.6s infinite}
+.ar::after{content:"";position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:shine 3.4s infinite}
+.ar .ic{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--icon-bg);color:var(--icon-ink,var(--gold2))}
+.ar .tx b{display:block;font:700 17px/1.2 Manrope,sans-serif}
+.ar .tx small{display:block;font:600 12px/1.3 Manrope,sans-serif;opacity:.75;margin-top:2px}
+.ar .ic svg{animation:scan 2.2s ease-in-out infinite}
+@keyframes scan{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 var(--a45)}70%,100%{box-shadow:0 0 0 14px var(--a0)}}
+@keyframes shine{0%,55%{left:-80px}100%{left:130%}}
+.hint{margin:10px 2px 0;font-size:12.5px;color:var(--mute);line-height:1.4}
+.note{font-size:13px;color:var(--gold2);margin-top:10px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}.eyebrow,.hc h1,.intro,.cue{opacity:1}.rule{width:140px}}
+</style>
+<style>:root{color-scheme:light;--bg:#F2B1C9;--surface:#F7CFDE;--ink:#3B0E14;--mute:#885260;--line:#D597AC;--grab:#BF8396;--gold:#9C212B;--gold2:#9C212B;--gold3:#7A1A22;--on-accent:#FFFFFF;--icon-bg:rgba(255,255,255,.92);--icon-ink:#9C212B;--glass:rgba(242,177,201,0.72);--glass2:rgba(242,177,201,0.6);--surface0:rgba(247,207,222,0);--a15:rgba(156,33,43,0.15);--a35:rgba(156,33,43,0.35);--a45:rgba(156,33,43,0.45);--a0:rgba(156,33,43,0)}.hc h1 img.logo{mix-blend-mode:multiply}</style>
+</head>
+<body>
+<button class="lg" id="lgbtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/></svg><span id="lgcode">EL</span></button>
+<div class="lgbox" id="lgbox" role="listbox" hidden></div>
+
+<div id="page">
+  <section class="hero" id="hero">
+    <div class="glow"></div>
+    <p class="demo" id="demo" hidden><span id="demotxt"></span></p>
+    <div class="hc" id="hc">
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="title"></h1>
+      <div class="rule"></div>
+      <p class="intro" id="intro"></p>
+    </div>
+    <button class="cue" id="cue" aria-label="Scroll"><span id="cuetxt"></span><span class="arrows"><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 8 8 8-8"/></svg></span></button>
+  </section>
+  <div class="wrap"><div id="menu"></div><div id="cta"></div></div>
+</div>
+
+<div class="cam" id="cam" hidden>
+  <video id="camv" playsinline muted autoplay></video>
+  <model-viewer id="cammv" camera-controls disable-pan disable-zoom touch-action="none" interaction-prompt="none" shadow-intensity="1" shadow-softness="0.7"
+    field-of-view="65deg" min-field-of-view="65deg" max-field-of-view="65deg" camera-orbit="0deg 30deg 0.462m"
+    min-camera-orbit="auto 0deg 0.1m" max-camera-orbit="auto 88deg 3m" interpolation-decay="80"></model-viewer>
+  <canvas id="camgl"></canvas>
+  <button class="x" id="camx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <p class="camhint" id="camhint"></p>
+</div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-name">
+  <div class="panel" id="panel"></div>
+</div>
+
+<script>
+/* ==== Restaurant data: filled in by tools/build.py from restaurants/<name>/menu.xlsx. Do not edit here. ==== */
+var M = {"name":"South Patty","kind":"Burgers|Burgers|Burger|Burger|Burgers|||||","langs":["el","en","de","it","fr"],"whatsapp":"","umami":"","trackDomain":"gerasimosde1.github.io","demo":true,"logo":"logo.jpg","sections":[{"id":"burgers","name":"Burgers|Burgers|Burger|Burger|Burgers|||||"},{"id":"fries","name":"Πατάτες|Fries|Pommes|Patatine|Frites|||||"},{"id":"sides","name":"Συνοδευτικά|Sides|Beilagen|Contorni|Accompagnements|||||"},{"id":"salads","name":"Σαλάτες|Salads|Salate|Insalate|Salades|||||"},{"id":"sauces","name":"Σάλτσες|Sauces|Saucen|Salse|Sauces|||||"},{"id":"desserts","name":"Γλυκά|Desserts|Desserts|Dolci|Desserts|||||"},{"id":"drinks","name":"Αναψυκτικά|Soft drinks|Erfrischungsgetränke|Bibite|Boissons|||||"},{"id":"beers","name":"Μπύρες|Beers|Biere|Birre|Bières|||||"}],"dishes":[{"s":"burgers","n":"Cheeseburger|Cheeseburger|Cheeseburger|Cheeseburger|Cheeseburger|||||","d":"Με διπλό μπιφτέκι από 100% μοσχαρίσιο κιμά, cheddar, κρεμμύδι σωτέ, πίκλα αγγουριού, κέτσαπ, μουστάρδα και μαγιονέζα|Double 100% beef patty, cheddar, sautéed onion, pickles, ketchup, mustard and mayonnaise|Doppeltes Patty aus 100 % Rind, Cheddar, geschmorte Zwiebeln, Gurken, Ketchup, Senf und Mayonnaise|Doppio hamburger 100% manzo, cheddar, cipolla saltata, cetrioli sottaceto, ketchup, senape e maionese|Double steak 100 % bœuf, cheddar, oignons sautés, pickles, ketchup, moutarde et mayonnaise|||||","tags":[],"alg":[],"price":8.9,"glb":"cheeseburger.glb","usdz":"cheeseburger.usdz","poster":"cheeseburger-poster.webp"},{"s":"burgers","n":"Bacon Cheese|Bacon Cheese|Bacon Cheese|Bacon Cheese|Bacon Cheese|||||","d":"Με διπλό μπιφτέκι από 100% μοσχαρίσιο κιμά, cheddar, iceberg, μαρμελάδα μπέικον, πίκλα αγγουριού και &quot;south patty&quot; house σως|Double 100% beef patty, cheddar, iceberg, bacon jam, pickles and South Patty house sauce|Doppeltes Patty aus 100 % Rind, Cheddar, Eisbergsalat, Bacon-Marmelade, Gurken und South-Patty-Haussauce|Doppio hamburger 100% manzo, cheddar, iceberg, marmellata di bacon, cetrioli e salsa della casa South Patty|Double steak 100 % bœuf, cheddar, iceberg, confiture de bacon, pickles et sauce maison South Patty|||||","tags":[],"alg":[],"price":10,"glb":"bacon-cheese.glb","usdz":"bacon-cheese.usdz","poster":"bacon-cheese-poster.webp"},{"s":"burgers","n":"Oklahoma Burger|Oklahoma Burger|Oklahoma Burger|Oklahoma Burger|Oklahoma Burger|||||","d":"Με διπλό μπιφτέκι από 100% μοσχαρίσιο κιμά, διπλό cheddar, κρεμμύδι, jalapeño πιπεριές, south patty sauce|Double 100% beef patty, double cheddar, onion, jalapeños and South Patty sauce|Doppeltes Patty aus 100 % Rind, doppelt Cheddar, Zwiebeln, Jalapeños und South-Patty-Sauce|Doppio hamburger 100% manzo, doppio cheddar, cipolla, jalapeño e salsa South Patty|Double steak 100 % bœuf, double cheddar, oignon, jalapeños et sauce South Patty|||||","tags":["spicy"],"alg":[],"price":12},{"s":"burgers","n":"Truffle Wagyu Beef|Truffle Wagyu Beef|Truffle Wagyu Beef|Truffle Wagyu Beef|Truffle Wagyu Beef|||||","d":"Με διπλό μπιφτέκι από 100% wagyu κιμά, cheddar, κρεμμύδι τηγανητό, πίκλα αγγουριού και truffle mayo|Double 100% wagyu patty, cheddar, crispy fried onion, pickles and truffle mayo|Doppeltes Patty aus 100 % Wagyu, Cheddar, Röstzwiebeln, Gurken und Trüffel-Mayo|Doppio hamburger 100% wagyu, cheddar, cipolla fritta, cetrioli e maionese al tartufo|Double steak 100 % wagyu, cheddar, oignons frits, pickles et mayo à la truffe|||||","tags":[],"alg":[],"price":14.5,"glb":"truffle-wagyu.glb","usdz":"truffle-wagyu.usdz","poster":"truffle-wagyu-poster.webp"},{"s":"burgers","n":"Black Sheep Burger|Black Sheep Burger|Black Sheep Burger|Black Sheep Burger|Black Sheep Burger|||||","d":"Με διπλό μπιφτέκι προβατίνας, καπνιστό τυρί, κρεμμύδι σωτέ, πίκλα αγγουριού και aioli μαύρου σκόρδου|Double mutton patty, smoked cheese, sautéed onion, pickles and black garlic aioli|Doppeltes Schafs-Patty, Räucherkäse, geschmorte Zwiebeln, Gurken und Schwarzknoblauch-Aioli|Doppio hamburger di pecora, formaggio affumicato, cipolla saltata, cetrioli e aioli all&#x27;aglio nero|Double steak de brebis, fromage fumé, oignons sautés, pickles et aïoli à l&#x27;ail noir|||||","tags":[],"alg":[],"price":11.5},{"s":"burgers","n":"Parmesan Chicken Buttermilk|Parmesan Chicken Buttermilk|Parmesan Chicken Buttermilk|Parmesan Chicken Buttermilk|Parmesan Chicken Buttermilk|||||","d":"Με ελευθέρας βοσκής κοτόπουλο μαριναρισμένο 24 ώρες, παρμεζάνα, iceberg, πίκλα αγγουριού και honey mustard mayo|Free-range chicken marinated for 24 hours, parmesan, iceberg, pickles and honey mustard mayo|Freiland-Hähnchen, 24 Stunden mariniert, Parmesan, Eisbergsalat, Gurken und Honig-Senf-Mayo|Pollo ruspante marinato 24 ore, parmigiano, iceberg, cetrioli e maionese miele e senape|Poulet fermier mariné 24 heures, parmesan, iceberg, pickles et mayo miel-moutarde|||||","tags":[],"alg":[],"price":9.5},{"s":"burgers","n":"Buffalo Chicken Buttermilk|Buffalo Chicken Buttermilk|Buffalo Chicken Buttermilk|Buffalo Chicken Buttermilk|Buffalo Chicken Buttermilk|||||","d":"Με ελευθέρας βοσκής κοτόπουλο μαριναρισμένο 24 ώρες, coleslaw salad, buffalo σως, cheddar, πίκλα αγγουριού και herb ranch mayo|Free-range chicken marinated for 24 hours, coleslaw, buffalo sauce, cheddar, pickles and herb ranch mayo|Freiland-Hähnchen, 24 Stunden mariniert, Coleslaw, Buffalo-Sauce, Cheddar, Gurken und Kräuter-Ranch-Mayo|Pollo ruspante marinato 24 ore, coleslaw, salsa buffalo, cheddar, cetrioli e maionese ranch alle erbe|Poulet fermier mariné 24 heures, coleslaw, sauce buffalo, cheddar, pickles et mayo ranch aux herbes|||||","tags":["spicy"],"alg":[],"price":9.5},{"s":"burgers","n":"Nashville Hot Chicken Buttermilk|Nashville Hot Chicken Buttermilk|Nashville Hot Chicken Buttermilk|Nashville Hot Chicken Buttermilk|Nashville Hot Chicken Buttermilk|||||","d":"Με ελευθέρας βοσκής κοτόπουλο μαριναρισμένο 24 ώρες, asian slaw salad, πίκλα αγγουριού και chipotle mayo|Free-range chicken marinated for 24 hours, asian slaw, pickles and chipotle mayo|Freiland-Hähnchen, 24 Stunden mariniert, Asian Slaw, Gurken und Chipotle-Mayo|Pollo ruspante marinato 24 ore, insalata asian slaw, cetrioli e maionese chipotle|Poulet fermier mariné 24 heures, salade asian slaw, pickles et mayo chipotle|||||","tags":["spicy"],"alg":[],"price":9.5},{"s":"burgers","n":"Vegetarian|Vegetarian|Vegetarian|Vegetarian|Vegetarian|||||","d":"Με χειροποίητο μπιφτέκι κουνουπιδιού, iceberg, κρεμμύδι τηγανητό και jalapeño mayo|Handmade cauliflower patty, iceberg, crispy fried onion and jalapeño mayo|Hausgemachtes Blumenkohl-Patty, Eisbergsalat, Röstzwiebeln und Jalapeño-Mayo|Hamburger di cavolfiore fatto a mano, iceberg, cipolla fritta e maionese al jalapeño|Steak de chou-fleur fait maison, iceberg, oignons frits et mayo jalapeño|||||","tags":["veg"],"alg":[],"price":8.5},{"s":"fries","n":"Κλασικές Τηγανιτές Πατάτες|Classic Fries|Klassische Pommes|Patatine classiche|Frites classiques|||||","d":"* Με seasoning: πάπρικα, κουρκουμάς, κόλιανδρος, αλάτι, μαύρο πιπέρι.|* Seasoned with paprika, turmeric, coriander, salt and black pepper.|* Gewürzt mit Paprika, Kurkuma, Koriander, Salz und schwarzem Pfeffer.|* Condite con paprika, curcuma, coriandolo, sale e pepe nero.|* Assaisonnées au paprika, curcuma, coriandre, sel et poivre noir.|||||","tags":[],"alg":[],"price":5},{"s":"fries","n":"Γλυκοπατάτες|Sweet Potato Fries|Süßkartoffel-Pommes|Patate dolci fritte|Frites de patate douce|||||","d":"* Με seasoning: πάπρικα, κουρκουμάς, κόλιανδρος, αλάτι, μαύρο πιπέρι.|* Seasoned with paprika, turmeric, coriander, salt and black pepper.|* Gewürzt mit Paprika, Kurkuma, Koriander, Salz und schwarzem Pfeffer.|* Condite con paprika, curcuma, coriandolo, sale e pepe nero.|* Assaisonnées au paprika, curcuma, coriandre, sel et poivre noir.|||||","tags":[],"alg":[],"price":6},{"s":"fries","n":"Πατάτες Cheddar - Bacon|Cheddar &amp; Bacon Fries|Cheddar-Bacon-Pommes|Patatine cheddar e bacon|Frites cheddar-bacon|||||","d":"Με cheddar sauce &amp; κύβους μπέικον. * Με seasoning: πάπρικα, κουρκουμάς, κόλιανδρος, αλάτι, μαύρο πιπέρι.|With cheddar sauce and bacon bits. * Seasoned with paprika, turmeric, coriander, salt and black pepper.|Mit Cheddar-Sauce und Speckwürfeln. * Gewürzt mit Paprika, Kurkuma, Koriander, Salz und schwarzem Pfeffer.|Con salsa cheddar e cubetti di bacon. * Condite con paprika, curcuma, coriandolo, sale e pepe nero.|Avec sauce cheddar et dés de bacon. * Assaisonnées au paprika, curcuma, coriandre, sel et poivre noir.|||||","tags":[],"alg":[],"price":6.5},{"s":"fries","n":"Πατάτες Truffle|Truffle Fries|Trüffel-Pommes|Patatine al tartufo|Frites à la truffe|||||","d":"Με truffle mayo και παρμεζάνα. * Με seasoning: πάπρικα, κουρκουμάς, κόλιανδρος, αλάτι, μαύρο πιπέρι.|With truffle mayo and parmesan. * Seasoned with paprika, turmeric, coriander, salt and black pepper.|Mit Trüffel-Mayo und Parmesan. * Gewürzt mit Paprika, Kurkuma, Koriander, Salz und schwarzem Pfeffer.|Con maionese al tartufo e parmigiano. * Condite con paprika, curcuma, coriandolo, sale e pepe nero.|Avec mayo à la truffe et parmesan. * Assaisonnées au paprika, curcuma, coriandre, sel et poivre noir.|||||","tags":[],"alg":[],"price":6.8},{"s":"fries","n":"Πατάτες Feta cream|Feta Cream Fries|Pommes mit Feta-Creme|Patatine con crema di feta|Frites crème de feta|||||","d":"Με κρέμα φέτας, peperoni ωρίμανσης, πίκλες. * Με seasoning: πάπρικα, κουρκουμάς, κόλιανδρος, αλάτι, μαύρο πιπέρι.|With feta cream, aged pepperoni and pickles. * Seasoned with paprika, turmeric, coriander, salt and black pepper.|Mit Feta-Creme, gereifter Peperoni und Gurken. * Gewürzt mit Paprika, Kurkuma, Koriander, Salz und schwarzem Pfeffer.|Con crema di feta, peperoni stagionato e sottaceti. * Condite con paprika, curcuma, coriandolo, sale e pepe nero.|Avec crème de feta, pepperoni affiné et pickles. * Assaisonnées au paprika, curcuma, coriandre, sel et poivre noir.|||||","tags":[],"alg":[],"price":6.8},{"s":"fries","n":"Πατάτες Chili con Carne|Chili con Carne Fries|Chili-con-Carne-Pommes|Patatine chili con carne|Frites chili con carne|||||","d":"Σιγομαγειρεμένος μοσχαρίσιος κιμάς, κόκκινο φασόλι, καλαμπόκι, chili, Mexican spice mix, cheddar sauce. * Με seasoning: πάπρικα, κουρκουμάς, κόλιανδρος, αλάτι, μαύρο πιπέρι.|Slow-cooked beef mince, red beans, corn, chili, Mexican spice mix and cheddar sauce. * Seasoned with paprika, turmeric, coriander, salt and black pepper.|Geschmortes Rinderhack, Kidneybohnen, Mais, Chili, mexikanische Gewürze und Cheddar-Sauce. * Gewürzt mit Paprika, Kurkuma, Koriander, Salz und schwarzem Pfeffer.|Macinato di manzo cotto lentamente, fagioli rossi, mais, chili, spezie messicane e salsa cheddar. * Condite con paprika, curcuma, coriandolo, sale e pepe nero.|Bœuf haché mijoté, haricots rouges, maïs, piment, épices mexicaines et sauce cheddar. * Assaisonnées au paprika, curcuma, coriandre, sel et poivre noir.|||||","tags":["spicy"],"alg":[],"price":8},{"s":"fries","n":"Γλυκοπατάτες Guacamole|Guacamole Sweet Potato Fries|Süßkartoffel-Pommes mit Guacamole|Patate dolci con guacamole|Frites de patate douce guacamole|||||","d":"Με guacamole, pico de gallo και sour cream. * Με seasoning: πάπρικα, κουρκουμάς, κόλιανδρος, αλάτι, μαύρο πιπέρι.|With guacamole, pico de gallo and sour cream. * Seasoned with paprika, turmeric, coriander, salt and black pepper.|Mit Guacamole, Pico de Gallo und Sauerrahm. * Gewürzt mit Paprika, Kurkuma, Koriander, Salz und schwarzem Pfeffer.|Con guacamole, pico de gallo e panna acida. * Condite con paprika, curcuma, coriandolo, sale e pepe nero.|Avec guacamole, pico de gallo et crème aigre. * Assaisonnées au paprika, curcuma, coriandre, sel et poivre noir.|||||","tags":[],"alg":[],"price":7.5},{"s":"sides","n":"Chicken Fried Strips|Chicken Fried Strips|Chicken Fried Strips|Chicken Fried Strips|Chicken Fried Strips|||||","d":"Ελευθέρας βοσκής κοτόπουλο, πίκλα αγγουριού και &quot;south patty&quot; house σως. 4 τεμάχια|Free-range chicken, pickles and South Patty house sauce. 4 pieces|Freiland-Hähnchen, Gurken und South-Patty-Haussauce. 4 Stück|Pollo ruspante, cetrioli e salsa della casa South Patty. 4 pezzi|Poulet fermier, pickles et sauce maison South Patty. 4 pièces|||||","tags":[],"alg":[],"price":9.5},{"s":"sides","n":"Mac n Cheese Balls|Mac n Cheese Balls|Mac n Cheese Balls|Mac n Cheese Balls|Mac n Cheese Balls|||||","d":"Με μπεσαμέλ τυριών και cheddar σως|With cheese béchamel and cheddar sauce|Mit Käse-Béchamel und Cheddar-Sauce|Con besciamella ai formaggi e salsa cheddar|Avec béchamel au fromage et sauce cheddar|||||","tags":[],"alg":[],"price":8},{"s":"salads","n":"Caesar&#x27;s|Caesar&#x27;s|Caesar&#x27;s|Caesar&#x27;s|Caesar&#x27;s|||||","d":"Με μαρούλι, iceberg, καλαμπόκι, τραγανό κοτόπουλο, bacon και σάλτσα caesar|Lettuce, iceberg, corn, crispy chicken, bacon and caesar dressing|Salat, Eisbergsalat, Mais, knuspriges Hähnchen, Bacon und Caesar-Dressing|Lattuga, iceberg, mais, pollo croccante, bacon e salsa caesar|Laitue, iceberg, maïs, poulet croustillant, bacon et sauce césar|||||","tags":[],"alg":[],"price":9},{"s":"salads","n":"Coleslaw|Coleslaw|Coleslaw|Coleslaw|Coleslaw|||||","d":"Με λάχανο, καρότο, τρίχρωμη πιπεριά, φρέσκο κρεμμύδι, πράσινο μήλο, σταφίδα, εστραγκόν και honey mayo|Cabbage, carrot, three peppers, spring onion, green apple, raisins, tarragon and honey mayo|Kohl, Karotte, dreierlei Paprika, Frühlingszwiebel, grüner Apfel, Rosinen, Estragon und Honig-Mayo|Cavolo, carota, peperoni tricolore, cipollotto, mela verde, uvetta, dragoncello e maionese al miele|Chou, carotte, poivrons tricolores, oignon nouveau, pomme verte, raisins secs, estragon et mayo au miel|||||","tags":[],"alg":[],"price":6.5},{"s":"sauces","n":"South Patty House Sauce|South Patty House Sauce|South Patty House Sauce|South Patty House Sauce|South Patty House Sauce|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"sauces","n":"Chipotle Mayo|Chipotle Mayo|Chipotle Mayo|Chipotle Mayo|Chipotle Mayo|||||","d":"|||||||||","tags":[],"alg":[],"price":2},{"s":"sauces","n":"Herb Ranch Mayo|Herb Ranch Mayo|Herb Ranch Mayo|Herb Ranch Mayo|Herb Ranch Mayo|||||","d":"|||||||||","tags":[],"alg":[],"price":2},{"s":"sauces","n":"Truffle Mayo|Truffle Mayo|Truffle Mayo|Truffle Mayo|Truffle Mayo|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"sauces","n":"Jalapeno Mayo|Jalapeno Mayo|Jalapeno Mayo|Jalapeno Mayo|Jalapeno Mayo|||||","d":"|||||||||","tags":[],"alg":[],"price":2},{"s":"sauces","n":"Ketchup|Ketchup|Ketchup|Ketchup|Ketchup|||||","d":"|||||||||","tags":[],"alg":[],"price":1.5},{"s":"sauces","n":"Aioli Μαύρου Σκόρδου|Black Garlic Aioli|Schwarzknoblauch-Aioli|Aioli all&#x27;aglio nero|Aïoli à l&#x27;ail noir|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"desserts","n":"Chocolate Brookie|Chocolate Brookie|Chocolate Brookie|Chocolate Brookie|Chocolate Brookie|||||","d":"Σερβίρεται με Nutella.|Served with Nutella.|Serviert mit Nutella.|Servito con Nutella.|Servi avec du Nutella.|||||","tags":[],"alg":[],"price":5.8},{"s":"drinks","n":"Coca-Cola 0.33 l|Coca-Cola 0.33 l|Coca-Cola 0.33 l|Coca-Cola 0.33 l|Coca-Cola 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Coca-Cola Light 0.33 l|Coca-Cola Light 0.33 l|Coca-Cola Light 0.33 l|Coca-Cola Light 0.33 l|Coca-Cola Light 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Coca-Cola Zero 0.33 l|Coca-Cola Zero 0.33 l|Coca-Cola Zero 0.33 l|Coca-Cola Zero 0.33 l|Coca-Cola Zero 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Coca-Cola Zero Caffeine Free 0.33 l|Coca-Cola Zero Caffeine Free 0.33 l|Coca-Cola Zero Caffeine Free 0.33 l|Coca-Cola Zero Caffeine Free 0.33 l|Coca-Cola Zero Caffeine Free 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Fanta Λεμονάδα 0.33 l|Fanta Λεμονάδα 0.33 l|Fanta Λεμονάδα 0.33 l|Fanta Λεμονάδα 0.33 l|Fanta Λεμονάδα 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Fanta Κόκκινη 0.33 l|Fanta Κόκκινη 0.33 l|Fanta Κόκκινη 0.33 l|Fanta Κόκκινη 0.33 l|Fanta Κόκκινη 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Fanta Μπλε 0.33 l|Fanta Μπλε 0.33 l|Fanta Μπλε 0.33 l|Fanta Μπλε 0.33 l|Fanta Μπλε 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Sprite 0.33 l|Sprite 0.33 l|Sprite 0.33 l|Sprite 0.33 l|Sprite 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Sprite Zero 0.33 l|Sprite Zero 0.33 l|Sprite Zero 0.33 l|Sprite Zero 0.33 l|Sprite Zero 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Schweppes Soda Water 0.33 l|Schweppes Soda Water 0.33 l|Schweppes Soda Water 0.33 l|Schweppes Soda Water 0.33 l|Schweppes Soda Water 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":2.2},{"s":"drinks","n":"Νερό 0.5 l|Water 0.5 l|Wasser 0,5 l|Acqua 0,5 l|Eau 0,5 l|||||","d":"|||||||||","tags":[],"alg":[],"price":0.5},{"s":"beers","n":"Heineken 0.33 l|Heineken 0.33 l|Heineken 0.33 l|Heineken 0.33 l|Heineken 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":3},{"s":"beers","n":"Άλφα 0.33 l|Άλφα 0.33 l|Άλφα 0.33 l|Άλφα 0.33 l|Άλφα 0.33 l|||||","d":"|||||||||","tags":[],"alg":[],"price":3}]};
+var RESTAURANT = M.name, KIND = M.kind || "", LANGS_ENABLED = M.langs, CONTACT_WHATSAPP = M.whatsapp || "",
+    UMAMI_ID = M.umami || "", TRACK_DOMAIN = M.trackDomain || "", SECTIONS = M.sections, DISHES = M.dishes;
+/* Demo restaurants only: ?name=Restaurant%20Name (optionally &type=Ταβέρνα) shows that name
+   with a "sample, not the official menu" label. */
+var DEMO_FOR = "", DEMO_TYPE = "";
+if (M.demo) try {
+  var QS = new URLSearchParams(location.search);
+  DEMO_FOR = (QS.get("name") || "").replace(/\s+/g, " ").trim().slice(0, 40);
+  DEMO_TYPE = (QS.get("type") || "").replace(/\s+/g, " ").trim().slice(0, 30);
+} catch (e) {}
+if (DEMO_FOR) RESTAURANT = DEMO_FOR;
+/* colours and logo: set by tools/build.py (theme CSS in the head, logo file name in M.logo) */
+
+/* All texts below: 10 languages separated by |  in this order: el|en|de|it|fr|es|nl|pl|ru|sv */
+var LANGS=[{c:"el",n:"Ελληνικά"},{c:"en",n:"English"},{c:"de",n:"Deutsch"},{c:"it",n:"Italiano"},{c:"fr",n:"Français"},{c:"es",n:"Español"},{c:"nl",n:"Nederlands"},{c:"pl",n:"Polski"},{c:"ru",n:"Русский"},{c:"sv",n:"Svenska"}];
+var UIS={
+ intro:"Ανακαλύψτε το μενού μας και δείτε τα πιάτα με το σύμβολο {3D} σε πραγματικό μέγεθος μπροστά σας.|Discover our menu and see the dishes marked {3D} at real size right in front of you.|Entdecken Sie unsere Speisekarte und sehen Sie die Gerichte mit {3D} in Originalgröße direkt vor sich.|Scopri il nostro menu e guarda i piatti con il simbolo {3D} a grandezza reale davanti a te.|Découvrez notre carte et voyez les plats marqués {3D} en taille réelle devant vous.|Descubre nuestra carta y mira los platos con el símbolo {3D} a tamaño real frente a ti.|Ontdek ons menu en zie de gerechten met {3D} op ware grootte vlak voor je.|Odkryj nasze menu i zobacz dania z symbolem {3D} w prawdziwym rozmiarze tuż przed sobą.|Откройте для себя наше меню и посмотрите блюда со значком {3D} в реальном размере прямо перед вами.|Upptäck vår meny och se rätterna med {3D} i verklig storlek rakt framför dig.",
+ enter:"Μενού|Menu|Speisekarte|Menu|La carte|Carta|Menu|Menu|Меню|Meny",
+ size:"Διάμετρος|Diameter|Durchmesser|Diametro|Diamètre|Diámetro|Diameter|Średnica|Диаметр|Diameter",
+ serves:"Μερίδα|Serves|Portion|Porzione|Portion|Porción|Portie|Porcja|Порция|Portion",
+ weight:"Βάρος|Weight|Gewicht|Peso|Poids|Peso|Gewicht|Waga|Вес|Vikt",
+ kcal:"Θερμίδες|Calories|Kalorien|Calorie|Calories|Calorías|Calorieën|Kalorie|Калории|Kalorier",
+ time:"Χρόνος|Time|Zeit|Tempo|Temps|Tiempo|Tijd|Czas|Время|Tid",
+ price:"Τιμή|Price|Preis|Prezzo|Prix|Precio|Prijs|Cena|Цена|Pris",
+ alg:"Αλλεργιογόνα|Allergens|Allergene|Allergeni|Allergènes|Alérgenos|Allergenen|Alergeny|Аллергены|Allergener",
+ cm:"εκ.|cm|cm|cm|cm|cm|cm|cm|см|cm",
+ g:"γρ.|g|g|g|g|g|g|g|г|g",
+ min:"λεπτά|min|Min.|min|min|min|min|min|мин|min",
+ ar:"Δες το στο τραπέζι σου|View on your table|Auf Ihrem Tisch ansehen|Guardala sul tuo tavolo|Voir sur votre table|Verlo en tu mesa|Bekijk op je tafel|Zobacz na swoim stole|Посмотреть на вашем столе|Se på ditt bord",
+ arsub:"Άνοιξε την κάμερα · πραγματικό μέγεθος|Open your camera · real size|Kamera öffnen · Originalgröße|Apri la fotocamera · grandezza reale|Ouvrez la caméra · taille réelle|Abre la cámara · tamaño real|Open je camera · ware grootte|Otwórz aparat · rozmiar rzeczywisty|Откройте камеру · реальный размер|Öppna kameran · verklig storlek",
+ hint:"Κράτα το κινητό κοντά πάνω από το τραπέζι και σκόπευσε προς τα κάτω.|Hold your phone close above the table and aim down.|Halten Sie das Handy nah über den Tisch und zielen Sie nach unten.|Tieni il telefono vicino al tavolo e inquadra verso il basso.|Tenez le téléphone près de la table et visez vers le bas.|Mantén el móvil cerca de la mesa y apunta hacia abajo.|Houd je telefoon dicht boven de tafel en richt naar beneden.|Trzymaj telefon blisko stołu i skieruj go w dół.|Держите телефон близко к столу и направьте камеру вниз.|Håll telefonen nära bordet och rikta den nedåt.",
+ noar:"Το 3D μοντέλο θα προστεθεί σύντομα.|The 3D model will be added soon.|Das 3D-Modell folgt in Kürze.|Il modello 3D sarà aggiunto presto.|Le modèle 3D sera bientôt ajouté.|El modelo 3D se añadirá pronto.|Het 3D-model komt binnenkort.|Model 3D zostanie dodany wkrótce.|3D-модель скоро появится.|3D-modellen läggs till snart.",
+ close:"Κλείσιμο|Close|Schließen|Chiudi|Fermer|Cerrar|Sluiten|Zamknij|Закрыть|Stäng",
+ camhint:"Κράτα το κινητό περίπου 40 εκ. πάνω από το τραπέζι και γείρε το προς τα κάτω|Hold your phone about 40 cm above the table and tilt it down|Halten Sie das Handy etwa 40 cm über den Tisch und neigen Sie es nach unten|Tieni il telefono a circa 40 cm sopra il tavolo e inclinalo verso il basso|Tenez le téléphone à environ 40 cm au-dessus de la table et inclinez-le vers le bas|Sostén el móvil a unos 40 cm sobre la mesa e inclínalo hacia abajo|Houd je telefoon ongeveer 40 cm boven de tafel en kantel hem naar beneden|Trzymaj telefon około 40 cm nad stołem i pochyl go w dół|Держите телефон примерно в 40 см над столом и наклоните его вниз|Håll telefonen cirka 40 cm ovanför bordet och luta den nedåt",
+ camqr:"Στόχευσε με την κάμερα το QR που είναι πάνω στο τραπέζι|Point the camera at the QR code on the table|Richten Sie die Kamera auf den QR-Code auf dem Tisch|Inquadra il codice QR sul tavolo|Visez le code QR posé sur la table|Apunta la cámara al código QR de la mesa|Richt de camera op de QR-code op tafel|Skieruj aparat na kod QR na stole|Наведите камеру на QR-код на столе|Rikta kameran mot QR-koden på bordet",
+ camdrag:"Σύρε το πιάτο με το δάχτυλο για να το μετακινήσεις|Drag the dish with your finger to move it|Ziehen Sie das Gericht mit dem Finger, um es zu verschieben|Trascina il piatto con il dito per spostarlo|Faites glisser le plat du doigt pour le déplacer|Arrastra el plato con el dedo para moverlo|Sleep het gerecht met je vinger om het te verplaatsen|Przeciągnij danie palcem, aby je przesunąć|Перетащите блюдо пальцем, чтобы переместить его|Dra rätten med fingret för att flytta den",
+ camno:"Δεν δόθηκε άδεια για την κάμερα. Επίτρεψέ την από τις ρυθμίσεις του browser.|Camera permission was not granted. Allow it in your browser settings.|Keine Kameraberechtigung. Bitte in den Browser-Einstellungen erlauben.|Permesso fotocamera non concesso. Consentilo nelle impostazioni del browser.|Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.|No se concedió permiso para la cámara. Actívalo en los ajustes del navegador.|Geen toestemming voor de camera. Sta dit toe in je browserinstellingen.|Brak dostępu do aparatu. Zezwól na to w ustawieniach przeglądarki.|Нет доступа к камере. Разрешите его в настройках браузера.|Kameraåtkomst nekades. Tillåt den i webbläsarens inställningar.",
+ extras:"Έξτρα υλικά|Extras|Extras|Extra|Suppléments|Extras|Extra's|Dodatki|Добавки|Tillbehör",
+ demo:"Δείγμα για «{n}» · δεν είναι το επίσημο μενού|Sample for “{n}” · not the official menu|Muster für „{n}“ · nicht die offizielle Speisekarte|Esempio per «{n}» · non è il menu ufficiale|Exemple pour « {n} » · pas la carte officielle|Ejemplo para «{n}» · no es la carta oficial|Voorbeeld voor “{n}” · niet het officiële menu|Przykład dla „{n}” · to nie jest oficjalne menu|Пример для «{n}» · не официальное меню|Exempel för ”{n}” · inte den officiella menyn",
+ cta:"Θέλεις ένα τέτοιο μενού για το μαγαζί σου;|Want a menu like this for your restaurant?|Möchten Sie so eine Speisekarte für Ihr Restaurant?|Vuoi un menu così per il tuo locale?|Envie d'une carte comme celle-ci pour votre restaurant ?|¿Quieres una carta así para tu restaurante?|Wil je zo'n menu voor je restaurant?|Chcesz takie menu dla swojej restauracji?|Хотите такое меню для своего ресторана?|Vill du ha en sådan meny för din restaurang?",
+ ctabtn:"Στείλε μας μήνυμα|Message us|Schreiben Sie uns|Scrivici|Écrivez-nous|Escríbenos|Stuur ons een bericht|Napisz do nas|Напишите нам|Skriv till oss",
+ noxr:"Η προβολή στον χώρο δεν υποστηρίζεται σε αυτή τη συσκευή ή στον browser.|Viewing in your space is not supported on this device or browser.|Die Ansicht im Raum wird auf diesem Gerät oder Browser nicht unterstützt.|La vista nello spazio non è supportata su questo dispositivo o browser.|La vue dans votre espace n'est pas prise en charge sur cet appareil ou navigateur.|La vista en tu espacio no es compatible con este dispositivo o navegador.|Weergave in je ruimte wordt niet ondersteund op dit apparaat of in deze browser.|Widok w przestrzeni nie jest obsługiwany na tym urządzeniu lub w tej przeglądarce.|Просмотр в пространстве не поддерживается на этом устройстве или в этом браузере.|Visning i ditt rum stöds inte på den här enheten eller webbläsaren."
+};
+var TAGS={
+ veg:"Χορτοφαγικό|Vegetarian|Vegetarisch|Vegetariano|Végétarien|Vegetariano|Vegetarisch|Wegetariańskie|Вегетарианское|Vegetariskt",
+ vegan:"Vegan|Vegan|Vegan|Vegano|Végétalien|Vegano|Veganistisch|Wegańskie|Веганское|Veganskt",
+ glutenfree:"Χωρίς γλουτένη|Gluten-free|Glutenfrei|Senza glutine|Sans gluten|Sin gluten|Glutenvrij|Bezglutenowe|Без глютена|Glutenfritt",
+ lactosefree:"Χωρίς λακτόζη|Lactose-free|Laktosefrei|Senza lattosio|Sans lactose|Sin lactosa|Lactosevrij|Bez laktozy|Без лактозы|Laktosfritt",
+ spicy:"Πικάντικο|Spicy|Scharf|Piccante|Épicé|Picante|Pittig|Pikantne|Острое|Kryddigt",
+ fasting:"Νηστίσιμο|Lenten|Fastenspeise|Di magro|De carême|De ayuno|Vastenmaaltijd|Postne|Постное|Fastemat",
+ star:"Επιλογή του σεφ|Chef's pick|Empfehlung des Küchenchefs|Scelta dello chef|Choix du chef|Elección del chef|Keuze van de chef|Wybór szefa kuchni|Выбор шефа|Kockens val",
+ new:"Νέο|New|Neu|Novità|Nouveau|Novedad|Nieuw|Nowość|Новинка|Nyhet",
+ flame:"Ξυλόφουρνο|Wood-fired|Holzofen|Forno a legna|Au feu de bois|Horno de leña|Houtoven|Z pieca opalanego drewnem|Дровяная печь|Vedugn",
+ share:"Για μοιρασιά|To share|Zum Teilen|Da condividere|À partager|Para compartir|Om te delen|Do dzielenia|Для компании|Att dela",
+ pin:"Τοπικό προϊόν|Local product|Regionales Produkt|Prodotto locale|Produit local|Producto local|Lokaal product|Produkt lokalny|Местный продукт|Lokal produkt"
+};
+var ALG={
+ wheat:"Γλουτένη|Gluten|Gluten|Glutine|Gluten|Gluten|Gluten|Gluten|Глютен|Gluten",
+ shrimp:"Καρκινοειδή|Crustaceans|Krebstiere|Crostacei|Crustacés|Crustáceos|Schaaldieren|Skorupiaki|Ракообразные|Kräftdjur",
+ egg:"Αυγά|Eggs|Eier|Uova|Œufs|Huevos|Eieren|Jaja|Яйца|Ägg",
+ fish:"Ψάρι|Fish|Fisch|Pesce|Poisson|Pescado|Vis|Ryby|Рыба|Fisk",
+ peanut:"Φιστίκια|Peanuts|Erdnüsse|Arachidi|Arachides|Cacahuetes|Pinda's|Orzeszki ziemne|Арахис|Jordnötter",
+ soy:"Σόγια|Soy|Soja|Soia|Soja|Soja|Soja|Soja|Соя|Soja",
+ milk:"Γάλα|Milk|Milch|Latte|Lait|Leche|Melk|Mleko|Молоко|Mjölk",
+ nuts:"Ξηροί καρποί|Tree nuts|Schalenfrüchte|Frutta a guscio|Fruits à coque|Frutos secos|Noten|Orzechy|Орехи|Nötter",
+ celery:"Σέλινο|Celery|Sellerie|Sedano|Céleri|Apio|Selderij|Seler|Сельдерей|Selleri",
+ mustard:"Μουστάρδα|Mustard|Senf|Senape|Moutarde|Mostaza|Mosterd|Gorczyca|Горчица|Senap",
+ sesame:"Σουσάμι|Sesame|Sesam|Sesamo|Sésame|Sésamo|Sesam|Sezam|Кунжут|Sesam",
+ sulph:"Θειώδη|Sulphites|Sulfite|Solfiti|Sulfites|Sulfitos|Sulfieten|Siarczyny|Сульфиты|Sulfiter",
+ lupin:"Λούπινο|Lupin|Lupinen|Lupini|Lupin|Altramuces|Lupine|Łubin|Люпин|Lupin",
+ mollusc:"Μαλάκια|Molluscs|Weichtiere|Molluschi|Mollusques|Moluscos|Weekdieren|Mięczaki|Моллюски|Blötdjur"
+};
+if(UMAMI_ID){var sc=document.createElement("script");sc.defer=true;sc.src="https://cloud.umami.is/script.js";sc.setAttribute("data-website-id",UMAMI_ID);if(TRACK_DOMAIN)sc.setAttribute("data-domains",TRACK_DOMAIN);document.head.appendChild(sc);}
+var currentDish="";
+function track(ev,data){try{if(window.umami)window.umami.track(ev,data);}catch(e){}}
+
+var LI={};LANGS.forEach(function(l,i){LI[l.c]=i;});
+var nav=((navigator.language||"en")+"").slice(0,2);
+var lang=LANGS_ENABLED.indexOf(nav)>=0?nav:(LANGS_ENABLED.indexOf("en")>=0?"en":LANGS_ENABLED[0]);
+function pick(s){var a=String(s).split("|");return a[LI[lang]]||a[1]||a[0];}
+function getT(){var t={};for(var k in UIS)t[k]=pick(UIS[k]);return t;}
+function nm(map,k){return pick(map[k]);}
+
+/* ---- icons (same set as the PDF) ---- */
+function lf(x,y,a,l,w){return '<path transform="translate('+x+' '+y+') rotate('+a+')" d="M0 0C'+l*.25+' '+w+' '+l*.75+' '+w+' '+l+' 0C'+l*.75+' '+(-w)+' '+l*.25+' '+(-w)+' 0 0Z"/>';}
+function pt(d,f){return '<path d="'+d+'"'+(f?' fill="currentColor" stroke="none"':'')+'/>';}
+function ln(a,b,c,d){return pt('M'+a+' '+b+'L'+c+' '+d);}
+function ci(x,y,r,f){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'"'+(f?' fill="currentColor" stroke="none"':'')+'/>';}
+function el(cx,cy,rx,ry){return '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"/>';}
+function slash(){return '<path d="M-6.4 6.4L6.4 -6.4" style="stroke:var(--surface)" stroke-width="3.6"/><path d="M-6.4 6.4L6.4 -6.4" stroke-width="1.3"/>';}
+function wheat(){var s=ln(0,-6.5,0,4),i,y;for(i=0;i<3;i++){y=-3.2+i*2.6;s+=lf(0,y,42,3.9,.95)+lf(0,y,138,3.9,.95);}return s+lf(0,3.6,90,3.4,.9);}
+function drop(){return pt('M0 6.2C2 3.4 4.5 1 4.5 -1.7C4.5 -4.3 2.5 -6.2 0 -6.2C-2.5 -6.2 -4.5 -4.3 -4.5 -1.7C-4.5 1 -2 3.4 0 6.2Z');}
+function spark(k,ox,oy){var p=[[0,6.6],[1.4,1.4],[6.6,0],[1.4,-1.4],[0,-6.6],[-1.4,-1.4],[-6.6,0],[-1.4,1.4]];return pt('M'+p.map(function(q){return (ox+q[0]*k)+' '+(oy+q[1]*k);}).join('L')+'Z');}
+var ICONS={
+ wheat:wheat,
+ glutenfree:function(){return wheat()+slash();},
+ veg:function(){return lf(-4.6,-4.6,45,11.5,4.4)+ln(-4.6,-4.6,3.4,3.4)+ln(-6.2,-6.2,-4.6,-4.6);},
+ vegan:function(){return pt('M-4.8 4L0 -4.8L4.8 4')+lf(2.6,3.2,55,3.8,1.4);},
+ lactosefree:function(){return drop()+slash();},
+ spicy:function(){return pt('M2.4 4.6C5.6 3 5 -1 0 -3.8C-2.6 -5.4 -5 -6 -6.2 -5.6C-4 -4.4 -3.6 -2 -2.2 .6C-1.1 2.6 0 4 2.4 4.6Z')+ln(2.4,4.6,3.2,6.6)+ln(3.2,6.6,5,6);},
+ fasting:function(){var s=ln(-5.8,-5.8,4.6,4.6),k=[-3.2,0,3.2],i;for(i=0;i<3;i++)s+=lf(k[i],k[i],95,3.7,1.2)+lf(k[i],k[i],-5,3.7,1.2);return s+lf(4.6,4.6,45,2.8,1);},
+ star:function(){var a=[],k,r,an;for(k=0;k<10;k++){an=Math.PI/2+k*Math.PI/5;r=k%2?2.9:6.8;a.push((r*Math.cos(an)).toFixed(2)+' '+(r*Math.sin(an)).toFixed(2));}return pt('M'+a.join('L')+'Z');},
+ new:function(){return spark(.78,-1,-1)+spark(.32,4.6,4.8);},
+ flame:function(){return pt('M.5 6.8C-.5 3.5 -4.5 2 -4.5 -2.2C-4.5 -5 -2.5 -6.8 0 -6.8C2.6 -6.8 4.5 -5 4.5 -2C4.5 0 3.2 1.2 2.4 2.2C2.2 .5 1.4 -.2 .8 -.5C1.6 1.8 1.4 4.5 .5 6.8Z')+pt('M0 -1.2C1.7 -2.5 1.9 -4 0 -5.2C-1.9 -4 -1.7 -2.5 0 -1.2Z');},
+ share:function(){return ci(-2.5,0,4)+ci(2.5,0,4);},
+ pin:function(){return pt('M0 -6.6C-1 -4.6 -4.6 -1.6 -4.6 1.5C-4.6 4.3 -2.6 6.2 0 6.2C2.6 6.2 4.6 4.3 4.6 1.5C4.6 -1.6 1 -4.6 0 -6.6Z')+ci(0,1.6,1.7);},
+ shrimp:function(){return pt('M3.2 5.2C-1 6.6 -6.2 2.5 -4.5 -2.8C-3.6 -5 -.8 -5.4 1.4 -3.6C-.2 -3.4 -2.2 -2.6 -1.8 .2C-1.4 2.6 1.2 3.4 3.2 5.2Z')+pt('M1.4 -3.6L3.9 -5.5L4.7 -3.2L3.2 -2.2')+ln(3.2,5.2,5.6,6.6)+ln(-3.3,3.1,-1.6,3.5)+ln(-4.6,.6,-2.6,.7);},
+ egg:function(){return pt('M0 6.3C3.7 6.3 5 2 5 -1.2C5 -4.6 2.8 -6.5 0 -6.5C-2.8 -6.5 -5 -4.6 -5 -1.2C-5 2 -3.7 6.3 0 6.3Z')+ci(0,-1.6,2.2);},
+ fish:function(){return el(-1.9,0,5.1,3.6)+pt('M3 0L6.8 3.6L6.8 -3.6Z')+ci(-3.8,.9,.55,1);},
+ peanut:function(){return '<g transform="rotate(40)">'+pt('M-3 2.8C-6.4 2.8 -6.4 -2.8 -3 -2.8C-1.5 -2.8 -1 -1.6 0 -1.6C1 -1.6 1.5 -2.8 3 -2.8C6.4 -2.8 6.4 2.8 3 2.8C1.5 2.8 1 1.6 0 1.6C-1 1.6 -1.5 2.8 -3 2.8Z')+ci(-3.5,.6,.35,1)+ci(-2.4,-.9,.35,1)+ci(3,.7,.35,1)+ci(3.8,-.6,.35,1)+'</g>';},
+ soy:function(){var s=lf(-6.8,-3.2,28,13.6,3.8),t=[3.6,6.8,10],i;for(i=0;i<3;i++)s+=ci((Math.cos(.489)*t[i]-6.8).toFixed(2),(Math.sin(.489)*t[i]-3.2).toFixed(2),1.15,1);return s;},
+ milk:function(){return pt('M-3.5 -6.5L3.5 -6.5L3.5 2L0 5.8L-3.5 2Z')+ln(-3.5,2,3.5,2)+ln(-3.5,-2,3.5,-2);},
+ nuts:function(){return el(0,-2.1,4.2,4.5)+pt('M-4.8 1.6C-4.8 6.6 4.8 6.6 4.8 1.6L-4.8 1.6Z')+ln(-2,1.6,-1.2,5.3)+ln(2,1.6,1.2,5.3)+ln(0,1.6,0,5.8);},
+ celery:function(){return ln(0,-6.5,0,3)+ln(-1,-6.5,-3.6,2.6)+ln(1,-6.5,3.6,2.6)+ln(-2,-6.5,2,-6.5)+lf(0,3,90,3.3,1.3)+lf(-3.6,2.6,115,3.1,1.2)+lf(3.6,2.6,65,3.1,1.2);},
+ mustard:function(){return '<rect x="-3.8" y="-6.2" width="7.6" height="9.2" rx="1.2"/><rect x="-4.3" y="3" width="8.6" height="2.6" rx=".8"/>'+el(0,-1.8,2,2.4);},
+ sesame:function(){return lf(-4.2,2.6,20,3.4,1.1)+lf(.6,4.2,-30,3.4,1.1)+lf(1.8,-.6,50,3.4,1.1)+lf(-3.8,-3.8,-20,3.4,1.1)+lf(2.4,-5.2,10,3.4,1.1);},
+ sulph:function(){var f=' font-family="Manrope,sans-serif" font-weight="700" fill="currentColor" stroke="none"';return '<text transform="scale(1 -1)" x="-6.6" y="2.6" font-size="7.6"'+f+'>SO</text><text transform="scale(1 -1)" x="3.6" y="4.2" font-size="4.6"'+f+'>2</text>';},
+ lupin:function(){var s=ln(0,-6.5,0,5.2),y=[-3.6,-1.6,.4,2.4],i;for(i=0;i<4;i++)s+=ci(i%2?1.7:-1.7,y[i],1.15);return s+ci(0,6.2,1);},
+ mollusc:function(){var s=pt('M0 -6.2C-7.6 -2 -6.6 4.6 0 5.6C6.6 4.6 7.6 -2 0 -6.2Z'),p=[[-4.3,3.6],[-2.2,5],[0,5.6],[2.2,5],[4.3,3.6]],i;for(i=0;i<5;i++)s+=ln(0,-6.2,p[i][0],p[i][1]);return s;}
+};
+var VF='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg>';
+var EYE='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+var XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+function badge(k,size,label){return '<span class="bd" style="--s:'+size+'px" role="img" title="'+label+'" aria-label="'+label+'"><svg viewBox="-8 -8 16 16" aria-hidden="true"><g transform="scale(1 -1)" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">'+ICONS[k]()+'</g></svg></span>';}
+function fmt(n){return "€"+n.toFixed(2).replace(".",",");}
+function sizesOf(d){return d.sizes||[{n:null,cm:d.cm,price:d.price,serves:d.serves,weight:d.weight,kcal:d.kcal,glb:d.glb,usdz:d.usdz,poster:d.poster}];}
+var WA='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2A9.8 9.8 0 0 0 3.6 17l-1.3 4.8 4.9-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.9c-1.5 0-2.9-.4-4.2-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8.1 8.1 0 1 1 12 20.1Zm4.5-6c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg>';
+function waLink(){
+  var txt=(lang==="el"?"Γεια σας! Είδα το 3D μενού":"Hi! I saw the 3D menu demo")+(DEMO_FOR?" ("+DEMO_FOR+")":"")+(lang==="el"?" και θα ήθελα πληροφορίες.":" and would like more information.");
+  return "https://wa.me/"+CONTACT_WHATSAPP.replace(/\D/g,"")+"?text="+encodeURIComponent(txt);
+}
+function $(id){return document.getElementById(id);}
+
+/* ---- scroll reveal ---- */
+var io=null;
+function reveal(){
+  var items=document.querySelectorAll(".rv");
+  if(!("IntersectionObserver" in window)){items.forEach(function(e){e.classList.add("in");});return;}
+  if(io)io.disconnect();
+  io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12,rootMargin:"0px 0px -6% 0px"});
+  items.forEach(function(e){io.observe(e);});
+}
+
+function render(){
+  var t=getT();
+  document.documentElement.lang=lang;
+  if(M.logo&&!DEMO_FOR)$("title").innerHTML='<img class="logo" src="'+M.logo+'" alt="">';   /* the restaurant's logo instead of the name */
+  else $("title").textContent=RESTAURANT;
+  $("title").setAttribute("aria-label",RESTAURANT);
+  $("title").classList.toggle("long",RESTAURANT.length>9);
+  $("demo").hidden=!DEMO_FOR;
+  if(DEMO_FOR)$("demotxt").textContent=t.demo.replace("{n}",DEMO_FOR);
+  $("cta").innerHTML=CONTACT_WHATSAPP?'<div class="cta rv"><p>'+t.cta+'</p><a href="'+waLink()+'" target="_blank" rel="noopener">'+WA+t.ctabtn+'</a></div>':'';
+  var kind=DEMO_FOR?DEMO_TYPE:(KIND?pick(KIND):"");
+  document.title=RESTAURANT+(kind?" – "+kind:"");
+  $("eyebrow").textContent=kind;
+  $("eyebrow").hidden=!$("eyebrow").textContent;
+  $("intro").innerHTML=t.intro.replace("{3D}",'<span class="chip">'+EYE+'3D</span>');
+  $("cuetxt").textContent=t.enter;
+  $("lgcode").textContent=lang.toUpperCase();
+  var html="",k=0;
+  SECTIONS.forEach(function(sec){
+    html+='<h2 class="rv">'+pick(sec.name)+'</h2>';
+    DISHES.forEach(function(d,i){
+      if(d.s!==sec.id) return;
+      var S=sizesOf(d),def=S[d.def||0],has=S.some(function(x){return x.glb;});
+      html+='<button class="dish rv" style="transition-delay:'+((k++%3)*70)+'ms" data-i="'+i+'"><span class="t"><b>'+pick(d.n)+'</b><small>'+pick(d.d)+'</small>'+(has?'<span class="tag">'+EYE+'3D</span>':'')+'</span><span class="price">'+fmt(def.price)+'</span></button>';
+    });
+  });
+  $("menu").innerHTML=html;
+  reveal();
+  buildLangBox();
+}
+
+/* ---- language picker ---- */
+function buildLangBox(){
+  var box=$("lgbox");
+  box.innerHTML=LANGS.filter(function(l){return LANGS_ENABLED.indexOf(l.c)>=0;}).map(function(l){return '<button role="option" data-l="'+l.c+'" aria-selected="'+(l.c===lang)+'">'+l.n+'</button>';}).join("");
+  $("lgbtn").style.display=LANGS_ENABLED.length>1?"flex":"none";
+}
+function toggleLang(open){
+  var box=$("lgbox");if(open===undefined)open=box.hidden;
+  box.hidden=!open;$("lgbtn").setAttribute("aria-expanded",String(open));
+}
+
+/* ---- sheet with scroll lock ---- */
+var savedY=0;
+function lockPage(){
+  savedY=window.pageYOffset||0;
+  document.body.style.top=(-savedY)+"px";document.body.classList.add("lock");
+  ["page","lgbtn"].forEach(function(id){$(id).setAttribute("inert","");});
+  toggleLang(false);
+}
+function unlockPage(){
+  document.body.classList.remove("lock");document.body.style.top="";
+  ["page","lgbtn"].forEach(function(id){$(id).removeAttribute("inert");});
+  window.scrollTo(0,savedY);
+}
+var extOpen=false;   /* extras list stays as the guest left it when switching sizes */
+function openDish(i,si){
+  var d=DISHES[i],t=getT(),S=sizesOf(d),first=(si==null),keepY=first?0:$("panel").scrollTop;
+  if(first){si=d.def||0;extOpen=false;}
+  var s=S[si],X=d.ext||[];
+  currentDish=pick(d.n)+(S.length>1?" / "+pick(s.n):"");
+  if(first)track("dish_open",{dish:d.n.split("|")[1]});
+  var model=s.glb?'<model-viewer id="mv" loading="eager" src="'+s.glb+'"'+(s.usdz?' ios-src="'+s.usdz+'"':'')+(s.poster?' poster="'+s.poster+'" class="ok"':'')+' ar ar-modes="webxr quick-look" ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" interaction-prompt="none" shadow-intensity="1" alt="'+pick(d.n)+(s.cm?' · '+s.cm+' '+t.cm:'')+'"><div slot="ar-button" style="display:none"></div></model-viewer>':'';
+  var tags=(d.tags||[]).map(function(k){return '<figure>'+badge(k,36,nm(TAGS,k))+nm(TAGS,k)+'</figure>';}).join("");
+  var pills=S.length>1?'<div class="pills">'+S.map(function(x,j){return '<button class="pill" data-si="'+j+'" aria-pressed="'+(j===si)+'"><b>'+pick(x.n)+'</b>'+(x.cm?'<small>'+x.cm+' '+t.cm+'</small>':'')+'</button>';}).join("")+'</div>':'';
+  var ext=X.length?'<details class="ext"'+(extOpen?' open':'')+'><summary>'+t.extras+'</summary><ul>'+X.map(function(x){return '<li>'+pick(x.n)+'<span>+'+fmt(x.price)+'</span></li>';}).join("")+'</ul></details>':'';
+  function has(v){return v!=null&&v!=="";}   /* facts left empty in the Excel are simply not shown */
+  var facts=[[t.size,has(s.cm)?s.cm+" "+t.cm:""],[t.serves,s.serves],[t.weight,has(s.weight)?s.weight+" "+t.g:""],[t.kcal,has(s.kcal)?s.kcal+" kcal":""],[t.time,has(d.time)?d.time+" "+t.min:""],[t.price,fmt(s.price)]].filter(function(f){return has(f[1]);});
+  var alg=(d.alg&&d.alg.length)?'<div class="alg"><h4>'+t.alg+'</h4><div class="row">'+d.alg.map(function(k){return '<figure>'+badge(k,44,nm(ALG,k))+nm(ALG,k)+'</figure>';}).join("")+'</div></div>':'';
+  $("panel").innerHTML=
+    '<div class="bar"><span class="grab"></span><button class="x" id="cl" aria-label="'+t.close+'">'+XI+'</button></div>'+
+    '<h3 id="sh-name">'+pick(d.n)+'</h3><p>'+pick(d.d)+'</p>'+
+    (tags?'<div class="tags">'+tags+'</div>':'')+model+
+    (S.some(function(x){return x.glb;})?   /* the AR button only on dishes that have a 3D model (in some size) */
+      '<button class="ar" id="arbtn"><span class="ic">'+VF+'</span><span class="tx"><b>'+t.ar+'</b><small>'+t.arsub+'</small></span></button>'+
+      (s.glb?'<p class="hint">'+t.hint+'</p>':'')+'<p class="note" id="arnote" hidden>'+t.noar+'</p>':'')+pills+ext+
+    '<div class="facts">'+facts.map(function(f){return '<div>'+f[0]+'<b>'+f[1]+'</b></div>';}).join("")+'</div>'+alg;
+  if(first){lockPage();$("sheet").classList.add("open");}
+  $("panel").scrollTop=keepY;
+  var mv=$("mv"),loaded=false,wantAR=false;
+  function startAR(){
+    if(IOS||XR_AR){                       /* real AR: Quick Look on iPhone, WebXR + Google AR on Android */
+      if(!IOS&&!loaded){wantAR=true;return;}
+      if(mv.canActivateAR){try{mv.activateAR();return;}catch(e){}}
+    }
+    if(!IOS&&MOBILE&&CAM_OK){openCam(s.glb,pick(d.n),t);return;}   /* phones without Google AR: camera view */
+    $("arnote").textContent=t.noxr;$("arnote").hidden=false;
+  }
+  if(mv)mv.addEventListener("load",function(){loaded=true;mv.classList.add("ok");if(wantAR){wantAR=false;startAR();}});
+  $("cl").onclick=closeSheet;
+  if($("arbtn"))$("arbtn").onclick=function(){
+    if(!mv){$("arnote").hidden=false;return;}       /* this size has no 3D model */
+    XR_P.then(startAR);
+  };
+  document.querySelectorAll("#panel .pill").forEach(function(b){b.onclick=function(){openDish(i,+b.dataset.si);};});
+  var ex=document.querySelector("#panel .ext");
+  if(ex)ex.addEventListener("toggle",function(){extOpen=ex.open;});
+}
+/* ---- AR support: real AR where the phone has it, otherwise our own camera view ---- */
+var UA=navigator.userAgent||"";
+var IOS=/iPad|iPhone|iPod/.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+var MOBILE=IOS||/Android|Mobi/i.test(UA);
+var CAM_OK=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+var XR_AR=false;   /* true when Chrome can run real AR (needs Google Play Services for AR on the phone) */
+var XR_P=Promise.resolve();
+try{
+  if(!IOS&&navigator.xr&&navigator.xr.isSessionSupported)
+    XR_P=navigator.xr.isSessionSupported("immersive-ar").then(function(v){XR_AR=!!v;},function(){XR_AR=false;});
+}catch(e){}
+var camStream=null;
+/* Real size without AR: the camera cannot measure the table, so we assume the phone is held CAM_H above it.
+   Tilt (beta) gives the viewing angle; the distance to the dish along the view is CAM_H / cos(angle).
+   A phone's main camera sees about 65deg along the long side of the screen; the video fills the screen by
+   cropping the short side, and model-viewer applies its field-of-view to the short side, so we set it to
+   the short side's share of those 65deg. */
+var CAM_H=0.40, CAM_LONG_FOV=65;
+function camFov(){
+  var w=window.innerWidth,h=window.innerHeight,
+      f=2*Math.atan(Math.tan(CAM_LONG_FOV*Math.PI/360)*Math.min(w,h)/Math.max(w,h))*180/Math.PI,
+      m=$("cammv");
+  ["field-of-view","min-field-of-view","max-field-of-view"].forEach(function(a){m.setAttribute(a,f.toFixed(1)+"deg");});
+}
+function camOrbit(theta,phiDeg){
+  var phi=Math.max(5,Math.min(78,phiDeg));
+  return theta+" "+phi+"deg "+(CAM_H/Math.cos(phi*Math.PI/180)).toFixed(3)+"m";
+}
+function onTilt(e){   /* phone flat over the table = view from above; upright = view from the side */
+  if(e.beta==null)return;
+  var m=$("cammv");
+  m.cameraOrbit=camOrbit(m.getCameraOrbit().theta+"rad",Math.abs(e.beta));
+}
+/* Camera view: first looks for the table QR (window.markerAR: dish anchored on the table, real size).
+   If no QR shows up within a few seconds, or the AR part cannot load, it falls back to the simple view
+   (model-viewer over the camera, size from an assumed 40 cm height). */
+function openCam(src,alt,t){
+  var m=$("cammv");
+  $("camhint").textContent=t.camqr;
+  m.setAttribute("alt",alt);
+  if(m.getAttribute("src")!==src)m.setAttribute("src",src);
+  m.cameraOrbit=camOrbit("0deg",30);    /* until the first tilt reading arrives */
+  camFov();
+  m.style.visibility=window.markerAR?"hidden":"";   /* simple view only as the fallback */
+  if(!window.markerAR)$("camhint").textContent=t.camhint;
+  $("cam").hidden=false;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false}).then(function(st){
+    camStream=st;var v=$("camv");v.srcObject=st;var p=v.play();if(p&&p.catch)p.catch(function(){});
+    if(window.markerAR)window.markerAR.start({video:v,canvas:$("camgl"),src:src,onState:function(state){
+      if(state==="found"){m.style.visibility="hidden";$("camhint").textContent=t.camdrag;}
+      else if(state==="lost")$("camhint").textContent=t.camqr;
+      else if(state==="nomarker"||state==="error"){m.style.visibility="";$("camhint").textContent=t.camhint;}
+    }});
+  },function(){$("camhint").textContent=t.camno;});
+  window.addEventListener("deviceorientation",onTilt);
+  track("cam_view",{dish:currentDish});
+}
+function closeCam(){
+  if($("cam").hidden)return;
+  $("cam").hidden=true;
+  if(window.markerAR)window.markerAR.stop();
+  window.removeEventListener("deviceorientation",onTilt);
+  if(camStream){camStream.getTracks().forEach(function(x){x.stop();});camStream=null;}
+  $("camv").srcObject=null;
+}
+function closeSheet(){
+  if(!$("sheet").classList.contains("open"))return;
+  $("sheet").classList.remove("open");unlockPage();
+}
+
+/* ---- events ---- */
+$("lgbtn").addEventListener("click",function(e){e.stopPropagation();toggleLang();});
+$("lgbox").addEventListener("click",function(e){var b=e.target.closest("button");if(b){lang=b.dataset.l;render();toggleLang(false);}});
+document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest(".lg,.lgbox"))toggleLang(false);});
+$("menu").addEventListener("click",function(e){var b=e.target.closest(".dish");if(b)openDish(+b.dataset.i);});
+$("sheet").addEventListener("click",function(e){if(e.target.id==="sheet")closeSheet();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(!$("cam").hidden){closeCam();return;}closeSheet();toggleLang(false);}});
+$("camx").addEventListener("click",closeCam);
+document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".ar"))track("ar_click",{dish:currentDish});});
+$("cue").addEventListener("click",function(){var m=$("menu");try{m.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){m.scrollIntoView();}});
+window.addEventListener("scroll",function(){
+  var y=window.pageYOffset||0,h=window.innerHeight||700,p=Math.min(1,y/(h*.7));
+  $("hc").style.opacity=String(1-p);$("hc").style.transform="translateY("+(-y*.25)+"px)";
+},{passive:true});
+render();
+</script>
+<script type="module">
+/* ---- AR with the table QR, for phones without Google AR ----
+   A QR sticker of known size (QR_SIZE) lies flat on the table. In every camera frame we find its 4 corners;
+   from how big and how skewed they look we compute where the table is (a "pose": rotation + position),
+   and draw the dish with three.js on that table, at real size, next to the QR. The pose comes from the camera
+   image itself, so the dish stays put while the phone moves, as long as the QR stays in view.
+   Exposed to the page as window.markerAR = {start, stop}. three.js and the QR reader load only when used. */
+const QR_SIZE = 0.065;     // printed QR symbol side in metres: must match QR_MM in tools/qr.py
+const LONG_FOV = 65;       // assumed camera field of view along the long side of the video (errors largely
+                           // cancel: the dish is drawn with the same camera that measured the QR)
+const FIND_LIMIT = 8000;   // ms without any QR before the page falls back to the simple camera view
+let S = null;              // the running session
+
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],
+      dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2], scl=(a,k)=>[a[0]*k,a[1]*k,a[2]*k],
+      cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],
+      len=a=>Math.hypot(a[0],a[1],a[2]), unit=a=>scl(a,1/len(a));
+
+function solve(A, b) {               // small linear system, Gauss-Jordan with partial pivoting
+  const n = b.length, M = A.map((r, i) => r.concat([b[i]]));
+  for (let c = 0; c < n; c++) {
+    let p = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    if (Math.abs(M[p][c]) < 1e-12) return null;
+    [M[c], M[p]] = [M[p], M[c]];
+    for (let r = 0; r < n; r++) if (r !== c) {
+      const k = M[r][c] / M[c][c];
+      for (let j = c; j <= n; j++) M[r][j] -= k * M[c][j];
+    }
+  }
+  return M.map((r, i) => r[n] / r[i]);
+}
+
+/* Pose of the QR in camera axes (x right, y down, z forward). corners: TL, TR, BR, BL in video pixels.
+   Marker axes: x along the QR's top edge, y down its left edge, z into the table. */
+/* Camera focal length (pixels) seen from one view of the QR. Every phone's camera is different and a wrong
+   focal skews size and tilt. The QR is a square, so in the true focal its two edges come out perpendicular and
+   equally long; with the homography H (QR plane -> centred pixels) that gives two equations for f². They are
+   only informative when the QR is seen at a slant, so flat-on views give nothing. Returns [f, ...] or []. */
+function focalFrom(corners, vw, vh) {
+  const obj = [[-1, -1], [1, -1], [1, 1], [-1, 1]], A = [], b = [];
+  corners.forEach((p, i) => {
+    const [X, Y] = obj[i], x = p.x - vw / 2, y = p.y - vh / 2;
+    A.push([X, Y, 1, 0, 0, 0, -x * X, -x * Y]); b.push(x);
+    A.push([0, 0, 0, X, Y, 1, -y * X, -y * Y]); b.push(y);
+  });
+  const g = solve(A, b);
+  if (!g) return [];
+  const [h11, h12, , h21, h22, , h31, h32] = g, out = [];
+  const scale = Math.max(Math.abs(h11), Math.abs(h12), Math.abs(h21), Math.abs(h22));
+  const tryF = (num, den) => {               // f² = -num/den, only when the slant term is clearly non-zero
+    if (Math.abs(den) * vw * vw < 0.02 * scale * scale) return;
+    const f2 = -num / den;
+    if (f2 > 0) out.push(Math.sqrt(f2));
+  };
+  tryF(h11 * h12 + h21 * h22, h31 * h32);
+  tryF(h11 * h11 + h21 * h21 - h12 * h12 - h22 * h22, h31 * h31 - h32 * h32);
+  return out;
+}
+
+function poseFrom(corners, vw, vh, f) {
+  const h = QR_SIZE / 2, obj = [[-h, -h], [h, -h], [h, h], [-h, h]];
+  const img = corners.map(p => [(p.x - vw / 2) / f, (p.y - vh / 2) / f]);
+  const A = [], b = [];
+  for (let i = 0; i < 4; i++) {
+    const [X, Y] = obj[i], [x, y] = img[i];
+    A.push([X, Y, 1, 0, 0, 0, -x * X, -x * Y]); b.push(x);
+    A.push([0, 0, 0, X, Y, 1, -y * X, -y * Y]); b.push(y);
+  }
+  const g = solve(A, b);
+  if (!g) return null;
+  const b1 = [g[0], g[3], g[6]], b2 = [g[1], g[4], g[7]], b3 = [g[2], g[5], 1];
+  let lam = 2 / (len(b1) + len(b2));
+  if (b3[2] * lam < 0) lam = -lam;                         // the QR is in front of the camera
+  const x0 = unit(b1), y0 = unit(b2), u = unit(add(x0, y0)), v = unit(sub(x0, y0));
+  const rx = scl(add(u, v), Math.SQRT1_2), ry = scl(sub(u, v), Math.SQRT1_2);   // nearest true rotation
+  const rz = cross(rx, ry), t = scl(b3, lam);
+  // reject bad reads: the 4 corners must reproject close to where they were seen
+  let err = 0;
+  obj.forEach(([X, Y], i) => {
+    const p = add(add(scl(rx, X), scl(ry, Y)), t);
+    err = Math.max(err, Math.hypot(p[0] / p[2] - img[i][0], p[1] / p[2] - img[i][1]));
+  });
+  const size = Math.hypot(img[1][0] - img[0][0], img[1][1] - img[0][1]);
+  if (!(t[2] > 0.05 && err < 0.08 * size)) return null;
+  return { rx, ry, rz, t, obj, img };
+}
+
+/* The weak part of a pose from a small square is its tilt, and a tilt error shows up as a size error.
+   The table is level, so its tilt is known from the phone's gravity sensor (which, unlike the gyroscope, does
+   not drift). down: unit "into the table" direction in camera axes. We blend it into the QR's normal, keep the
+   QR's own turn, then re-solve the distance with that rotation fixed (linear least squares on the corners). */
+function levelPose(P, down) {
+  if (dot(down, P.rz) < 0.8) return P;            // they disagree a lot (table not level?): keep the QR's own
+  const rz = unit(add(scl(down, 0.8), scl(P.rz, 0.2)));
+  const rx = unit(sub(P.rx, scl(rz, dot(P.rx, rz)))), ry = cross(rz, rx);
+  const M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], r = [0, 0, 0];
+  P.obj.forEach(([X, Y], i) => {
+    const q = add(scl(rx, X), scl(ry, Y)), [u, v] = P.img[i];
+    // (q + t) projected = (u, v):  t.x - u t.z = u q.z - q.x ;  t.y - v t.z = v q.z - q.y
+    [[[1, 0, -u], u * q[2] - q[0]], [[0, 1, -v], v * q[2] - q[1]]].forEach(([a, bb]) => {
+      for (let j = 0; j < 3; j++) { r[j] += a[j] * bb; for (let k = 0; k < 3; k++) M[j][k] += a[j] * a[k]; }
+    });
+  });
+  const t = solve(M, r);
+  return t && t[2] > 0.05 ? { rx, ry, rz, t, obj: P.obj, img: P.img, level: true } : P;
+}
+
+async function loadLibs() {
+  const [THREE, { GLTFLoader }, { DRACOLoader }] = await Promise.all([
+    // esm.sh: full URLs (no import map, which older Chrome lacks); it serves code the visiting browser understands,
+    // and the loaders get the same three.js instance
+    import("https://esm.sh/three@0.160.0"), import("https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"),
+    import("https://esm.sh/three@0.160.0/examples/jsm/loaders/DRACOLoader.js")]);
+  return { THREE, GLTFLoader, DRACOLoader };
+}
+function loadJsQR() {
+  if (window.jsQR) return Promise.resolve();
+  return new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"; s.onload = ok; s.onerror = no;
+    document.head.appendChild(s);
+  });
+}
+
+/* QR corners in the current video frame, in the QR's own order (TL, TR, BR, BL of the QR, whichever way the
+   phone is turned), or null. The order matters: it decides which side of the QR the dish is on.
+   jsQR finds the 3 big finder squares, so its corners are always in the QR's order; it is the authority.
+   The phone's built-in reader (when present) is better at finding a small or slanted QR, but may list the
+   corners from the screen's top-left, so it is only used to tell jsQR where to look, or, for a moment when
+   jsQR misses, matched to the last known corners by position. */
+function bbox(c) {
+  const xs = c.map(p => p.x), ys = c.map(p => p.y);
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+}
+function matchOrder(c, prev) {           // cyclic order of c closest to prev (both in image pixels)
+  let best = null, bd = Infinity;
+  for (let k = 0; k < 4; k++) {
+    const r = c.slice(k).concat(c.slice(0, k));
+    const d = r.reduce((a, p, i) => a + Math.hypot(p.x - prev[i].x, p.y - prev[i].y), 0);
+    if (d < bd) { bd = d; best = r; }
+  }
+  return best;
+}
+async function findCorners(s) {
+  const v = s.video;
+  if (!window.jsQR) return null;
+  const VW = v.videoWidth, VH = v.videoHeight;
+  if (!VW || !VH) return null;
+  // jsQR on a region of the frame (sharper and faster), or on the whole frame
+  const read = (x0, y0, cw, ch, maxSide) => {
+    const k = Math.min(1, maxSide / Math.max(cw, ch)), w = Math.round(cw * k), h = Math.round(ch * k);
+    if (w < 40 || h < 40) return null;
+    s.cv.width = w; s.cv.height = h;
+    s.cx.drawImage(v, x0, y0, cw, ch, 0, 0, w, h);
+    const q = window.jsQR(s.cx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: "dontInvert" });
+    if (!q) return null;
+    s.dbg.jsqr = (s.dbg.jsqr || 0) + 1;
+    const L = q.location;
+    return [L.topLeftCorner, L.topRightCorner, L.bottomRightCorner, L.bottomLeftCorner].map(p => ({ x: x0 + p.x / k, y: y0 + p.y / k }));
+  };
+  const around = (q, grow) => {          // jsQR on the area around corners q
+    const [minX, minY, maxX, maxY] = bbox(q), m = Math.max(maxX - minX, maxY - minY) * grow;
+    const x0 = Math.max(0, minX - m), y0 = Math.max(0, minY - m), x1 = Math.min(VW, maxX + m), y1 = Math.min(VH, maxY + m);
+    return read(x0, y0, x1 - x0, y1 - y0, 1000);   // around the QR: (almost) full resolution, small QRs need it
+  };
+  const now = performance.now(), recent = s.last && now - s.lastAt < 1500;
+  let c = null;
+  if (s.detector) {
+    // fast path: the phone's own reader (native, quick) every frame. Its corners are put in the order of the last
+    // known corners; jsQR (slower) is only run to set the order at the start, and every 10th frame to re-check it.
+    let d = null;
+    try { const r = await s.detector.detect(v); d = r && r[0] && r[0].cornerPoints; }
+    catch (e) { s.detector = null; }     // the built-in reader failed: jsQR only from now on
+    if (d && d.length === 4) {
+      d = d.map(p => ({ x: p.x, y: p.y }));
+      s.dbg.builtin = (s.dbg.builtin || 0) + 1;
+      s.n = (s.n || 0) + 1;
+      if (!recent || s.n % 10 === 0) c = around(d, 0.25);
+      if (!c) c = recent ? matchOrder(d, s.last) : d;
+    }
+  } else if (s.last) c = around(s.last, 0.9);
+  if (!c && (!s.detector || (s.miss = (s.miss || 0) + 1) % 3 === 0)) c = read(0, 0, VW, VH, 960) || read(0, 0, VW, VH, 1280);   // whole frame (every 3rd miss when the built-in reader is searching too)
+  if (c) { s.last = c; s.lastAt = now; }
+  else if (now - (s.lastAt || 0) > 400) s.last = null;
+  return c;
+}
+
+async function start(opt) {
+  stop();
+  const s = S = { video: opt.video, canvas: opt.canvas, alive: true, dbg: { libs: "loading" },
+                  pose: null, seen: 0, place: null, everFound: false, t0: performance.now() };
+  // state changes go to the page, to the stats (once per state per session) and to the ?debug=1 panel
+  const told = {};
+  s.onState = (state, err) => {
+    s.dbg.state = state; if (err) s.dbg.err = String(err).slice(0, 160);
+    (opt.onState || (() => {}))(state);
+    if (!told[state] && window.track) { told[state] = 1; window.track("ar_marker", { state, err: s.dbg.err || "", reader: s.detector ? "builtin" : "jsqr" }); }
+  };
+  if (/[?&]debug/.test(location.search)) {
+    s.dbgEl = document.createElement("pre");
+    s.dbgEl.style.cssText = "position:absolute;left:8px;top:64px;z-index:3;margin:0;padding:6px 8px;max-width:70%;white-space:pre-wrap;font:11px/1.35 monospace;color:#0f0;background:rgba(0,0,0,.6);border-radius:6px";
+    s.canvas.parentNode.appendChild(s.dbgEl);
+  }
+  s.onState("searching");
+  let L;
+  try {
+    if ("BarcodeDetector" in window) {
+      const f = await BarcodeDetector.getSupportedFormats();
+      if (f.includes("qr_code")) s.detector = new BarcodeDetector({ formats: ["qr_code"] });
+    }
+    [L] = await Promise.all([loadLibs(), loadJsQR()]);
+    s.dbg.libs = "ok";
+  } catch (e) { s.dbg.libs = "FAILED"; if (s.alive) { s.onState("error", e && (e.message || e)); showDbg(s); } return; }
+  if (!s.alive) return;
+  const { THREE, GLTFLoader, DRACOLoader } = L;
+  s.cv = document.createElement("canvas"); s.cx = s.cv.getContext("2d", { willReadFrequently: true });
+
+  const renderer = s.renderer = new THREE.WebGLRenderer({ canvas: s.canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.shadowMap.enabled = true;
+  const scene = new THREE.Scene(), camera = s.camera = new THREE.PerspectiveCamera(50, 1, 0.01, 30);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6b5a48, 2.2));
+  const table = s.table = new THREE.Group(); table.matrixAutoUpdate = false; table.visible = false; scene.add(table);
+  const spot = new THREE.Group(); table.add(spot);                 // where the dish sits, in table axes
+  const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+  sun.position.set(0.15, -0.1, -0.8); sun.castShadow = true;       // above the table (table z points down into it)
+  sun.shadow.mapSize.set(1024, 1024);
+  Object.assign(sun.shadow.camera, { left: -0.4, right: 0.4, top: 0.4, bottom: -0.4, near: 0.1, far: 2 });
+  spot.add(sun); spot.add(sun.target);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShadowMaterial({ opacity: 0.35, side: THREE.DoubleSide }));
+  ground.receiveShadow = true; spot.add(ground);
+
+  const loader = new GLTFLoader(), draco = new DRACOLoader();
+  draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.6/");
+  loader.setDRACOLoader(draco);
+  let radius = 0.17;
+  loader.load(opt.src, gltf => {
+    if (!s.alive) return;
+    const dish = gltf.scene, box = new THREE.Box3().setFromObject(dish), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
+    dish.position.set(-c.x, -box.min.y, -c.z);                     // centred, resting on the table
+    dish.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    const holder = new THREE.Group(); holder.rotation.x = -Math.PI / 2;   // glTF "up" -> out of the table
+    holder.add(dish); spot.add(holder);
+    radius = Math.max(sz.x, sz.z) / 2;
+    ground.scale.set(radius * 3, radius * 3, 1);
+  }, undefined, e => { if (s.alive) s.onState("error", "3D model: " + (e && (e.message || e))); });
+
+  const focal0 = () => Math.max(s.video.videoWidth, s.video.videoHeight) / 2 / Math.tan(LONG_FOV * Math.PI / 360);
+  /* Focal length: with the tilt taken from gravity a wrong focal no longer cancels out (it shows as a size error),
+     so each phone's focal is measured: the focal at which the QR's own tilt agrees with gravity. Per view we
+     scan focals, keep the best when the view is slanted enough to tell, and use the median of many views. */
+  s.fg = [];
+  const focal = () => s.fGrav || focal0();
+  function learnFocalFromGravity(c) {
+    if (!s.down || performance.now() - s.downAt > 500) return;
+    const f0 = focal0(), vw = s.video.videoWidth, vh = s.video.videoHeight;
+    let best = null, bestA = 9, worstA = 0;
+    for (let m = 0.6; m <= 1.61; m += 0.025) {
+      const P = poseFrom(c, vw, vh, f0 * m);
+      if (!P) continue;
+      const a = Math.acos(Math.min(1, dot(P.rz, s.down)));
+      if (a < bestA) { bestA = a; best = f0 * m; }
+      if (a > worstA) worstA = a;
+    }
+    if (best && worstA - bestA > 0.05 && bestA < 0.06) {     // informative view (>3° spread) and a good fit (<3.5°)
+      s.fg.push(best); if (s.fg.length > 60) s.fg.shift();
+      if (s.fg.length >= 8) {
+        const srt = s.fg.slice().sort((a, b) => a - b); s.fGrav = srt[srt.length >> 1];
+        s.dbg.fov = (2 * Math.atan(Math.max(vw, vh) / 2 / s.fGrav) * 180 / Math.PI).toFixed(1) + "° (" + s.fg.length + " views, gravity)";
+      }
+    }
+  }
+  // gravity from the phone's tilt sensors -> "into the table" direction in camera axes (see levelPose)
+  const onGrav = e => {
+    if (e.beta == null || e.gamma == null) return;
+    const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
+    s.down = [Math.cos(b) * Math.sin(g), Math.sin(b), Math.cos(b) * Math.cos(g)]; s.downAt = performance.now();
+  };
+  window.addEventListener("deviceorientation", onGrav);
+  s.offGrav = () => window.removeEventListener("deviceorientation", onGrav);
+  s.fs = [];
+  function learnFocal(c) {
+    const f0 = focal0();
+    focalFrom(c, s.video.videoWidth, s.video.videoHeight).forEach(f => {
+      if (f > 0.55 * f0 && f < 1.8 * f0) s.fs.push(f);
+    });
+    if (s.fs.length > 80) s.fs.splice(0, s.fs.length - 80);
+    if (s.fs.length >= 12) {
+      const sorted = s.fs.slice().sort((a, b) => a - b);
+      s.fEst = sorted[sorted.length >> 1];
+      s.dbg.fov = (2 * Math.atan(Math.max(s.video.videoWidth, s.video.videoHeight) / 2 / s.fEst) * 180 / Math.PI).toFixed(1) + "° (" + s.fs.length + " views)";
+    }
+  }
+  const coverScale = () => Math.max(innerWidth / s.video.videoWidth, innerHeight / s.video.videoHeight);
+
+  // a screen point -> point on the table (table axes), using the current pose; null if it misses the table
+  function onTable(sx, sy) {
+    if (!s.pose) return null;
+    const F = focal() * coverScale(), d = [(sx - innerWidth / 2) / F, (sy - innerHeight / 2) / F, 1];
+    const { rx, ry, rz, t } = s.pose;
+    const o = [-dot(rx, t), -dot(ry, t), -dot(rz, t)], dm = [dot(rx, d), dot(ry, d), dot(rz, d)];   // camera & ray in table axes
+    if (Math.abs(dm[2]) < 1e-6) return null;
+    const k = -o[2] / dm[2];
+    return k > 0 ? [o[0] + k * dm[0], o[1] + k * dm[1]] : null;
+  }
+  function keepClear(p) {           // the dish must not cover the QR, or the camera loses it
+    const need = QR_SIZE * 0.75 + radius + 0.01, n = Math.hypot(p[0], p[1]);
+    if (n >= need) return p;
+    let dir = n > 1e-3 ? [p[0] / n, p[1] / n] : null;
+    if (!dir) { const { rx, ry, t } = s.pose, o = [-dot(rx, t), -dot(ry, t)], m = Math.hypot(o[0], o[1]) || 1; dir = [o[0] / m, o[1] / m]; }
+    return [dir[0] * need, dir[1] * need];
+  }
+  function setPlace(p) { s.place = keepClear(p); spot.position.set(s.place[0], s.place[1], 0); }
+
+  // drag the dish along the table
+  let drag = false;
+  s.canvas.onpointerdown = e => { drag = true; s.canvas.setPointerCapture(e.pointerId); };
+  s.canvas.onpointermove = e => { if (!drag) return; const p = onTable(e.clientX, e.clientY); if (p) setPlace(p); };
+  s.canvas.onpointerup = s.canvas.onpointercancel = () => { drag = false; };
+
+  const smooth = { p: new THREE.Vector3(), q: new THREE.Quaternion(), ok: false }, m4 = new THREE.Matrix4();
+  function usePose(P) {
+    s.pose = P;
+    // camera axes (x right, y down, z forward) -> three.js (x right, y up, z back)
+    const X = [P.rx[0], -P.rx[1], -P.rx[2]], Y = [P.ry[0], -P.ry[1], -P.ry[2]], Z = [P.rz[0], -P.rz[1], -P.rz[2]];
+    m4.set(X[0], Y[0], Z[0], P.t[0], X[1], Y[1], Z[1], -P.t[1], X[2], Y[2], Z[2], -P.t[2], 0, 0, 0, 1);
+    const p = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+    m4.decompose(p, q, sc);
+    if (!smooth.ok || p.distanceTo(smooth.p) > 0.25) { smooth.p.copy(p); smooth.q.copy(q); smooth.ok = true; }
+    else {
+      // adaptive smoothing: follow quickly when the phone moves (big change), smooth hard when it is still
+      // (small change = mostly noise of the corner detection)
+      const move = p.distanceTo(smooth.p) / 0.015 + smooth.q.angleTo(q) / 0.05;   // 1.5 cm or 3 deg ≈ 1
+      const k = Math.min(0.95, 0.25 + 0.3 * move);
+      smooth.p.lerp(p, k); smooth.q.slerp(q, k);
+    }
+    table.matrix.compose(smooth.p, smooth.q, new THREE.Vector3(1, 1, 1));
+    table.matrixWorldNeedsUpdate = true;
+    if (!s.place) setPlace(onTable(innerWidth / 2, innerHeight * 0.55) || [0, 0]);
+    table.visible = true;
+  }
+
+  function bestPose(c) {          // corners already in the QR's own order (see findCorners)
+    if (!s.fGrav) learnFocal(c);
+    learnFocalFromGravity(c);
+    const P = poseFrom(c, s.video.videoWidth, s.video.videoHeight, focal());
+    // gravity only once this phone's focal is known (with a wrong focal, forcing the tilt makes size worse)
+    const level = P && s.fGrav && s.down && performance.now() - s.downAt < 500;
+    s.dbg.level = level ? "gravity" : "QR only";
+    return level ? levelPose(P, s.down) : P;
+  }
+
+  async function seek() {
+    if (!s.alive) return;
+    if (s.video.readyState >= 2) {
+      const c = await findCorners(s);
+      const P = c && bestPose(c);
+      if (!s.alive) return;
+      s.dbg.tries = (s.dbg.tries || 0) + 1;
+      if (c && !P) s.dbg.rejected = (s.dbg.rejected || 0) + 1;
+      if (P) {
+        s.dbg.poses = (s.dbg.poses || 0) + 1; s.dbg.dist = Math.round(len(P.t) * 100) + " cm";
+        usePose(P); s.seen = performance.now();
+        if (!s.everFound) { s.everFound = true; s.canvas.classList.add("on"); }
+        s.onState("found");
+      } else if (s.everFound && performance.now() - s.seen > 1200) s.onState("lost");
+      else if (!s.everFound && performance.now() - s.t0 > FIND_LIMIT) s.onState("nomarker");
+    }
+    showDbg(s);
+    s.timer = setTimeout(seek, 50);
+  }
+  seek();
+
+  (function frame() {
+    if (!s.alive) return;
+    if (s.video.videoWidth) {
+      const W = innerWidth, H = innerHeight, F = focal() * coverScale();
+      renderer.setSize(W, H, false);
+      camera.aspect = W / H; camera.fov = 2 * Math.atan(H / 2 / F) * 180 / Math.PI; camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    }
+    s.raf = requestAnimationFrame(frame);
+  })();
+}
+
+function showDbg(s) {           // ?debug=1 panel: what the QR tracking is doing on this phone
+  if (!s.dbgEl) return;
+  const d = s.dbg, v = s.video;
+  s.dbgEl.textContent = [
+    "3D libs: " + d.libs + "   reader: " + (s.detector ? "built-in + jsQR" : "jsQR"),
+    "video: " + v.videoWidth + "x" + v.videoHeight + "   screen: " + innerWidth + "x" + innerHeight,
+    "tries " + (d.tries || 0) + " · built-in saw " + (d.builtin || 0) + " · jsQR read " + (d.jsqr || 0),
+    "poses " + (d.poses || 0) + " · rejected " + (d.rejected || 0) + (d.dist ? " · QR at " + d.dist : ""),
+    "tilt from: " + (d.level || "-") + "   camera angle seen: " + (d.fov || "learning"),
+    "state: " + (d.state || "") + (d.err ? "\nerror: " + d.err : "")].join("\n");
+}
+
+function stop() {
+  const s = S; S = null;
+  if (!s) return;
+  if (s.dbgEl) s.dbgEl.remove();
+  if (s.offGrav) s.offGrav();
+  s.alive = false; clearTimeout(s.timer); cancelAnimationFrame(s.raf);
+  s.canvas.classList.remove("on"); s.canvas.onpointerdown = s.canvas.onpointermove = s.canvas.onpointerup = s.canvas.onpointercancel = null;
+  if (s.renderer) { s.renderer.clear(); s.renderer.dispose(); }
+}
+
+window.markerAR = { start, stop, _poseFrom: poseFrom, _session: () => S };   // _ = for testing
+</script>
+</body>
+</html>
