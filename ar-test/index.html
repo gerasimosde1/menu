@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>AR test · 8th Wall</title>
+<!-- Test: the dish on the table WITHOUT Google AR and WITHOUT the QR sticker, using the 8th Wall engine's own tracking
+     (SLAM, absolute scale = real metres). Engine: @8thwall/engine-binary 1.0.0, © Niantic Spatial, limited-use license (xr/LICENSE). -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/DRACOLoader.js"></script>
+<script async src="xr/xr.js" data-preload-chunks="slam"></script>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:system-ui,sans-serif}
+#camerafeed{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+#msg{position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:12px 14px;border-radius:14px;
+  background:rgba(10,13,17,.75);color:#fff;font:600 14px/1.45 system-ui,sans-serif;text-align:center}
+#dbg{position:fixed;left:8px;top:calc(8px + env(safe-area-inset-top,0px));padding:6px 8px;border-radius:8px;background:rgba(0,0,0,.55);
+  color:#9f9;font:11px/1.35 ui-monospace,monospace;white-space:pre;max-width:70vw}
+#credit{position:fixed;right:8px;top:calc(8px + env(safe-area-inset-top,0px));color:#fff;opacity:.7;font:10px system-ui,sans-serif;text-align:right}
+</style>
+</head>
+<body>
+<canvas id="camerafeed"></canvas>
+<div id="msg">Φορτώνει η μηχανή AR…</div>
+<div id="dbg"></div>
+<div id="credit">Powered by 8th Wall engine<br>© Niantic Spatial</div>
+<script>
+var msg=document.getElementById("msg"), dbg=document.getElementById("dbg");
+var t0=Date.now(), info={ua:navigator.userAgent.replace(/^.*?\(/,"(").slice(0,90)};
+function show(){dbg.textContent=Object.keys(info).map(function(k){return k+": "+info[k];}).join("\n");}
+show();
+var dish=null, placed=false, scaleMode="absolute";
+
+function sceneModule(){
+  return {
+    name:"dish-scene",
+    onStart:function(){
+      var xr=XR8.Threejs.xrScene(), scene=xr.scene, camera=xr.camera, renderer=xr.renderer;
+      renderer.outputEncoding=THREE.sRGBEncoding; renderer.shadowMap.enabled=true;
+      scene.add(new THREE.HemisphereLight(0xffffff,0x553322,1.1));
+      var sun=new THREE.DirectionalLight(0xffffff,0.9); sun.position.set(0.3,1,0.2); sun.castShadow=true;
+      sun.shadow.camera.left=sun.shadow.camera.bottom=-0.5; sun.shadow.camera.right=sun.shadow.camera.top=0.5;
+      scene.add(sun);
+      var floor=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShadowMaterial({opacity:0.35}));
+      floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+      camera.position.set(0,0.4,0);          // phone held ~40 cm above the table at the start
+      XR8.XrController.updateCameraProjectionMatrix({origin:camera.position,facing:camera.quaternion});
+      var gl=new THREE.GLTFLoader(), dr=new THREE.DRACOLoader();
+      dr.setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/libs/draco/"); gl.setDRACOLoader(dr);
+      gl.load("../pizza-margherita.glb",function(g){
+        dish=g.scene; dish.visible=false;
+        dish.traverse(function(o){if(o.isMesh){o.castShadow=true;}});
+        scene.add(dish); dish.userData.floor=floor;
+        info.model="loaded"; show();
+      },undefined,function(e){info.model="ERROR "+e; show();});
+      // tap = put the dish where the finger points on the table
+      document.getElementById("camerafeed").addEventListener("touchstart",function(e){
+        if(!dish)return;
+        var t=e.touches[0], x=t.clientX/window.innerWidth, y=t.clientY/window.innerHeight;
+        var hits=XR8.XrController.hitTest(x,y,["DETECTED_SURFACE","ESTIMATED_SURFACE","FEATURE_POINT"]);
+        info.hits=hits.length?hits[0].type+" @ "+hits[0].distance.toFixed(2)+"m":"none"; show();
+        if(!hits.length){msg.textContent="Δεν βρέθηκε επιφάνεια εκεί. Κούνησε λίγο το κινητό και ξαναπάτα πάνω στο τραπέζι.";return;}
+        var p=hits[0].position; dish.position.set(p.x,p.y,p.z); dish.visible=true;
+        dish.userData.floor.position.set(p.x,p.y+0.001,p.z); placed=true;
+        msg.textContent="Το πιάτο είναι στο τραπέζι (33 εκ.). Πάτα αλλού για να το μετακινήσεις.";
+      },{passive:true});
+    },
+    onUpdate:function(a){
+      var r=a.processCpuResult&&a.processCpuResult.reality;
+      if(r){info.tracking=r.trackingStatus+(r.trackingReason?" ("+r.trackingReason+")":""); }
+      info.fps=a.frameStartResult&&a.frameStartResult.frameTime?"":info.fps;
+      if(!placed&&r&&r.trackingStatus==="NORMAL")msg.textContent="Το τραπέζι βρέθηκε. Πάτα πάνω του για να βάλεις την πίτσα.";
+      if(Date.now()%1000<40)show();
+    },
+    onCameraStatusChange:function(e){info.camera=e.status;show();
+      if(e.status==="requesting")msg.textContent="Δώσε άδεια για την κάμερα.";
+      if(e.status==="hasVideo")msg.textContent="Κούνησε λίγο το κινητό πάνω από το τραπέζι για να το βρει.";
+      if(e.status==="failed")msg.textContent="Η κάμερα δεν άνοιξε. Δώσε άδεια στις ρυθμίσεις του browser.";},
+    onException:function(e){info.error=String(e&&e.message||e).slice(0,120);show();}
+  };
+}
+
+function onxrloaded(){
+  info.engine="loaded in "+((Date.now()-t0)/1000).toFixed(1)+"s"; show();
+  XR8.XrController.configure({scale:scaleMode});
+  XR8.addCameraPipelineModules([
+    XR8.GlTextureRenderer.pipelineModule(),
+    XR8.Threejs.pipelineModule(),
+    XR8.XrController.pipelineModule(),
+    sceneModule()
+  ]);
+  var c=document.getElementById("camerafeed"), d=window.devicePixelRatio||1;
+  c.width=Math.round(innerWidth*d); c.height=Math.round(innerHeight*d);
+  XR8.run({canvas:c,allowedDevices:XR8.XrConfig.device().ANY});
+}
+window.XR8?onxrloaded():window.addEventListener("xrloaded",onxrloaded);
+setTimeout(function(){if(!window.XR8){info.engine="NOT loaded after 30s";show();msg.textContent="Η μηχανή AR δεν φόρτωσε.";}},30000);
+</script>
+</body>
+</html>
