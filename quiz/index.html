@@ -107,6 +107,19 @@ input[type=text]:focus{outline:none;border-color:var(--cherry)}
 .shake{animation:shake .4s}
 .small{font-size:13px;color:var(--muted)}
 .ai{display:flex;flex-direction:column;gap:8px}
+.room{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.code{font-family:var(--show);font-size:56px;letter-spacing:.18em;padding-left:.18em;line-height:1;color:var(--cherry)}
+.qr{width:184px;height:184px;max-width:100%;background:#fff;border-radius:16px;padding:12px;box-sizing:border-box}
+.qr svg{width:100%;height:100%;display:block}
+.joined{font-weight:800;color:var(--good);margin:0;font-size:18px}
+.err{color:var(--miss);font-weight:700}
+.banner{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:color-mix(in srgb,var(--miss) 14%,var(--card));border:1.5px solid var(--miss);border-radius:14px;padding:10px 12px;font-weight:700;font-size:14px}
+input.code-in{text-transform:uppercase;letter-spacing:.3em;font-family:var(--show)}
+input:disabled{opacity:.65}
+.ans.mine{border-color:var(--ink)}
+.ans.watch{opacity:.7}
+.linkish{all:unset;cursor:pointer;text-decoration:underline;color:var(--muted);font-weight:700}
+.linkish:focus-visible{outline:3px solid var(--tang);outline-offset:2px}
 .foot{margin-top:auto;text-align:center;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -114,6 +127,8 @@ input[type=text]:focus{outline:none;border-color:var(--cherry)}
 <div class="wrap" id="app"></div>
 <div class="sparks" id="sparks" aria-hidden="true"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
 const CATS = {geo:"Geography", hist:"History & Art", sci:"Science & Nature", sport:"Sport", screen:"Movies & TV", music:"Music", food:"Food & Drink", gi:"Greece & Italy"};
 const LEVEL = {1:"Easy",2:"Medium",3:"Hard"};
@@ -323,8 +338,13 @@ const saved = store.get();
 let S = {
   screen:"intro", a:saved.a||"Gioia", b:saved.b||"Gerasimos", mode:saved.mode||"h2h",
   cats:saved.cats||Object.keys(CATS), diff:saved.diff||"mix", rounds:saved.rounds||10, timer:saved.timer??20, sound:saved.sound??true,
-  deck:[], i:0, phase:"ask", picks:[null,null], used:[[],[]], fifty:[1,1], removed:[], scores:[0,0], right:[0,0], streak:[0,0], hist:[], extra:[]
+  online:false, gid:0, deck:[], i:0, phase:"first", picks:[null,null], fifty:[1,1], scores:[0,0], right:[0,0], streak:[0,0], hist:[], lastRes:[], extra:[]
 };
+// this phone only, never sent to the other phone
+const L = { removed:[], tKey:"", code:"", myName:saved.me||"" };
+// two phones: the phone that creates the game is player 1 (index 0) and runs the game; the one that joins is player 2 (index 1)
+const NET = { role:null, me:0, peer:null, conn:null, code:"", open:false, connected:false, everConnected:false, err:"" };
+const PEER_PREFIX = "ggquiznight-", CODE_ABC = "ABCDEFGHJKMNPQRSTUVWXYZ";
 
 const app = document.getElementById("app");
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -334,8 +354,9 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.rando
 const nameOf = p => p===0 ? S.a : S.b;
 const cur = () => S.deck[S.i];
 const pts = q => q.d;
+const top0 = () => window.scrollTo(0,0);
 
-// who answers now: duel → alternates per question; h2h → first alternates, second is the other; team → shared (index 0 holds the team score)
+// one phone: duel alternates per question; h2h first picker alternates, second is the other; team is shared (index 0 holds the team score)
 function firstP(){ return S.i % 2; }
 function activeP(){
   if(S.mode==="team") return 0;
@@ -345,8 +366,9 @@ function activeP(){
 
 // ---------- sound ----------
 let ac=null;
+const soundOn = () => NET.role==="guest" ? (store.get().sound ?? true) : S.sound;
 function beep(kind){
-  if(!S.sound) return;
+  if(!soundOn()) return;
   try{
     ac = ac || new (window.AudioContext||window.webkitAudioContext)();
     const notes = kind==="good"?[660,880,1175]:kind==="bad"?[220,165]:kind==="win"?[523,659,784,1047]:[880];
@@ -356,12 +378,21 @@ function beep(kind){
   }catch(e){}
 }
 
-// ---------- timer ----------
+// ---------- screen stays on during a game ----------
+let wake=null;
+async function keepAwake(){ try{ if(!wake && navigator.wakeLock){ wake=await navigator.wakeLock.request("screen"); wake.addEventListener("release",()=>{wake=null;}); } }catch(e){} }
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState!=="visible") return;
+  if(S.online||S.screen==="play") keepAwake();
+  if(NET.role==="guest" && NET.everConnected && !NET.connected) reconnect();
+});
+
+// ---------- timer (keeps running across re-renders of the same question) ----------
 let tHandle=null, tEnd=0;
 function stopTimer(){ if(tHandle){cancelAnimationFrame(tHandle);tHandle=null;} }
-function startTimer(onOut){
+function startTimer(onOut,key){
   stopTimer(); if(!S.timer) return;
-  tEnd = performance.now()+S.timer*1000;
+  if(L.tKey!==key){ L.tKey=key; tEnd=performance.now()+S.timer*1000; }
   const bar=$("tbar"), secs=$("secs"), wrap=$("timer");
   const tick=()=>{
     const left=Math.max(0,tEnd-performance.now());
@@ -374,25 +405,119 @@ function startTimer(onOut){
   tick();
 }
 
+// ---------- two phones (PeerJS: direct phone-to-phone link, codes go through the free PeerJS server) ----------
+function netErr(e){
+  if(["network","server-error","socket-error","socket-closed"].includes(e.type)) return "Couldn't reach the game server. Check your internet and try again.";
+  if(e.type==="browser-incompatible") return "This browser can't play on two phones. Try Chrome or Safari.";
+  return "The connection failed. Try again.";
+}
+function grabNames(){ const na=$("na"); if(na) S.a=na.value.trim()||S.a; }
+function sync(){ if(NET.role==="host" && NET.conn && NET.conn.open){ try{ NET.conn.send({t:"state", s:{...S, extra:[]}}); }catch(e){} } }
+function leaveOnline(){
+  try{ NET.peer && NET.peer.destroy(); }catch(e){}
+  Object.assign(NET,{role:null,me:0,peer:null,conn:null,code:"",open:false,connected:false,everConnected:false,err:""});
+  S.online=false;
+}
+
+function host(){
+  leaveOnline();
+  NET.role="host"; NET.me=0; S.online=true; if(S.mode==="team") S.mode="h2h";
+  NET.code = Array.from({length:4},()=>CODE_ABC[Math.random()*CODE_ABC.length|0]).join("");
+  const peer = new Peer(PEER_PREFIX+NET.code.toLowerCase(), {debug:0}); NET.peer=peer;
+  peer.on("open",()=>{ NET.open=true; NET.err=""; render(); });
+  peer.on("connection",c=>{
+    c.on("open",()=>{
+      if(NET.conn && NET.conn!==c){ try{NET.conn.close()}catch(e){} }
+      NET.conn=c; NET.connected=NET.everConnected=true; keepAwake();
+      if(S.screen==="setup") grabNames();
+      sync(); render();
+    });
+    c.on("data",m=>{ if(c===NET.conn) onHostData(m); });
+    c.on("close",()=>{ if(c===NET.conn){ NET.connected=false; render(); } });
+  });
+  peer.on("disconnected",()=>{ try{ peer.reconnect(); }catch(e){} });
+  peer.on("error",e=>{
+    if(e.type==="unavailable-id"){ host(); return; }
+    if(e.type==="peer-unavailable") return;
+    NET.err=netErr(e); render();
+  });
+  S.screen="setup"; render();
+}
+
+function onHostData(m){
+  if(!m || typeof m!=="object") return;
+  if(m.t==="hello"){ grabNames(); S.b=String(m.name||"Player 2").slice(0,18); sync(); render(); }
+  else if(m.t==="pick" && m.i===S.i) hostPick(1, [0,1,2,3,-1].includes(+m.k)?+m.k:-1);
+  else if(m.t==="fifty" && m.i===S.i && S.fifty[1]>0){ S.fifty[1]--; sync(); }
+  else if(m.t==="next" && m.i===S.i && S.phase==="reveal") next();
+}
+
+function join(code){
+  leaveOnline();
+  NET.role="guest"; NET.me=1; NET.code=code; S.online=true;
+  const peer = new Peer({debug:0}); NET.peer=peer;
+  peer.on("open",()=>connectToHost());
+  peer.on("disconnected",()=>{ try{ peer.reconnect(); }catch(e){} });
+  peer.on("error",e=>{
+    NET.connected=false;
+    NET.err = e.type==="peer-unavailable" ? `No game found with code ${code}. Check the code on the other phone, and keep that phone on the quiz.` : netErr(e);
+    render();
+  });
+  render();
+}
+function connectToHost(){
+  if(!NET.peer) return;
+  const c = NET.peer.connect(PEER_PREFIX+NET.code.toLowerCase(), {reliable:true}); NET.conn=c;
+  c.on("open",()=>{ NET.connected=NET.everConnected=true; NET.err=""; keepAwake(); c.send({t:"hello",name:L.myName}); render(); });
+  c.on("data",m=>{ if(c===NET.conn) onGuestData(m); });
+  c.on("close",()=>{ if(c===NET.conn){ NET.connected=false; render(); } });
+}
+function reconnect(){
+  if(NET.role!=="guest") return;
+  NET.err="";
+  if(!NET.peer || NET.peer.destroyed) return join(NET.code);
+  if(NET.peer.disconnected){ try{ NET.peer.reconnect(); }catch(e){} setTimeout(connectToHost,800); }
+  else connectToHost();
+  render();
+}
+
+function onGuestData(m){
+  if(!m || m.t!=="state" || !m.s) return;
+  const prev = {i:S.i, phase:S.phase, screen:S.screen, gid:S.gid};
+  Object.assign(S, m.s);
+  const moved = S.i!==prev.i || S.screen!==prev.screen || S.gid!==prev.gid;
+  if(moved) L.removed=[];
+  render();
+  if(moved) top0();
+  if(S.screen==="play" && S.phase==="reveal" && !(prev.phase==="reveal" && prev.i===S.i && prev.gid===S.gid)){ top0(); roundFx(); }
+  if(S.screen==="end" && prev.screen!=="end") endFx();
+}
+
 // ---------- screens ----------
 function header(){
   const playing = S.screen==="play";
   let right;
   if(playing && S.mode==="team") right=`<div class="board"><span class="pl a on"><b>${S.scores[0]}</b>Team</span></div>`;
-  else if(playing){ const ap=activeP(); right=`<div class="board">
-    <span class="pl a ${ap===0&&S.phase!=="reveal"?"on":""}"><b>${S.scores[0]}</b>${esc(S.a)}</span>
-    <span class="pl b ${ap===1&&S.phase!=="reveal"?"on":""}"><b>${S.scores[1]}</b>${esc(S.b)}</span></div>`; }
+  else if(playing){
+    const ap = S.online ? (S.mode==="duel" ? S.i%2 : -1) : activeP();
+    right=`<div class="board">${[0,1].map(p=>`<span class="pl ${p?"b":"a"} ${ap===p&&S.phase!=="reveal"?"on":""}"><b>${S.scores[p]}</b>${esc(nameOf(p))}</span>`).join("")}</div>`;
+  }
   else right=`<div class="small" style="font-weight:800">${esc(S.a)} &amp; ${esc(S.b)}</div>`;
+  const lost = S.online && NET.everConnected && !NET.connected && (S.screen==="play"||S.screen==="end");
   return `<div class="logo"><div class="gg">GG<small>quiz night</small></div>${right}</div>
+  ${lost?`<div class="banner" role="status"><span>${NET.err?esc(NET.err):`Lost the connection to ${esc(nameOf(1-NET.me))}'s phone.`}</span>${NET.role==="guest"?`<button class="btn mini" id="recon">Reconnect</button>`:`<span class="small">Waiting for them to come back…</span>`}</div>`:""}
   ${playing?`<div class="progress" aria-hidden="true"><i style="width:${(S.i/S.deck.length*100).toFixed(1)}%"></i></div>`:""}`;
 }
 
 function render(){
   stopTimer();
-  if(S.screen==="intro") return renderIntro();
-  if(S.screen==="setup") return renderSetup();
-  if(S.screen==="play") return renderPlay();
-  if(S.screen==="end") return renderEnd();
+  if(NET.role==="guest" && S.screen!=="play" && S.screen!=="end") renderGuestWait();
+  else if(S.screen==="intro") renderIntro();
+  else if(S.screen==="online") renderOnline();
+  else if(S.screen==="setup") renderSetup();
+  else if(S.screen==="play") renderPlay();
+  else if(S.screen==="end") renderEnd();
+  const rc=$("recon"); if(rc) rc.onclick=reconnect;
 }
 
 function renderIntro(){
@@ -401,10 +526,55 @@ function renderIntro(){
     <div class="eyebrow">Round two for</div>
     <div class="big">${esc(S.a)} vs ${esc(S.b)}</div>
     <p style="font-size:18px;max-width:30ch;margin:0">You know each other. Now let's see who knows more about everything else.</p>
-    <button class="btn" id="go">Let's play ★</button>
+    <div class="row" style="width:100%;max-width:380px">
+      <button class="btn" id="two">Two phones</button>
+      <button class="btn ghost" id="one">One phone</button>
+    </div>
   </div>
   <div class="foot">${BANK.length} questions across ${Object.keys(CATS).length} categories. Easy = 1 point, Medium = 2, Hard = 3.</div>`);
-  $("go").onclick = ()=>{ S.screen="setup"; sparks(10); render(); };
+  $("two").onclick = ()=>{ S.screen="online"; sparks(10); render(); };
+  $("one").onclick = ()=>{ leaveOnline(); S.screen="setup"; sparks(10); render(); };
+}
+
+function renderOnline(){
+  const ok = typeof Peer!=="undefined";
+  h(`${header()}
+  <div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:26px">Play on two phones</h2>
+    <p class="hint">Each of you answers on your own phone. One phone creates the game, the other joins with the code or QR.</p>
+    <button class="btn" id="create" ${ok?"":"disabled"}>Create a game</button>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div class="eyebrow">Or join a game</div>
+    <div class="row">
+      <div><label for="jn">Your name</label><input type="text" id="jn" maxlength="18" value="${esc(L.myName)}" autocomplete="off"></div>
+      <div><label for="jc">Game code</label><input type="text" id="jc" class="code-in" maxlength="4" value="${esc(L.code)}" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+    </div>
+    <button class="btn ghost" id="join" ${ok?"":"disabled"}>Join game</button>
+    <div class="small err" id="jerr" role="status">${ok?esc(NET.err):"Two-phone play needs the internet. Check your connection and reload the page."}</div>
+  </div>
+  <div class="foot"><button class="linkish" id="back">Back</button></div>`);
+  $("create").onclick = ()=>host();
+  $("join").onclick = ()=>{
+    const code=$("jc").value.toUpperCase().replace(/[^A-Z]/g,""), name=$("jn").value.trim();
+    if(!name){ $("jerr").textContent="Write your name first."; $("jn").focus(); return; }
+    if(code.length!==4){ $("jerr").textContent="The code has 4 letters. You'll find it on the other phone."; $("jc").focus(); return; }
+    L.myName=name; L.code=code; store.set({me:name}); join(code);
+  };
+  $("back").onclick = ()=>{ NET.err=""; S.screen="intro"; render(); };
+  if(L.code && !L.myName) $("jn").focus();
+}
+
+function renderGuestWait(){
+  let big, sub, btn="";
+  if(NET.err){ big="Couldn't join"; sub=esc(NET.err); btn=`<button class="btn" id="gback">Try again</button>`; }
+  else if(!NET.connected){ big = NET.everConnected ? "Reconnecting…" : "Joining…"; sub=`Game code <b>${esc(NET.code)}</b>`; if(NET.everConnected) btn=`<button class="btn" id="recon">Reconnect</button>`; }
+  else { big=`You're in, ${esc(L.myName)}!`; sub=`${esc(S.a)} is choosing the settings. The game starts on both phones at once.`; }
+  h(`${header()}<div class="curtain"><div class="eyebrow">Two phones</div><div class="big">${big}</div>
+    <p class="hint" style="font-size:16px;max-width:32ch">${sub}</p>${btn}</div>
+    <div class="foot"><button class="linkish" id="gleave">Leave</button></div>`);
+  const gb=$("gback"); if(gb) gb.onclick=()=>{ const err=NET.err; leaveOnline(); NET.err=err; S.screen="online"; render(); };
+  $("gleave").onclick=()=>{ leaveOnline(); S.screen="intro"; render(); };
 }
 
 function pool(){
@@ -412,16 +582,35 @@ function pool(){
   return [...S.extra, ...BANK].filter(q=>S.cats.includes(q.c)&&lv.includes(q.d));
 }
 
+function modeSub(k){
+  if(S.online && k==="h2h") return "Same question on both phones. Answer at the same time, then reveal.";
+  if(S.online && k==="duel") return "Your own questions, one at a time. The other phone watches.";
+  return MODES[k].sub;
+}
+
 function renderSetup(){
   const opt = (id,list,val) => `<div class="opts" id="${id}">${list.map(([v,t])=>`<button class="opt" data-v="${v}" aria-pressed="${String(val)===String(v)}">${t}</button>`).join("")}</div>`;
+  const modes = Object.keys(MODES).filter(k=>!(S.online&&k==="team"));
+  const joinUrl = location.origin+location.pathname+"#"+NET.code;
+  const room = !S.online ? "" : `<div class="card room">
+    <div class="eyebrow">Game code</div>
+    <div class="code">${NET.open?esc(NET.code):"…"}</div>
+    ${NET.connected
+      ? `<p class="joined">✓ ${esc(S.b)} joined</p>`
+      : `${NET.open?`<div class="qr" id="qr" role="img" aria-label="QR code to join this game"></div>`:""}
+         <p class="hint">On the other phone, scan the QR, or open <b>${esc(location.host+location.pathname)}</b>, tap Two phones and type the code.</p>
+         <p class="small">${NET.open?"Waiting for player 2…":"Creating the game…"}</p>`}
+    ${NET.err?`<p class="small err">${esc(NET.err)} <button class="linkish" id="retry">Try again</button></p>`:""}
+  </div>`;
   h(`${header()}
+  ${room}
   <div class="card" style="display:flex;flex-direction:column;gap:18px">
     <h2 style="font-size:26px">Game settings</h2>
     <div class="row">
-      <div><label for="na">Player 1</label><input type="text" id="na" value="${esc(S.a)}" maxlength="18"></div>
-      <div><label for="nb">Player 2</label><input type="text" id="nb" value="${esc(S.b)}" maxlength="18"></div>
+      <div><label for="na">${S.online?"You":"Player 1"}</label><input type="text" id="na" value="${esc(S.a)}" maxlength="18"></div>
+      <div><label for="nb">Player 2</label><input type="text" id="nb" value="${esc(S.online?(NET.connected?S.b:"Waiting…"):S.b)}" maxlength="18" ${S.online?"disabled":""}></div>
     </div>
-    <div><span class="lab">Mode</span><div class="modes" id="mode">${Object.entries(MODES).map(([k,m])=>`<button class="mode" data-v="${k}" aria-pressed="${S.mode===k}"><b>${m.name}</b><span>${m.sub}</span></button>`).join("")}</div></div>
+    <div><span class="lab">Mode</span><div class="modes" id="mode">${modes.map(k=>`<button class="mode" data-v="${k}" aria-pressed="${S.mode===k}"><b>${MODES[k].name}</b><span>${modeSub(k)}</span></button>`).join("")}</div></div>
     <div><span class="lab">Categories</span><div class="opts" id="cats">${Object.entries(CATS).map(([k,v])=>`<button class="opt" data-v="${k}" aria-pressed="${S.cats.includes(k)}">${v}</button>`).join("")}
       <button class="opt" data-v="__all" aria-pressed="false">All</button></div></div>
     <div><span class="lab">Difficulty</span>${opt("diff",[["mix","Mixed"],["easy","Easy"],["medium","Medium"],["hard","Hard"]],S.diff)}</div>
@@ -437,8 +626,13 @@ function renderSetup(){
     <button class="btn ghost" id="gen">Write new questions</button>
     <div class="small" id="aimsg" role="status"></div>
   </div>
-  <div class="foot">Each player gets one 50:50 per game. Questions you have already seen come last.</div>`);
-  const upd = ()=>{ const n=pool().length; $("count").textContent = n+" questions match"+(S.extra.length?` (incl. ${S.extra.length} new from Claude)`:"")+(n<4?". Pick more categories.":""); $("start").disabled = n<2; };
+  <div class="foot">Each player gets one 50:50 per game. Questions you have already seen come last.${S.online?`<br><button class="linkish" id="leave">Stop the two-phone game</button>`:""}</div>`);
+  const upd = ()=>{
+    const n=pool().length;
+    $("count").textContent = n+" questions match"+(S.extra.length?` (incl. ${S.extra.length} new from Claude)`:"")+(n<4?". Pick more categories.":"");
+    const wait = S.online && !NET.connected;
+    $("start").disabled = n<2 || wait; $("start").textContent = wait ? "Waiting for player 2" : "Start";
+  };
   upd();
   const press = (id,fn)=>{$(id).onclick=e=>{const b=e.target.closest("[data-v]");if(!b)return;fn(b.dataset.v);
     $(id).querySelectorAll("[data-v]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===b.dataset.v)));upd();};};
@@ -449,13 +643,18 @@ function renderSetup(){
     else { S.cats = S.cats.includes(k)? S.cats.filter(x=>x!==k) : [...S.cats,k]; if(!S.cats.length) S.cats=[k]; }
     $("cats").querySelectorAll("[data-v]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="__all"?"false":String(S.cats.includes(x.dataset.v)))); upd(); };
   $("start").onclick = start;
+  const qrBox=$("qr");
+  if(qrBox && typeof qrcode!=="undefined"){ const qr=qrcode(0,"M"); qr.addData(joinUrl); qr.make(); qrBox.innerHTML=qr.createSvgTag({cellSize:4,margin:0,scalable:true}); }
+  const rt=$("retry"); if(rt) rt.onclick=()=>host();
+  const lv=$("leave"); if(lv) lv.onclick=()=>{ grabNames(); leaveOnline(); S.screen="intro"; render(); };
   setupAI();
 }
 
 function start(){
+  if(NET.role==="guest") return;
   const na=$("na"), nb=$("nb");
-  if(na){ S.a = na.value.trim()||"Player 1"; S.b = nb.value.trim()||"Player 2"; }
-  store.set({a:S.a,b:S.b,mode:S.mode,cats:S.cats,diff:S.diff,rounds:S.rounds,timer:S.timer,sound:S.sound});
+  if(na){ S.a = na.value.trim()||"Player 1"; if(!S.online) S.b = nb.value.trim()||"Player 2"; }
+  store.set(Object.assign({a:S.a,mode:S.mode,cats:S.cats,diff:S.diff,rounds:S.rounds,timer:S.timer,sound:S.sound}, S.online?{}:{b:S.b}));
   const seen = new Set(store.get().seen||[]);
   const p = pool();
   const fresh = shuffle(p.filter(q=>!seen.has(q.id))), old = shuffle(p.filter(q=>seen.has(q.id)));
@@ -465,12 +664,44 @@ function start(){
   if(S.mode!=="team" && n%2) n--; // equal turns
   deck = shuffle(deck.slice(0, Math.max(2,Math.min(n,deck.length - (S.mode!=="team"&&deck.length%2?1:0)))));
   S.deck = deck.map(q=>{ const order=shuffle([0,1,2,3]); return {...q, opts:order.map(k=>q.a[k]), ok:order.indexOf(0)}; });
-  S.i=0; S.phase="first"; S.picks=[null,null]; S.fifty=S.mode==="team"?[2,0]:[1,1]; S.removed=[];
-  S.scores=[0,0]; S.right=[0,0]; S.streak=[0,0]; S.hist=[];
-  S.screen="play"; render(); window.scrollTo(0,0);
+  S.gid=Date.now(); S.i=0; S.phase=S.online?"ask":"first"; S.picks=[null,null]; S.fifty=S.mode==="team"?[2,0]:[1,1]; L.removed=[];
+  S.scores=[0,0]; S.right=[0,0]; S.streak=[0,0]; S.hist=[]; S.lastRes=[];
+  S.screen="play"; keepAwake(); render(); top0(); sync();
 }
 
+function answerTiles(q, tileClass, tagsFor){
+  return `<div class="answers" id="ans">${q.opts.map((t,k)=>`<button class="ans ${tileClass(k)}" data-k="${k}" ${/locked|gone/.test(tileClass(k))?'tabindex="-1"':""}>
+    <span class="k">${"ABCD"[k]}</span><span>${esc(t)}</span>${tagsFor(k)}</button>`).join("")}</div>`;
+}
+// picks by player: [player 1's pick, player 2's pick]
+function revealTiles(q, byPlayer){
+  return answerTiles(q, k=>{
+    const mine = S.mode==="team" ? byPlayer[0]===k : (byPlayer[0]===k||byPlayer[1]===k);
+    return k===q.ok ? "right locked" : mine ? "wrong locked" : "locked";
+  }, k=>{
+    const tags=[];
+    if(S.mode==="team"){ if(byPlayer[0]===k) tags.push(`<span class="dot t">Team</span>`); }
+    else { if(byPlayer[0]===k) tags.push(`<span class="dot a">${esc(S.a)}</span>`); if(byPlayer[1]===k) tags.push(`<span class="dot b">${esc(S.b)}</span>`); }
+    return tags.length?`<span class="who">${tags.join("")}</span>`:"";
+  });
+}
+function questionCard(q, hint){
+  return `<div class="card" id="qcard">
+    <div class="chips"><span class="chip">${CATS[q.c]||"Bonus"}</span><span class="chip lvl">${LEVEL[q.d]} · ${pts(q)} pt${pts(q)>1?"s":""}</span></div>
+    <div class="q">${esc(q.q)}</div>
+    <p class="hint">${hint}</p>
+  </div>`;
+}
+function toolsRow(fiftyLeft){
+  return `<div class="tools">
+     ${S.timer?`<div class="timer" id="timer"><i id="tbar"></i></div><span class="secs" id="secs">${S.timer}s</span>`:`<div style="flex:1"></div>`}
+     <button class="btn mini" id="fifty" ${fiftyLeft&&!L.removed.length?"":"disabled"}>50:50${S.mode==="team"?` ×${fiftyLeft}`:""}</button>
+   </div>`;
+}
+function useFifty(q){ L.removed = shuffle([0,1,2,3].filter(k=>k!==q.ok)).slice(0,2); }
+
 function renderPlay(){
+  if(S.online) return renderOnlinePlay();
   const q = cur(), fp = firstP(), ap = activeP();
   if(S.phase==="pass"){
     h(`${header()}<div class="curtain">
@@ -478,7 +709,7 @@ function renderPlay(){
       <div class="big">Pass the phone to ${esc(nameOf(1-fp))}</div>
       <p class="hint">${esc(nameOf(fp))} has locked in an answer.</p>
       <button class="btn" id="ready">I'm ${esc(nameOf(1-fp))}, ready</button></div>`);
-    $("ready").onclick=()=>{S.phase="second";S.removed=[];render();};
+    $("ready").onclick=()=>{S.phase="second";L.removed=[];render();};
     return;
   }
   const reveal = S.phase==="reveal";
@@ -487,49 +718,50 @@ function renderPlay(){
   else if(S.mode==="duel") who = `<b style="color:var(--ink)">${esc(nameOf(ap))}</b>'s question`;
   else who = `<b style="color:var(--ink)">${esc(nameOf(ap))}</b>, answer secretly`;
   const fiftyLeft = S.mode==="team" ? S.fifty[0] : S.fifty[ap];
-
+  const byPlayer = S.mode==="duel" ? (fp===0?[S.picks[0],null]:[null,S.picks[0]]) : S.mode==="team" ? [S.picks[0],null] : (fp===0?[S.picks[0],S.picks[1]]:[S.picks[1],S.picks[0]]);
   h(`${header()}
-  <div class="card" id="qcard">
-    <div class="chips"><span class="chip">${CATS[q.c]||"Bonus"}</span><span class="chip lvl">${LEVEL[q.d]} · ${pts(q)} pt${pts(q)>1?"s":""}</span></div>
-    <div class="q">${esc(q.q)}</div>
-    <p class="hint">${reveal ? `Question ${S.i+1} of ${S.deck.length}` : who}</p>
-  </div>
-  ${!reveal?`<div class="tools">
-     ${S.timer?`<div class="timer" id="timer"><i id="tbar"></i></div><span class="secs" id="secs">${S.timer}s</span>`:`<div style="flex:1"></div>`}
-     <button class="btn mini" id="fifty" ${fiftyLeft&&!S.removed.length?"":"disabled"}>50:50${S.mode==="team"?` ×${fiftyLeft}`:""}</button>
-   </div>`:""}
-  <div class="answers" id="ans">${q.opts.map((t,k)=>{
-     let cls="", tags="";
-     if(reveal){
-       cls = k===q.ok ? "right locked" : "locked";
-       const pa = S.mode==="duel" ? (fp===0?[S.picks[0],null]:[null,S.picks[0]]) : S.mode==="team" ? [S.picks[0],null] : (fp===0?[S.picks[0],S.picks[1]]:[S.picks[1],S.picks[0]]);
-       const mine = [];
-       if(S.mode==="team"){ if(pa[0]===k) mine.push(`<span class="dot t">Team</span>`); }
-       else { if(pa[0]===k) mine.push(`<span class="dot a">${esc(S.a)}</span>`); if(pa[1]===k) mine.push(`<span class="dot b">${esc(S.b)}</span>`); }
-       if(mine.length && k!==q.ok) cls="wrong locked";
-       tags = mine.length?`<span class="who">${mine.join("")}</span>`:"";
-     } else if(S.removed.includes(k)) cls="gone";
-     return `<button class="ans ${cls}" data-k="${k}" ${reveal||S.removed.includes(k)?'tabindex="-1"':""}>
-       <span class="k">${"ABCD"[k]}</span><span>${esc(t)}</span>${tags}</button>`;}).join("")}</div>
+  ${questionCard(q, reveal ? `Question ${S.i+1} of ${S.deck.length}` : who)}
+  ${reveal ? revealTiles(q, byPlayer) : toolsRow(fiftyLeft) + answerTiles(q, k=>L.removed.includes(k)?"gone":"", ()=>"")}
   ${reveal?revealBlock(q):""}`);
-
   if(!reveal){
     $("ans").onclick = e=>{ const b=e.target.closest(".ans"); if(!b||b.classList.contains("gone")) return; choose(+b.dataset.k); };
+    $("fifty").onclick = ()=>{ useFifty(q); if(S.mode==="team") S.fifty[0]--; else S.fifty[ap]--; render(); };
+    startTimer(()=>choose(-1), `${S.gid}-${S.i}-${S.phase}`);
+  } else $("next").onclick = next;
+}
+
+function renderOnlinePlay(){
+  const q=cur(), me=NET.me, other=1-me, reveal=S.phase==="reveal";
+  const duel=S.mode==="duel", active=duel?S.i%2:me, myTurn=!duel||active===me;
+  const mine=S.picks[me], canAnswer=!reveal && myTurn && mine==null;
+  const B = s => `<b style="color:var(--ink)">${esc(s)}</b>`;
+  let hint;
+  if(reveal) hint=`Question ${S.i+1} of ${S.deck.length}`;
+  else if(duel) hint = !myTurn ? `${B(nameOf(active))} is answering…` : mine==null ? "Your question" : "Locked in";
+  else hint = mine!=null ? `Locked in. Waiting for ${B(nameOf(other))}…` : S.picks[other]!=null ? `${B(nameOf(other))} has answered. Your turn!` : "Answer on your phone";
+  const tiles = reveal ? revealTiles(q, S.picks)
+    : answerTiles(q, k=> canAnswer ? (L.removed.includes(k)?"gone":"") : "locked"+(mine===k?" mine":"")+(myTurn?"":" watch"), k=> mine===k?`<span class="who"><span class="dot ${me?"b":"a"}">Locked</span></span>`:"");
+  h(`${header()}
+  ${questionCard(q, hint)}
+  ${canAnswer ? toolsRow(S.fifty[me]) : ""}
+  ${tiles}
+  ${reveal?revealBlock(q):""}`);
+  if(canAnswer){
+    $("ans").onclick = e=>{ const b=e.target.closest(".ans"); if(!b||b.classList.contains("gone")) return; choose(+b.dataset.k); };
     $("fifty").onclick = ()=>{
-      const wrong = shuffle([0,1,2,3].filter(k=>k!==q.ok)).slice(0,2);
-      S.removed = wrong; if(S.mode==="team") S.fifty[0]--; else S.fifty[ap]--;
-      const keep=tEnd; render(); if(S.timer){ tEnd=keep; }
+      useFifty(q); S.fifty[me]--;
+      if(NET.role==="guest"){ try{ NET.conn.send({t:"fifty",i:S.i}); }catch(e){} } else sync();
+      render();
     };
-    startTimer(()=>choose(-1));
-  } else {
-    $("next").onclick = next;
+    startTimer(()=>choose(-1), `${S.gid}-${S.i}-${me}`);
   }
+  if(reveal) $("next").onclick = next;
 }
 
 function revealBlock(q){
   const ans = esc(q.opts[q.ok]);
   let big, sub, good;
-  const res = S.lastRes; // [{p, ok}]
+  const res = S.lastRes;
   if(S.mode==="h2h"){
     const okA = res.find(r=>r.p===0).ok, okB = res.find(r=>r.p===1).ok;
     good = okA||okB;
@@ -545,14 +777,8 @@ function revealBlock(q){
     <button class="btn" id="next">${S.i+1<S.deck.length?"Next question":"See the winner"}</button>`;
 }
 
-function choose(k){
-  stopTimer();
-  const q = cur(), fp = firstP();
-  if(S.mode==="h2h" && S.phase==="first"){ S.picks[0]=k; S.phase="pass"; render(); window.scrollTo(0,0); return; }
-  if(S.mode==="h2h"){ S.picks[1]=k; }
-  else S.picks[0]=k;
-  // score
-  const takers = S.mode==="h2h" ? [[fp,S.picks[0]],[1-fp,S.picks[1]]] : [[S.mode==="team"?0:fp,S.picks[0]]];
+function scoreRound(takers){
+  const q = cur();
   S.lastRes = takers.map(([p,pick])=>{
     const ok = pick===q.ok;
     if(ok){ S.scores[p]+=pts(q); S.right[p]++; S.streak[p]++; } else S.streak[p]=0;
@@ -560,15 +786,47 @@ function choose(k){
   });
   S.hist.push({q:q.q, ans:q.opts[q.ok], c:q.c, res:S.lastRes.map(r=>({p:r.p,ok:r.ok}))});
   const seen = store.get().seen||[]; if(!seen.includes(q.id)) store.set({seen:[...seen,q.id].slice(-400)});
-  const any = S.lastRes.some(r=>r.ok);
-  S.phase="reveal"; render(); window.scrollTo(0,0);
-  if(any){ beep("good"); sparks(S.lastRes.every(r=>r.ok)?16:10); } else { beep("bad"); $("qcard")?.classList.add("shake"); }
+}
+function roundFx(){
+  const mineRes = S.online ? (S.lastRes.find(r=>r.p===NET.me) || S.lastRes[0]) : null;
+  const good = mineRes ? mineRes.ok : S.lastRes.some(r=>r.ok);
+  if(good){ beep("good"); sparks(S.lastRes.every(r=>r.ok)?16:10); } else { beep("bad"); $("qcard")?.classList.add("shake"); }
+}
+function endFx(){ beep("win"); sparks(26); }
+
+function hostPick(p,k){
+  if(S.screen!=="play" || S.phase==="reveal" || S.picks[p]!=null) return;
+  if(S.mode==="duel" && S.i%2!==p) return;
+  S.picks[p]=k;
+  const need = S.mode==="duel" ? [S.i%2] : [0,1];
+  const done = need.every(x=>S.picks[x]!=null);
+  if(done){ scoreRound(need.map(x=>[x,S.picks[x]])); S.phase="reveal"; }
+  sync(); render();
+  if(done){ top0(); roundFx(); }
+}
+
+function choose(k){
+  stopTimer();
+  if(S.online){
+    if(S.screen!=="play" || S.phase==="reveal" || S.picks[NET.me]!=null) return;
+    if(S.mode==="duel" && S.i%2!==NET.me) return;
+    if(NET.role==="host") return hostPick(0,k);
+    S.picks[1]=k; try{ NET.conn.send({t:"pick",i:S.i,k}); }catch(e){}
+    render(); return;
+  }
+  const fp = firstP();
+  if(S.mode==="h2h" && S.phase==="first"){ S.picks[0]=k; S.phase="pass"; render(); top0(); return; }
+  if(S.mode==="h2h") S.picks[1]=k; else S.picks[0]=k;
+  scoreRound(S.mode==="h2h" ? [[fp,S.picks[0]],[1-fp,S.picks[1]]] : [[S.mode==="team"?0:fp,S.picks[0]]]);
+  S.phase="reveal"; render(); top0(); roundFx();
 }
 
 function next(){
-  S.i++; S.picks=[null,null]; S.removed=[]; S.phase="first";
-  if(S.i>=S.deck.length){ S.screen="end"; render(); window.scrollTo(0,0); return; }
-  render(); window.scrollTo(0,0);
+  if(S.online && NET.role==="guest"){ try{ NET.conn.send({t:"next",i:S.i}); }catch(e){} return; }
+  S.i++; S.picks=[null,null]; L.removed=[]; S.phase=S.online?"ask":"first";
+  if(S.i>=S.deck.length) S.screen="end";
+  sync(); render(); top0();
+  if(S.screen==="end") endFx();
 }
 
 function renderEnd(){
@@ -588,20 +846,23 @@ function renderEnd(){
       <div class="bar ${p?"b":"a"}"><i style="width:${(S.scores[p]/top*100).toFixed(0)}%"></i></div></div>`).join("");
   }
   const missed = S.hist.filter(r=>r.res.some(x=>!x.ok));
+  const guest = NET.role==="guest";
   h(`${header()}
   <div class="card final">
     <div class="eyebrow">${MODES[S.mode].name} · ${n} questions</div>
     <div class="winner">${head}</div>
     <p class="hint" style="font-size:16px">${sub}</p>
     <div class="bars">${bars}</div>
-    <div class="row" style="width:100%"><button class="btn" id="again">Play again</button><button class="btn ghost" id="setup">Settings</button></div>
+    ${guest ? `<p class="hint">Waiting for ${esc(S.a)} to start the rematch…</p>`
+            : `<div class="row" style="width:100%"><button class="btn" id="again">Play again</button><button class="btn ghost" id="setup">Settings</button></div>`}
   </div>
   ${missed.length?`<div class="card"><div class="eyebrow" style="margin-bottom:10px">Learn the answers you missed</div><div class="review">
     ${missed.map(r=>`<div class="rv"><q>${esc(r.q)}</q><span class="ok">${esc(r.ans)}</span>${S.mode==="team"?"":` <span class="small">· missed by ${r.res.filter(x=>!x.ok).map(x=>esc(nameOf(x.p))).join(" & ")}</span>`}</div>`).join("")}
   </div></div>`:""}`);
-  beep("win"); sparks(26);
-  $("again").onclick=start;
-  $("setup").onclick=()=>{ S.screen="setup"; render(); window.scrollTo(0,0); };
+  if(!guest){
+    $("again").onclick=start;
+    $("setup").onclick=()=>{ S.screen="setup"; sync(); render(); top0(); };
+  }
 }
 
 function sparks(n){
@@ -617,7 +878,7 @@ document.addEventListener("keydown",e=>{
   if(S.screen!=="play"||e.target.tagName==="INPUT") return;
   if(S.phase==="reveal"&&e.key==="Enter"){ $("next")?.click(); return; }
   const k = "1234".indexOf(e.key)>=0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
-  if(k>=0 && S.phase!=="reveal" && S.phase!=="pass" && !S.removed.includes(k)) choose(k);
+  if(k>=0 && S.phase!=="reveal" && S.phase!=="pass" && !L.removed.includes(k) && $("ans") && !$("ans").querySelector(".locked")) choose(k);
 });
 
 // Optional: Claude writes new questions (only where this viewer can use Claude)
@@ -649,9 +910,13 @@ Reply with only a JSON array like [{"c":"geo","d":2,"q":"...","a":["correct","wr
   };
 }
 
-// keep the game going when the page updates while open
-window.claude?.hot?.snapshot?.(()=>S);
-function boot(data){ if(data && data.screen) S = Object.assign(S,data); render(); }
+// a join link (…/quiz/#ABCD) opens straight on the join form with the code filled in
+const hashCode = location.hash.slice(1).toUpperCase();
+if(/^[A-Z]{4}$/.test(hashCode)){ L.code=hashCode; S.screen="online"; }
+
+// keep the game going when the page updates while open (one-phone games only)
+window.claude?.hot?.snapshot?.(()=>S.online?null:S);
+function boot(data){ if(data && data.screen && !data.online) S = Object.assign(S,data); render(); }
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
 </script>
 
