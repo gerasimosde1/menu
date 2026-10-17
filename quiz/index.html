@@ -1,0 +1,658 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>GG Quiz Night</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka:wght@600;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: same phone-sized "card table" as the GG love game: question card on top, four answer tiles, pass-the-phone curtains, a scoreboard strip. */
+:root{
+  --bg:#F7EEF6; --bg2:#EFDDEB; --card:#FFFFFF; --ink:#2B1530; --muted:#7A5C7E;
+  --cherry:#E2335E; --cherry-ink:#FFFFFF; --tang:#FF9640; --line:#E6CFE0; --good:#1E9E6A; --miss:#C7354F;
+  --show:"Luckiest Guy","Impact","Arial Black",sans-serif; --display:"Fredoka","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1B0F1F; --bg2:#2A1730; --card:#2B1A31; --ink:#F7E9F5; --muted:#C2A2C3;
+  --cherry:#FF5A80; --cherry-ink:#24071A; --tang:#FFAA5E; --line:#45294D; --good:#4CD69B; --miss:#FF7A90; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1B0F1F; --bg2:#2A1730; --card:#2B1A31; --ink:#F7E9F5; --muted:#C2A2C3;
+  --cherry:#FF5A80; --cherry-ink:#24071A; --tang:#FFAA5E; --line:#45294D; --good:#4CD69B; --miss:#FF7A90; color-scheme:dark}
+html,body{height:100%}
+body{background:radial-gradient(120% 70% at 50% 0%,var(--bg2),var(--bg) 70%);background-color:var(--bg);color:var(--ink);font:500 16px/1.45 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:460px;margin:0 auto;padding-block:20px 32px;display:flex;flex-direction:column;gap:16px;min-height:100%;box-sizing:border-box}
+h1,h2{font-family:var(--show);font-weight:400;letter-spacing:.03em;text-wrap:balance;margin:0}
+.logo{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo .gg{font-family:var(--show);font-weight:400;letter-spacing:.04em;font-size:26px;color:var(--cherry);line-height:1}
+.logo .gg small{color:var(--ink);font-size:15px;margin-left:6px}
+.board{display:flex;gap:8px;align-items:center;font-weight:800;font-size:13px;font-variant-numeric:tabular-nums}
+.pl{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:99px;background:var(--card);border:1.5px solid var(--line)}
+.pl b{display:grid;place-items:center;min-width:26px;height:26px;border-radius:99px;padding:0 6px;box-sizing:border-box;font-size:14px}
+.pl.a b{background:var(--cherry);color:var(--cherry-ink)} .pl.b b{background:var(--tang);color:#2B1530}
+.pl.on{border-color:var(--ink)}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:22px 20px;box-shadow:0 10px 30px -18px rgba(120,20,70,.45)}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:color-mix(in srgb,var(--cherry) 14%,transparent);color:var(--cherry)}
+.chip.lvl{background:var(--bg2);color:var(--muted)}
+.q{font-family:var(--display);font-weight:700;font-size:clamp(23px,6.4vw,29px);line-height:1.15;margin:12px 0 6px;text-wrap:balance}
+.hint{color:var(--muted);font-size:14px;margin:0}
+.answers{display:grid;gap:10px}
+.ans{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 16px;font-weight:700;font-size:17px;cursor:pointer;transition:transform .12s,border-color .12s,opacity .2s}
+.ans:hover{border-color:var(--cherry)}
+.ans:active{transform:scale(.98)}
+.ans:focus-visible{outline:3px solid var(--tang);outline-offset:2px}
+.ans .k{flex:none;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--bg2);font-family:var(--show);padding-top:3px;box-sizing:border-box;color:var(--cherry);font-size:16px}
+.ans.gone{opacity:.25;pointer-events:none;text-decoration:line-through}
+.ans.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--card))}
+.ans.right .k{background:var(--good);color:var(--card)}
+.ans.wrong{border-color:var(--miss);background:color-mix(in srgb,var(--miss) 10%,var(--card))}
+.ans.wrong .k{background:var(--miss);color:var(--card)}
+.ans.locked{cursor:default}
+.ans .who{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.dot{font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;color:var(--cherry-ink)}
+.dot.a{background:var(--cherry)} .dot.b{background:var(--tang);color:#2B1530} .dot.t{background:var(--ink);color:var(--bg)}
+.tools{display:flex;gap:10px;align-items:center}
+.tools .timer{flex:1}
+.timer{height:10px;border-radius:99px;background:var(--bg2);overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--cherry),var(--tang));border-radius:99px;transform-origin:left}
+.timer.low i{background:var(--miss)}
+.secs{font-weight:800;font-variant-numeric:tabular-nums;min-width:3ch;text-align:right;color:var(--muted)}
+.btn{all:unset;box-sizing:border-box;text-align:center;font-family:var(--show);font-weight:400;letter-spacing:.05em;font-size:20px;padding:15px 22px;border-radius:18px;background:var(--cherry);color:var(--cherry-ink);cursor:pointer;box-shadow:0 6px 0 color-mix(in srgb,var(--cherry) 55%,#000)}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 color-mix(in srgb,var(--cherry) 55%,#000)}
+.btn:focus-visible{outline:3px solid var(--tang);outline-offset:3px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);box-shadow:none;font-family:var(--body);font-weight:800;font-size:16px;padding:12px 18px}
+.btn.mini{font-family:var(--body);font-weight:800;font-size:14px;padding:8px 14px;border-radius:99px;background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 140px;min-width:0}
+label,.lab{font-weight:800;font-size:14px;display:block;margin-bottom:6px}
+input[type=text]{width:100%;box-sizing:border-box;font:700 17px var(--body);color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+input[type=text]:focus{outline:none;border-color:var(--cherry)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{all:unset;cursor:pointer;font-weight:800;font-size:15px;padding:9px 14px;border-radius:99px;border:2px solid var(--line);background:var(--card)}
+.opt[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.opt:focus-visible{outline:3px solid var(--tang);outline-offset:2px}
+.modes{display:grid;gap:8px}
+.mode{all:unset;cursor:pointer;box-sizing:border-box;border:2px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--card)}
+.mode b{display:block;font-size:16px}
+.mode span{font-size:13px;color:var(--muted)}
+.mode[aria-pressed=true]{border-color:var(--cherry);background:color-mix(in srgb,var(--cherry) 8%,var(--card))}
+.mode:focus-visible{outline:3px solid var(--tang);outline-offset:2px}
+.curtain{min-height:58vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:18px}
+.curtain .big{font-family:var(--show);font-weight:400;letter-spacing:.02em;font-size:clamp(36px,11vw,52px);line-height:1.05;color:var(--cherry)}
+.result{text-align:center;padding:4px 0}
+.result .big{font-family:var(--show);font-weight:400;letter-spacing:.03em;font-size:32px;line-height:1.1}
+.result.good .big{color:var(--good)} .result.miss .big{color:var(--miss)}
+.final{text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.winner{font-family:var(--show);font-weight:400;letter-spacing:.02em;font-size:clamp(34px,10vw,46px);line-height:1.05;color:var(--cherry)}
+.bars{width:100%;display:grid;gap:10px;text-align:left}
+.bars .lab{display:flex;justify-content:space-between;margin:0 0 4px;font-variant-numeric:tabular-nums}
+.bar{width:100%;height:14px;border-radius:99px;background:var(--bg2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .8s}
+.bar.a i{background:var(--cherry)} .bar.b i{background:var(--tang)} .bar.t i{background:linear-gradient(90deg,var(--cherry),var(--tang))}
+.progress{height:6px;border-radius:99px;background:var(--bg2);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--cherry);transition:width .3s}
+.review{display:grid;gap:10px}
+.rv{border-top:1.5px solid var(--line);padding-top:10px;font-size:14px}
+.rv:first-child{border-top:0;padding-top:0}
+.rv q{quotes:none;font-weight:800;display:block}
+.rv .ok{color:var(--good);font-weight:800}
+.sparks{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.sparks span{position:absolute;bottom:-40px;color:var(--cherry);animation:up 2.2s ease-in forwards}
+.sparks span:nth-child(2n){color:var(--tang)}
+@keyframes up{to{transform:translateY(-110vh) rotate(35deg);opacity:0}}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+.small{font-size:13px;color:var(--muted)}
+.ai{display:flex;flex-direction:column;gap:8px}
+.foot{margin-top:auto;text-align:center;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="sparks" id="sparks" aria-hidden="true"></div>
+
+<script>
+const CATS = {geo:"Geography", hist:"History & Art", sci:"Science & Nature", sport:"Sport", screen:"Movies & TV", music:"Music", food:"Food & Drink", gi:"Greece & Italy"};
+const LEVEL = {1:"Easy",2:"Medium",3:"Hard"};
+const MODES = {
+  h2h:{name:"Head to head", sub:"Same question for both. Pick secretly, pass the phone, reveal."},
+  duel:{name:"Take turns", sub:"Each of you gets your own questions. Highest score wins."},
+  team:{name:"Team up", sub:"Answer together and chase your best team score."}
+};
+// [category, level, question, correct answer, wrong, wrong, wrong]
+const BANK = [
+ ["geo",2,"What is the capital of Australia?","Canberra","Sydney","Melbourne","Perth"],
+ ["geo",1,"Which is the largest ocean on Earth?","Pacific","Atlantic","Indian","Arctic"],
+ ["geo",2,"Which country has the most people?","India","China","USA","Indonesia"],
+ ["geo",2,"What is the longest river in Europe?","Volga","Danube","Rhine","Dnieper"],
+ ["geo",1,"What is the capital of Canada?","Ottawa","Toronto","Vancouver","Montreal"],
+ ["geo",2,"Mount Everest sits on the border of Nepal and…","China","India","Bhutan","Pakistan"],
+ ["geo",1,"How many continents are there?","7","5","6","8"],
+ ["geo",1,"What is the smallest country in the world?","Vatican City","Monaco","San Marino","Malta"],
+ ["geo",1,"What is the largest hot desert in the world?","Sahara","Gobi","Kalahari","Arabian"],
+ ["geo",1,"What is the capital of Turkey?","Ankara","Istanbul","Izmir","Antalya"],
+ ["geo",3,"Which country has the most islands?","Sweden","Indonesia","Philippines","Greece"],
+ ["geo",2,"What is the capital of New Zealand?","Wellington","Auckland","Christchurch","Queenstown"],
+ ["geo",1,"Which river flows through Cairo?","Nile","Euphrates","Congo","Jordan"],
+ ["geo",2,"Which strait separates Europe from Africa?","Gibraltar","Bosphorus","Hormuz","Magellan"],
+ ["geo",3,"Counting its overseas territories, which country has the most time zones?","France","Russia","USA","China"],
+ ["geo",3,"What is the capital of Morocco?","Rabat","Casablanca","Marrakesh","Fez"],
+ ["geo",2,"Lake Titicaca lies between Peru and…","Bolivia","Chile","Ecuador","Argentina"],
+ ["geo",2,"Andorra sits between France and…","Spain","Italy","Switzerland","Portugal"],
+ ["geo",1,"What is the highest mountain in Africa?","Kilimanjaro","Mount Kenya","Mount Toubkal","Mount Stanley"],
+ ["geo",2,"Which country has the city of Marrakesh?","Morocco","Tunisia","Egypt","Algeria"],
+ ["geo",2,"Reykjavik is the capital of…","Iceland","Norway","Finland","Greenland"],
+
+ ["hist",1,"In which year did World War II end?","1945","1944","1939","1950"],
+ ["hist",1,"Who was the first person to walk on the Moon?","Neil Armstrong","Buzz Aldrin","Yuri Gagarin","Michael Collins"],
+ ["hist",2,"In which year did the Berlin Wall fall?","1989","1991","1987","1985"],
+ ["hist",1,"Who painted the Mona Lisa?","Leonardo da Vinci","Michelangelo","Raphael","Botticelli"],
+ ["hist",2,"In which year did the Titanic sink?","1912","1905","1920","1898"],
+ ["hist",2,"Who was the first emperor of Rome?","Augustus","Julius Caesar","Nero","Caligula"],
+ ["hist",2,"Which ancient wonder is still standing today?","Great Pyramid of Giza","Colossus of Rhodes","Lighthouse of Alexandria","Hanging Gardens of Babylon"],
+ ["hist",2,"Where was Napoleon finally defeated in 1815?","Waterloo","Austerlitz","Trafalgar","Leipzig"],
+ ["hist",1,"Who painted The Starry Night?","Vincent van Gogh","Claude Monet","Pablo Picasso","Salvador Dalí"],
+ ["hist",2,"Who was the first woman to win a Nobel Prize?","Marie Curie","Ada Lovelace","Rosalind Franklin","Florence Nightingale"],
+ ["hist",2,"In which year did the French Revolution begin?","1789","1776","1815","1799"],
+ ["hist",2,"Which civilisation built Machu Picchu?","Inca","Aztec","Maya","Olmec"],
+ ["hist",2,"Who was the first human in space?","Yuri Gagarin","Neil Armstrong","Alan Shepard","John Glenn"],
+ ["hist",3,"In which year did euro coins and notes come into use?","2002","1999","2000","2004"],
+ ["hist",2,"Who painted Guernica?","Pablo Picasso","Joan Miró","Salvador Dalí","Francisco Goya"],
+ ["hist",3,"In which year was the Magna Carta signed?","1215","1066","1492","1314"],
+ ["hist",3,"In which year was the Battle of Hastings?","1066","1215","966","1166"],
+ ["hist",1,"Which ship sank after hitting an iceberg on its first voyage?","Titanic","Lusitania","Britannic","Queen Mary"],
+ ["hist",2,"Who wrote Romeo and Juliet?","William Shakespeare","Charles Dickens","Jane Austen","Oscar Wilde"],
+ ["hist",3,"Which artist cut off part of his own ear?","Vincent van Gogh","Paul Gauguin","Edvard Munch","Henri Matisse"],
+ ["hist",3,"Who painted The Birth of Venus?","Sandro Botticelli","Titian","Caravaggio","Raphael"],
+ ["hist",1,"Which country gave the Statue of Liberty to the USA?","France","United Kingdom","Spain","Italy"],
+
+ ["sci",1,"What is the chemical symbol for gold?","Au","Ag","Gd","Go"],
+ ["sci",1,"Which planet is closest to the Sun?","Mercury","Venus","Mars","Earth"],
+ ["sci",1,"What is the hardest natural substance?","Diamond","Granite","Quartz","Iron"],
+ ["sci",2,"How many bones does an adult human have?","206","186","212","230"],
+ ["sci",1,"Which gas do plants take in from the air?","Carbon dioxide","Oxygen","Nitrogen","Helium"],
+ ["sci",2,"Roughly how fast does light travel?","300,000 km/s","150,000 km/s","1,000,000 km/s","30,000 km/s"],
+ ["sci",1,"Which is the largest planet in our solar system?","Jupiter","Saturn","Neptune","Earth"],
+ ["sci",2,"Which element has the symbol Fe?","Iron","Fluorine","Lead","Tin"],
+ ["sci",1,"Which planet is called the Red Planet?","Mars","Venus","Jupiter","Mercury"],
+ ["sci",2,"How many hearts does an octopus have?","3","1","2","8"],
+ ["sci",1,"What is the fastest land animal?","Cheetah","Lion","Horse","Greyhound"],
+ ["sci",1,"What is the largest animal that has ever lived?","Blue whale","African elephant","Megalodon","T. rex"],
+ ["sci",1,"Who came up with the theory of relativity?","Albert Einstein","Isaac Newton","Nikola Tesla","Stephen Hawking"],
+ ["sci",2,"At sea level, water boils at what temperature in °F?","212 °F","100 °F","180 °F","250 °F"],
+ ["sci",2,"What is the pH of pure water?","7","0","1","14"],
+ ["sci",2,"Which gas makes up most of Earth's air?","Nitrogen","Oxygen","Carbon dioxide","Argon"],
+ ["sci",2,"Which part of the cell is called its powerhouse?","Mitochondria","Nucleus","Ribosome","Cell wall"],
+ ["sci",2,"What is the smallest prime number?","2","1","3","0"],
+ ["sci",3,"About how long does sunlight take to reach Earth?","8 minutes","8 seconds","1 hour","1 day"],
+ ["sci",2,"Which element has atomic number 1?","Hydrogen","Helium","Oxygen","Carbon"],
+ ["sci",3,"Which blood type is the universal donor?","O negative","AB positive","A negative","O positive"],
+ ["sci",1,"How many legs does a spider have?","8","6","10","12"],
+ ["sci",2,"What is the largest organ of the human body?","Skin","Liver","Brain","Lungs"],
+ ["sci",3,"Who discovered penicillin?","Alexander Fleming","Louis Pasteur","Edward Jenner","Robert Koch"],
+ ["sci",3,"Which planet spins on its side?","Uranus","Neptune","Saturn","Venus"],
+ ["sci",2,"What do bees collect from flowers to make honey?","Nectar","Pollen","Sap","Dew"],
+
+ ["sport",1,"How many players does a football (soccer) team have on the pitch?","11","10","9","12"],
+ ["sport",1,"How often are the Summer Olympics held?","Every 4 years","Every 2 years","Every 3 years","Every 5 years"],
+ ["sport",1,"Who won the 2022 FIFA World Cup?","Argentina","France","Brazil","Croatia"],
+ ["sport",2,"Which Grand Slam tennis tournament is played on clay?","French Open","Wimbledon","US Open","Australian Open"],
+ ["sport",1,"How many rings are on the Olympic flag?","5","4","6","7"],
+ ["sport",2,"Which man has won the most Grand Slam singles titles?","Novak Djokovic","Rafael Nadal","Roger Federer","Pete Sampras"],
+ ["sport",2,"How long is a marathon?","42.195 km","40 km","26.2 km","50 km"],
+ ["sport",1,"In which sport does \"love\" mean zero?","Tennis","Golf","Cricket","Volleyball"],
+ ["sport",1,"Michael Phelps became a legend in which sport?","Swimming","Athletics","Cycling","Rowing"],
+ ["sport",3,"What is Usain Bolt's 100 m world record?","9.58 s","9.69 s","9.72 s","9.49 s"],
+ ["sport",2,"Which country won Euro 2004?","Greece","Portugal","France","Italy"],
+ ["sport",2,"Which country won the 2006 World Cup?","Italy","France","Germany","Brazil"],
+ ["sport",1,"How many holes are in a standard round of golf?","18","9","12","21"],
+ ["sport",2,"Which country did judo come from?","Japan","China","South Korea","Thailand"],
+ ["sport",2,"Which chess piece can jump over other pieces?","Knight","Bishop","Rook","Queen"],
+ ["sport",1,"Which sport uses a shuttlecock?","Badminton","Squash","Table tennis","Volleyball"],
+ ["sport",3,"How high is a basketball hoop?","3.05 m","2.75 m","3.35 m","2.90 m"],
+ ["sport",2,"How many points is a touchdown worth in American football?","6","3","7","5"],
+ ["sport",3,"In which city did Cristiano Ronaldo play from 2009 to 2018?","Madrid","Turin","Manchester","Lisbon"],
+ ["sport",2,"How many players are on a volleyball team on court?","6","5","7","8"],
+
+ ["screen",2,"Who directed Titanic (1997)?","James Cameron","Steven Spielberg","Martin Scorsese","Christopher Nolan"],
+ ["screen",1,"What is the name of Harry Potter's school?","Hogwarts","Durmstrang","Beauxbatons","Ilvermorny"],
+ ["screen",2,"What is the coffee shop called in Friends?","Central Perk","Monk's Café","MacLaren's","The Max"],
+ ["screen",1,"Who famously said \"I'll be back\" in The Terminator?","Arnold Schwarzenegger","Sylvester Stallone","Bruce Willis","Jean-Claude Van Damme"],
+ ["screen",1,"What is the lion cub called in The Lion King?","Simba","Mufasa","Nala","Kovu"],
+ ["screen",1,"In The Matrix, which pill does Neo take?","Red","Blue","Green","White"],
+ ["screen",2,"What is the chemistry teacher called in Breaking Bad?","Walter White","Jesse Pinkman","Saul Goodman","Hank Schrader"],
+ ["screen",2,"In Game of Thrones, which house has the direwolf?","Stark","Lannister","Targaryen","Baratheon"],
+ ["screen",1,"Which film has the song \"Let It Go\"?","Frozen","Tangled","Moana","Encanto"],
+ ["screen",1,"What kind of creature is Shrek?","Ogre","Troll","Giant","Goblin"],
+ ["screen",1,"Who plays Captain Jack Sparrow?","Johnny Depp","Orlando Bloom","Brad Pitt","Keanu Reeves"],
+ ["screen",3,"In which town is Stranger Things set?","Hawkins","Derry","Riverdale","Twin Peaks"],
+ ["screen",3,"Which film has the line \"Here's looking at you, kid\"?","Casablanca","Gone with the Wind","Citizen Kane","Roman Holiday"],
+ ["screen",1,"Which Pixar film is about a rat who cooks in Paris?","Ratatouille","Coco","Luca","Up"],
+ ["screen",2,"Money Heist (La Casa de Papel) comes from which country?","Spain","Mexico","Argentina","Italy"],
+ ["screen",1,"Squid Game comes from which country?","South Korea","Japan","China","Thailand"],
+ ["screen",2,"Which was the first non-English film to win Best Picture at the Oscars?","Parasite","Roma","Life Is Beautiful","Amélie"],
+ ["screen",2,"Who directed Pulp Fiction?","Quentin Tarantino","Guy Ritchie","David Fincher","Coen brothers"],
+ ["screen",1,"What is the cowboy called in Toy Story?","Woody","Buzz","Jessie","Bo"],
+ ["screen",1,"Who played Iron Man in the Marvel films?","Robert Downey Jr.","Chris Evans","Chris Hemsworth","Mark Ruffalo"],
+ ["screen",3,"Who directed The Godfather?","Francis Ford Coppola","Martin Scorsese","Brian De Palma","Stanley Kubrick"],
+ ["screen",2,"In Finding Nemo, what kind of fish is Dory?","Blue tang","Clownfish","Angelfish","Pufferfish"],
+ ["screen",3,"How many Oscars did Titanic (1997) win?","11","7","9","14"],
+
+ ["music",1,"Who was the lead singer of Queen?","Freddie Mercury","Mick Jagger","David Bowie","Elton John"],
+ ["music",1,"Who released the album Thriller?","Michael Jackson","Prince","Madonna","Whitney Houston"],
+ ["music",1,"How many strings does a standard guitar have?","6","4","5","8"],
+ ["music",2,"Which city are The Beatles from?","Liverpool","London","Manchester","Birmingham"],
+ ["music",2,"Who sang \"Rolling in the Deep\"?","Adele","Amy Winehouse","Duffy","Florence Welch"],
+ ["music",2,"Who composed The Four Seasons?","Antonio Vivaldi","Wolfgang Amadeus Mozart","Johann Sebastian Bach","Ludwig van Beethoven"],
+ ["music",2,"Which band won Eurovision 2021 for Italy?","Måneskin","Il Volo","Mahmood","The Kolors"],
+ ["music",3,"How many symphonies did Beethoven complete?","9","5","7","12"],
+ ["music",1,"Who was known as \"The King of Rock and Roll\"?","Elvis Presley","Chuck Berry","Little Richard","Johnny Cash"],
+ ["music",2,"Who is known as the \"Queen of Pop\"?","Madonna","Britney Spears","Lady Gaga","Beyoncé"],
+ ["music",1,"ABBA come from which country?","Sweden","Norway","Denmark","Netherlands"],
+ ["music",2,"In which country was Mozart born?","Austria","Germany","Italy","Switzerland"],
+ ["music",1,"Which instrument usually has 88 keys?","Piano","Organ","Accordion","Harp"],
+ ["music",2,"Who sang \"Despacito\" with Daddy Yankee?","Luis Fonsi","Enrique Iglesias","J Balvin","Ricky Martin"],
+ ["music",1,"Bob Marley is famous for which music?","Reggae","Blues","Jazz","Salsa"],
+ ["music",1,"Who sang \"Shape of You\"?","Ed Sheeran","Sam Smith","Shawn Mendes","Harry Styles"],
+ ["music",2,"Marshall Mathers is better known as…","Eminem","50 Cent","Dr. Dre","Snoop Dogg"],
+ ["music",3,"Who composed the opera La Traviata?","Giuseppe Verdi","Giacomo Puccini","Gioachino Rossini","Richard Wagner"],
+ ["music",3,"How many members does BTS have?","7","5","6","9"],
+ ["music",2,"Taylor Swift's album 1989 is named after…","Her birth year","Her first concert","A street","Her grandmother's band"],
+ ["music",3,"Which band released the album The Dark Side of the Moon?","Pink Floyd","Led Zeppelin","The Rolling Stones","Genesis"],
+
+ ["food",1,"What is the main ingredient of guacamole?","Avocado","Tomato","Lime","Pepper"],
+ ["food",2,"What is the seaweed wrap on sushi called?","Nori","Wakame","Kombu","Miso"],
+ ["food",1,"Champagne comes from which country?","France","Italy","Spain","Portugal"],
+ ["food",2,"Which is the most expensive spice by weight?","Saffron","Vanilla","Cardamom","Cinnamon"],
+ ["food",1,"Paella is a dish from which country?","Spain","Mexico","Portugal","Italy"],
+ ["food",2,"Greek feta is mostly made from which milk?","Sheep's milk","Cow's milk","Buffalo milk","Camel milk"],
+ ["food",3,"What does \"tiramisù\" mean in Italian?","Pick me up","Sweet dream","Little cloud","Coffee cake"],
+ ["food",1,"Kimchi comes from which country?","Korea","Japan","China","Vietnam"],
+ ["food",2,"Which nut is marzipan made from?","Almond","Hazelnut","Walnut","Pistachio"],
+ ["food",2,"Bubble tea was invented in…","Taiwan","Japan","Thailand","Hong Kong"],
+ ["food",2,"Tequila is made from which plant?","Agave","Cactus","Sugar cane","Corn"],
+ ["food",1,"What is the main ingredient of hummus?","Chickpeas","Lentils","Fava beans","Peas"],
+ ["food",2,"Gin gets its main flavour from…","Juniper berries","Lemon peel","Anise","Mint"],
+ ["food",1,"Which fruit wears its seeds on the outside?","Strawberry","Raspberry","Kiwi","Fig"],
+ ["food",1,"Oranges are famous for which vitamin?","Vitamin C","Vitamin A","Vitamin D","Vitamin B12"],
+ ["food",2,"Which country grows the most coffee?","Brazil","Colombia","Ethiopia","Vietnam"],
+ ["food",3,"What gives Earl Grey tea its flavour?","Bergamot","Lavender","Jasmine","Vanilla"],
+ ["food",2,"Which country does the dish pad thai come from?","Thailand","Vietnam","Malaysia","Indonesia"],
+ ["food",3,"Which cheese is traditionally used in a Greek saganaki?","Kefalograviera","Feta","Halloumi","Mizithra"],
+ ["food",1,"What is the main ingredient of an omelette?","Eggs","Potatoes","Flour","Milk"],
+
+ ["gi",1,"What is the capital of Italy?","Rome","Milan","Florence","Naples"],
+ ["gi",1,"Who is the Greek god of the sea?","Poseidon","Zeus","Hermes","Apollo"],
+ ["gi",1,"What is the highest mountain in Greece?","Olympus","Parnassus","Taygetus","Athos"],
+ ["gi",1,"What is the largest Greek island?","Crete","Evia","Rhodes","Corfu"],
+ ["gi",1,"Which Italian city is built on canals?","Venice","Verona","Bologna","Genoa"],
+ ["gi",1,"Which city has the famous Leaning Tower?","Pisa","Siena","Lucca","Florence"],
+ ["gi",2,"How many letters are in the Greek alphabet?","24","22","26","28"],
+ ["gi",2,"Which Greek island has a famous volcanic caldera?","Santorini","Mykonos","Naxos","Paros"],
+ ["gi",2,"What is the longest river in Italy?","Po","Tiber","Arno","Adige"],
+ ["gi",2,"Which river flows through Rome?","Tiber","Po","Arno","Piave"],
+ ["gi",3,"Ferrari and Lamborghini are based in which Italian region?","Emilia-Romagna","Lombardy","Piedmont","Tuscany"],
+ ["gi",2,"Which philosopher taught Alexander the Great?","Aristotle","Plato","Socrates","Pythagoras"],
+ ["gi",2,"What is the capital of Sicily?","Palermo","Catania","Messina","Syracuse"],
+ ["gi",2,"Greek Independence Day is on…","25 March","28 October","15 August","1 May"],
+ ["gi",3,"Cinque Terre is in which Italian region?","Liguria","Campania","Tuscany","Calabria"],
+ ["gi",2,"Pizza Margherita is named after a…","Queen","Flower","Singer","Saint"],
+ ["gi",1,"Who wrote the Odyssey?","Homer","Sophocles","Plato","Herodotus"],
+ ["gi",1,"Mount Etna is on which island?","Sicily","Sardinia","Crete","Capri"],
+ ["gi",1,"What is the ancient hilltop citadel of Athens called?","Acropolis","Agora","Lycabettus","Kerameikos"],
+ ["gi",2,"Which dance did Zorba the Greek make world famous?","Sirtaki","Tsamiko","Kalamatianos","Hasapiko"],
+ ["gi",2,"Where were the ancient Olympic Games held?","Olympia","Delphi","Sparta","Corinth"],
+ ["gi",1,"Mount Vesuvius looks over which city?","Naples","Rome","Palermo","Bari"],
+ ["gi",2,"What was Italy's currency before the euro?","Lira","Drachma","Peseta","Franc"],
+ ["gi",2,"What was Greece's currency before the euro?","Drachma","Lira","Escudo","Dinar"],
+ ["gi",1,"Who painted the ceiling of the Sistine Chapel?","Michelangelo","Leonardo da Vinci","Raphael","Caravaggio"],
+ ["gi",1,"Who is the Greek goddess of wisdom?","Athena","Aphrodite","Hera","Artemis"],
+ ["gi",3,"What is the first part of Dante's Divine Comedy?","Inferno","Purgatorio","Paradiso","Vita Nuova"],
+ ["gi",1,"Which country is shaped like a boot?","Italy","Greece","Portugal","Croatia"],
+ ["gi",2,"Which ancient city was buried by Vesuvius in AD 79?","Pompeii","Ostia","Paestum","Agrigento"],
+ ["gi",3,"Which Greek island was home to the Minoan palace of Knossos?","Crete","Rhodes","Delos","Santorini"]
+].map((r,id)=>({id:"b"+id,c:r[0],d:r[1],q:r[2],a:r.slice(3)}));
+
+const LS = "gg-quiz-night";
+const store = {get(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return {}}}, set(v){try{localStorage.setItem(LS,JSON.stringify(Object.assign(store.get(),v)))}catch(e){}}};
+const saved = store.get();
+
+let S = {
+  screen:"intro", a:saved.a||"Gioia", b:saved.b||"Gerasimos", mode:saved.mode||"h2h",
+  cats:saved.cats||Object.keys(CATS), diff:saved.diff||"mix", rounds:saved.rounds||10, timer:saved.timer??20, sound:saved.sound??true,
+  deck:[], i:0, phase:"ask", picks:[null,null], used:[[],[]], fifty:[1,1], removed:[], scores:[0,0], right:[0,0], streak:[0,0], hist:[], extra:[]
+};
+
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const h = html => { app.innerHTML = html; };
+const $ = id => document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+const nameOf = p => p===0 ? S.a : S.b;
+const cur = () => S.deck[S.i];
+const pts = q => q.d;
+
+// who answers now: duel → alternates per question; h2h → first alternates, second is the other; team → shared (index 0 holds the team score)
+function firstP(){ return S.i % 2; }
+function activeP(){
+  if(S.mode==="team") return 0;
+  if(S.mode==="duel") return firstP();
+  return S.phase==="second" ? 1-firstP() : firstP();
+}
+
+// ---------- sound ----------
+let ac=null;
+function beep(kind){
+  if(!S.sound) return;
+  try{
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    const notes = kind==="good"?[660,880,1175]:kind==="bad"?[220,165]:kind==="win"?[523,659,784,1047]:[880];
+    notes.forEach((f,k)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=kind==="bad"?"square":"triangle";o.frequency.value=f;
+      const t=ac.currentTime+k*0.11;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.12,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
+      o.connect(g).connect(ac.destination);o.start(t);o.stop(t+0.2);});
+  }catch(e){}
+}
+
+// ---------- timer ----------
+let tHandle=null, tEnd=0;
+function stopTimer(){ if(tHandle){cancelAnimationFrame(tHandle);tHandle=null;} }
+function startTimer(onOut){
+  stopTimer(); if(!S.timer) return;
+  tEnd = performance.now()+S.timer*1000;
+  const bar=$("tbar"), secs=$("secs"), wrap=$("timer");
+  const tick=()=>{
+    const left=Math.max(0,tEnd-performance.now());
+    if(bar) bar.style.transform=`scaleX(${left/(S.timer*1000)})`;
+    if(secs) secs.textContent=Math.ceil(left/1000)+"s";
+    if(wrap) wrap.classList.toggle("low",left<4000);
+    if(left<=0){ tHandle=null; onOut(); return; }
+    tHandle=requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+// ---------- screens ----------
+function header(){
+  const playing = S.screen==="play";
+  let right;
+  if(playing && S.mode==="team") right=`<div class="board"><span class="pl a on"><b>${S.scores[0]}</b>Team</span></div>`;
+  else if(playing){ const ap=activeP(); right=`<div class="board">
+    <span class="pl a ${ap===0&&S.phase!=="reveal"?"on":""}"><b>${S.scores[0]}</b>${esc(S.a)}</span>
+    <span class="pl b ${ap===1&&S.phase!=="reveal"?"on":""}"><b>${S.scores[1]}</b>${esc(S.b)}</span></div>`; }
+  else right=`<div class="small" style="font-weight:800">${esc(S.a)} &amp; ${esc(S.b)}</div>`;
+  return `<div class="logo"><div class="gg">GG<small>quiz night</small></div>${right}</div>
+  ${playing?`<div class="progress" aria-hidden="true"><i style="width:${(S.i/S.deck.length*100).toFixed(1)}%"></i></div>`:""}`;
+}
+
+function render(){
+  stopTimer();
+  if(S.screen==="intro") return renderIntro();
+  if(S.screen==="setup") return renderSetup();
+  if(S.screen==="play") return renderPlay();
+  if(S.screen==="end") return renderEnd();
+}
+
+function renderIntro(){
+  h(`${header()}
+  <div class="curtain">
+    <div class="eyebrow">Round two for</div>
+    <div class="big">${esc(S.a)} vs ${esc(S.b)}</div>
+    <p style="font-size:18px;max-width:30ch;margin:0">You know each other. Now let's see who knows more about everything else.</p>
+    <button class="btn" id="go">Let's play ★</button>
+  </div>
+  <div class="foot">${BANK.length} questions across ${Object.keys(CATS).length} categories. Easy = 1 point, Medium = 2, Hard = 3.</div>`);
+  $("go").onclick = ()=>{ S.screen="setup"; sparks(10); render(); };
+}
+
+function pool(){
+  const lv = {easy:[1],medium:[2],hard:[3],mix:[1,2,3]}[S.diff];
+  return [...S.extra, ...BANK].filter(q=>S.cats.includes(q.c)&&lv.includes(q.d));
+}
+
+function renderSetup(){
+  const opt = (id,list,val) => `<div class="opts" id="${id}">${list.map(([v,t])=>`<button class="opt" data-v="${v}" aria-pressed="${String(val)===String(v)}">${t}</button>`).join("")}</div>`;
+  h(`${header()}
+  <div class="card" style="display:flex;flex-direction:column;gap:18px">
+    <h2 style="font-size:26px">Game settings</h2>
+    <div class="row">
+      <div><label for="na">Player 1</label><input type="text" id="na" value="${esc(S.a)}" maxlength="18"></div>
+      <div><label for="nb">Player 2</label><input type="text" id="nb" value="${esc(S.b)}" maxlength="18"></div>
+    </div>
+    <div><span class="lab">Mode</span><div class="modes" id="mode">${Object.entries(MODES).map(([k,m])=>`<button class="mode" data-v="${k}" aria-pressed="${S.mode===k}"><b>${m.name}</b><span>${m.sub}</span></button>`).join("")}</div></div>
+    <div><span class="lab">Categories</span><div class="opts" id="cats">${Object.entries(CATS).map(([k,v])=>`<button class="opt" data-v="${k}" aria-pressed="${S.cats.includes(k)}">${v}</button>`).join("")}
+      <button class="opt" data-v="__all" aria-pressed="false">All</button></div></div>
+    <div><span class="lab">Difficulty</span>${opt("diff",[["mix","Mixed"],["easy","Easy"],["medium","Medium"],["hard","Hard"]],S.diff)}</div>
+    <div><span class="lab">Questions</span>${opt("rounds",[[10,"10"],[16,"16"],[24,"24"],[0,"All"]],S.rounds)}</div>
+    <div><span class="lab">Timer per answer</span>${opt("timer",[[0,"Off"],[10,"10s"],[20,"20s"],[30,"30s"]],S.timer)}</div>
+    <div><span class="lab">Sounds</span>${opt("sound",[["true","On"],["false","Off"]],S.sound)}</div>
+    <div class="small" id="count"></div>
+    <button class="btn" id="start">Start</button>
+  </div>
+  <div class="card ai" id="aibox" hidden>
+    <div class="eyebrow">Fresh questions</div>
+    <p class="hint">Played them all? Ask Claude for 10 brand-new questions in your categories and difficulty.</p>
+    <button class="btn ghost" id="gen">Write new questions</button>
+    <div class="small" id="aimsg" role="status"></div>
+  </div>
+  <div class="foot">Each player gets one 50:50 per game. Questions you have already seen come last.</div>`);
+  const upd = ()=>{ const n=pool().length; $("count").textContent = n+" questions match"+(S.extra.length?` (incl. ${S.extra.length} new from Claude)`:"")+(n<4?". Pick more categories.":""); $("start").disabled = n<2; };
+  upd();
+  const press = (id,fn)=>{$(id).onclick=e=>{const b=e.target.closest("[data-v]");if(!b)return;fn(b.dataset.v);
+    $(id).querySelectorAll("[data-v]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===b.dataset.v)));upd();};};
+  press("mode",v=>S.mode=v); press("diff",v=>S.diff=v); press("rounds",v=>S.rounds=+v); press("timer",v=>S.timer=+v);
+  press("sound",v=>{S.sound=v==="true"; if(S.sound) beep("tick");});
+  $("cats").onclick = e=>{const b=e.target.closest("[data-v]");if(!b)return;const k=b.dataset.v;
+    if(k==="__all") S.cats = S.cats.length===Object.keys(CATS).length ? [Object.keys(CATS)[0]] : Object.keys(CATS);
+    else { S.cats = S.cats.includes(k)? S.cats.filter(x=>x!==k) : [...S.cats,k]; if(!S.cats.length) S.cats=[k]; }
+    $("cats").querySelectorAll("[data-v]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="__all"?"false":String(S.cats.includes(x.dataset.v)))); upd(); };
+  $("start").onclick = start;
+  setupAI();
+}
+
+function start(){
+  const na=$("na"), nb=$("nb");
+  if(na){ S.a = na.value.trim()||"Player 1"; S.b = nb.value.trim()||"Player 2"; }
+  store.set({a:S.a,b:S.b,mode:S.mode,cats:S.cats,diff:S.diff,rounds:S.rounds,timer:S.timer,sound:S.sound});
+  const seen = new Set(store.get().seen||[]);
+  const p = pool();
+  const fresh = shuffle(p.filter(q=>!seen.has(q.id))), old = shuffle(p.filter(q=>seen.has(q.id)));
+  // Claude's new questions first, then unseen, then repeats
+  let deck = [...fresh.filter(q=>q.id[0]==="x"), ...fresh.filter(q=>q.id[0]!=="x"), ...old];
+  let n = S.rounds || deck.length;
+  if(S.mode!=="team" && n%2) n--; // equal turns
+  deck = shuffle(deck.slice(0, Math.max(2,Math.min(n,deck.length - (S.mode!=="team"&&deck.length%2?1:0)))));
+  S.deck = deck.map(q=>{ const order=shuffle([0,1,2,3]); return {...q, opts:order.map(k=>q.a[k]), ok:order.indexOf(0)}; });
+  S.i=0; S.phase="first"; S.picks=[null,null]; S.fifty=S.mode==="team"?[2,0]:[1,1]; S.removed=[];
+  S.scores=[0,0]; S.right=[0,0]; S.streak=[0,0]; S.hist=[];
+  S.screen="play"; render(); window.scrollTo(0,0);
+}
+
+function renderPlay(){
+  const q = cur(), fp = firstP(), ap = activeP();
+  if(S.phase==="pass"){
+    h(`${header()}<div class="curtain">
+      <div class="eyebrow">No peeking</div>
+      <div class="big">Pass the phone to ${esc(nameOf(1-fp))}</div>
+      <p class="hint">${esc(nameOf(fp))} has locked in an answer.</p>
+      <button class="btn" id="ready">I'm ${esc(nameOf(1-fp))}, ready</button></div>`);
+    $("ready").onclick=()=>{S.phase="second";S.removed=[];render();};
+    return;
+  }
+  const reveal = S.phase==="reveal";
+  let who;
+  if(S.mode==="team") who = "Answer together";
+  else if(S.mode==="duel") who = `<b style="color:var(--ink)">${esc(nameOf(ap))}</b>'s question`;
+  else who = `<b style="color:var(--ink)">${esc(nameOf(ap))}</b>, answer secretly`;
+  const fiftyLeft = S.mode==="team" ? S.fifty[0] : S.fifty[ap];
+
+  h(`${header()}
+  <div class="card" id="qcard">
+    <div class="chips"><span class="chip">${CATS[q.c]||"Bonus"}</span><span class="chip lvl">${LEVEL[q.d]} · ${pts(q)} pt${pts(q)>1?"s":""}</span></div>
+    <div class="q">${esc(q.q)}</div>
+    <p class="hint">${reveal ? `Question ${S.i+1} of ${S.deck.length}` : who}</p>
+  </div>
+  ${!reveal?`<div class="tools">
+     ${S.timer?`<div class="timer" id="timer"><i id="tbar"></i></div><span class="secs" id="secs">${S.timer}s</span>`:`<div style="flex:1"></div>`}
+     <button class="btn mini" id="fifty" ${fiftyLeft&&!S.removed.length?"":"disabled"}>50:50${S.mode==="team"?` ×${fiftyLeft}`:""}</button>
+   </div>`:""}
+  <div class="answers" id="ans">${q.opts.map((t,k)=>{
+     let cls="", tags="";
+     if(reveal){
+       cls = k===q.ok ? "right locked" : "locked";
+       const pa = S.mode==="duel" ? (fp===0?[S.picks[0],null]:[null,S.picks[0]]) : S.mode==="team" ? [S.picks[0],null] : (fp===0?[S.picks[0],S.picks[1]]:[S.picks[1],S.picks[0]]);
+       const mine = [];
+       if(S.mode==="team"){ if(pa[0]===k) mine.push(`<span class="dot t">Team</span>`); }
+       else { if(pa[0]===k) mine.push(`<span class="dot a">${esc(S.a)}</span>`); if(pa[1]===k) mine.push(`<span class="dot b">${esc(S.b)}</span>`); }
+       if(mine.length && k!==q.ok) cls="wrong locked";
+       tags = mine.length?`<span class="who">${mine.join("")}</span>`:"";
+     } else if(S.removed.includes(k)) cls="gone";
+     return `<button class="ans ${cls}" data-k="${k}" ${reveal||S.removed.includes(k)?'tabindex="-1"':""}>
+       <span class="k">${"ABCD"[k]}</span><span>${esc(t)}</span>${tags}</button>`;}).join("")}</div>
+  ${reveal?revealBlock(q):""}`);
+
+  if(!reveal){
+    $("ans").onclick = e=>{ const b=e.target.closest(".ans"); if(!b||b.classList.contains("gone")) return; choose(+b.dataset.k); };
+    $("fifty").onclick = ()=>{
+      const wrong = shuffle([0,1,2,3].filter(k=>k!==q.ok)).slice(0,2);
+      S.removed = wrong; if(S.mode==="team") S.fifty[0]--; else S.fifty[ap]--;
+      const keep=tEnd; render(); if(S.timer){ tEnd=keep; }
+    };
+    startTimer(()=>choose(-1));
+  } else {
+    $("next").onclick = next;
+  }
+}
+
+function revealBlock(q){
+  const ans = esc(q.opts[q.ok]);
+  let big, sub, good;
+  const res = S.lastRes; // [{p, ok}]
+  if(S.mode==="h2h"){
+    const okA = res.find(r=>r.p===0).ok, okB = res.find(r=>r.p===1).ok;
+    good = okA||okB;
+    big = okA&&okB ? "Both right!" : okA ? `Point to ${esc(S.a)}` : okB ? `Point to ${esc(S.b)}` : "Both wrong!";
+    sub = okA&&okB ? `+${pts(q)} each.` : good ? `+${pts(q)}. The answer was ${ans}.` : `It was ${ans}.`;
+  } else {
+    const r = res[0]; good = r.ok;
+    const nm = S.mode==="team" ? "Team" : esc(nameOf(r.p));
+    big = r.ok ? (S.streak[r.p]>=3 ? `${S.streak[r.p]} in a row!` : "Correct!") : r.timeout ? "Time's up!" : "Not quite";
+    sub = r.ok ? `+${pts(q)} for ${nm}.` : `It was ${ans}.`;
+  }
+  return `<div class="result ${good?"good":"miss"}"><div class="big">${big}</div><p class="hint">${sub}</p></div>
+    <button class="btn" id="next">${S.i+1<S.deck.length?"Next question":"See the winner"}</button>`;
+}
+
+function choose(k){
+  stopTimer();
+  const q = cur(), fp = firstP();
+  if(S.mode==="h2h" && S.phase==="first"){ S.picks[0]=k; S.phase="pass"; render(); window.scrollTo(0,0); return; }
+  if(S.mode==="h2h"){ S.picks[1]=k; }
+  else S.picks[0]=k;
+  // score
+  const takers = S.mode==="h2h" ? [[fp,S.picks[0]],[1-fp,S.picks[1]]] : [[S.mode==="team"?0:fp,S.picks[0]]];
+  S.lastRes = takers.map(([p,pick])=>{
+    const ok = pick===q.ok;
+    if(ok){ S.scores[p]+=pts(q); S.right[p]++; S.streak[p]++; } else S.streak[p]=0;
+    return {p, ok, timeout: pick===-1};
+  });
+  S.hist.push({q:q.q, ans:q.opts[q.ok], c:q.c, res:S.lastRes.map(r=>({p:r.p,ok:r.ok}))});
+  const seen = store.get().seen||[]; if(!seen.includes(q.id)) store.set({seen:[...seen,q.id].slice(-400)});
+  const any = S.lastRes.some(r=>r.ok);
+  S.phase="reveal"; render(); window.scrollTo(0,0);
+  if(any){ beep("good"); sparks(S.lastRes.every(r=>r.ok)?16:10); } else { beep("bad"); $("qcard")?.classList.add("shake"); }
+}
+
+function next(){
+  S.i++; S.picks=[null,null]; S.removed=[]; S.phase="first";
+  if(S.i>=S.deck.length){ S.screen="end"; render(); window.scrollTo(0,0); return; }
+  render(); window.scrollTo(0,0);
+}
+
+function renderEnd(){
+  const n = S.hist.length;
+  let head, sub, bars;
+  if(S.mode==="team"){
+    const max = S.deck.reduce((s,q)=>s+pts(q),0), p = max?Math.round(S.scores[0]/max*100):0;
+    head = p>=85?"Genius couple":p>=65?"Big brains":p>=45?"Solid team":p>=25?"Getting there":"Pub quiz rookies";
+    sub = `${S.right[0]} of ${n} right · ${S.scores[0]} of ${max} points`;
+    bars = `<div><div class="lab"><span>Team</span><span>${p}%</span></div><div class="bar t"><i style="width:${p}%"></i></div></div>`;
+  } else {
+    const [x,y]=S.scores, top=Math.max(x,y,1);
+    head = x===y ? "It's a tie!" : `${esc(x>y?S.a:S.b)} wins!`;
+    const per = S.mode==="duel" ? n/2 : n;
+    sub = x===y ? "Rematch to settle it?" : `${esc(x>y?S.b:S.a)} wants a rematch.`;
+    bars = [0,1].map(p=>`<div><div class="lab"><span>${esc(nameOf(p))}</span><span>${S.scores[p]} pts · ${S.right[p]}/${per} right</span></div>
+      <div class="bar ${p?"b":"a"}"><i style="width:${(S.scores[p]/top*100).toFixed(0)}%"></i></div></div>`).join("");
+  }
+  const missed = S.hist.filter(r=>r.res.some(x=>!x.ok));
+  h(`${header()}
+  <div class="card final">
+    <div class="eyebrow">${MODES[S.mode].name} · ${n} questions</div>
+    <div class="winner">${head}</div>
+    <p class="hint" style="font-size:16px">${sub}</p>
+    <div class="bars">${bars}</div>
+    <div class="row" style="width:100%"><button class="btn" id="again">Play again</button><button class="btn ghost" id="setup">Settings</button></div>
+  </div>
+  ${missed.length?`<div class="card"><div class="eyebrow" style="margin-bottom:10px">Learn the answers you missed</div><div class="review">
+    ${missed.map(r=>`<div class="rv"><q>${esc(r.q)}</q><span class="ok">${esc(r.ans)}</span>${S.mode==="team"?"":` <span class="small">· missed by ${r.res.filter(x=>!x.ok).map(x=>esc(nameOf(x.p))).join(" & ")}</span>`}</div>`).join("")}
+  </div></div>`:""}`);
+  beep("win"); sparks(26);
+  $("again").onclick=start;
+  $("setup").onclick=()=>{ S.screen="setup"; render(); window.scrollTo(0,0); };
+}
+
+function sparks(n){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box=$("sparks");
+  for(let i=0;i<n;i++){const s=document.createElement("span");s.textContent=i%3?"★":"♥";
+    s.style.left=Math.random()*100+"%";s.style.animationDelay=(Math.random()*.7)+"s";s.style.fontSize=(14+Math.random()*22)+"px";
+    box.appendChild(s);setTimeout(()=>s.remove(),3200);}
+}
+
+// keyboard: 1-4 or A-D to answer, Enter for next
+document.addEventListener("keydown",e=>{
+  if(S.screen!=="play"||e.target.tagName==="INPUT") return;
+  if(S.phase==="reveal"&&e.key==="Enter"){ $("next")?.click(); return; }
+  const k = "1234".indexOf(e.key)>=0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
+  if(k>=0 && S.phase!=="reveal" && S.phase!=="pass" && !S.removed.includes(k)) choose(k);
+});
+
+// Optional: Claude writes new questions (only where this viewer can use Claude)
+let samplePromise = window.claude?.use ? window.claude.use("sample").catch(()=>null) : Promise.resolve(null);
+async function setupAI(){
+  const sample = await samplePromise; const box=$("aibox"); if(!sample||!box) return;
+  box.hidden=false;
+  const btn=$("gen"), msg=$("aimsg");
+  btn.onclick = async ()=>{
+    btn.disabled=true; msg.textContent="Claude is writing questions…";
+    const cats = S.cats.map(k=>`${k} (${CATS[k]})`).join(", ");
+    const lv = {easy:"all easy (1)",medium:"all medium (2)",hard:"all hard (3)",mix:"a mix of easy (1), medium (2) and hard (3)"}[S.diff];
+    const prompt = `Write 10 new general-knowledge quiz questions for a couple's quiz night. Spread them across these categories (use the key): ${cats}. Difficulty: ${lv}.
+Every question must have one clearly correct, well-established, non-controversial answer that will not change over time. Avoid "as of" facts, records likely to be broken, and trick questions. Double-check each fact.
+Each question has exactly 4 short answers (max 6 words each); the FIRST answer is the correct one, the other three are plausible but clearly wrong.
+Avoid these existing questions: ${shuffle(BANK).slice(0,50).map(q=>q.q).join(" | ")}.
+Reply with only a JSON array like [{"c":"geo","d":2,"q":"...","a":["correct","wrong","wrong","wrong"]}].`;
+    try{
+      const arr = await sample.json(prompt,{cache:false});
+      const ok = (Array.isArray(arr)?arr:[]).filter(x=>x&&typeof x.q==="string"&&Array.isArray(x.a)&&x.a.length===4&&CATS[x.c]&&[1,2,3].includes(+x.d)&&new Set(x.a.map(String)).size===4)
+        .map((x,j)=>({id:"x"+Date.now().toString(36)+j,c:x.c,d:+x.d,q:String(x.q).slice(0,160),a:x.a.map(s=>String(s).slice(0,60))}));
+      S.extra = [...ok, ...S.extra];
+      msg.textContent = ok.length? `Added ${ok.length} new questions. They come first in your next game.` : "That didn't work. Try again.";
+      const c=$("count"); if(c) c.textContent = pool().length+` questions match (incl. ${S.extra.length} new from Claude)`;
+    }catch(e){
+      if(["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"].includes(e?.code)){ box.hidden=true; return; }
+      msg.textContent = e?.code==="rate_limited" ? "Too many requests. Try again in a minute." : "That didn't work. Try again.";
+    }finally{ btn.disabled=false; }
+  };
+}
+
+// keep the game going when the page updates while open
+window.claude?.hot?.snapshot?.(()=>S);
+function boot(data){ if(data && data.screen) S = Object.assign(S,data); render(); }
+window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>
