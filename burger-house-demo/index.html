@@ -6,10 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Burger House – Burger House</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<!-- Libraries are served from our own site (app/vendor, made by tools/vendor.py; build sets ../vendor) -->
+<link href="../vendor/fonts/fonts.css" rel="stylesheet">
+<script>self.ModelViewerElement=self.ModelViewerElement||{};self.ModelViewerElement.dracoDecoderLocation=new URL("../vendor/draco/",location.href).href;</script>
+<script type="module" src="../vendor/model-viewer/model-viewer.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#0A0D11;--surface:#11161C;--ink:#EDEAE3;--mute:#85909A;--gold:#D9B877;--gold2:#F0D9A4;--gold3:#B8944F;--line:#1D252D;--grab:#2A343D;--on-accent:#17110A;--icon-bg:rgba(20,14,6,.9);--glass:rgba(10,13,17,.72);--glass2:rgba(10,13,17,.6);--surface0:rgba(17,22,28,0);--a15:rgba(217,184,119,.15);--a35:rgba(217,184,119,.35);--a45:rgba(217,184,119,.45);--a0:rgba(217,184,119,0)}
 *{box-sizing:border-box}
@@ -729,17 +729,17 @@ function levelPose(P, down) {
 
 async function loadLibs() {
   const [THREE, { GLTFLoader }, { DRACOLoader }] = await Promise.all([
-    // esm.sh: full URLs (no import map, which older Chrome lacks); it serves code the visiting browser understands,
-    // and the loaders get the same three.js instance
-    import("https://esm.sh/three@0.160.0"), import("https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"),
-    import("https://esm.sh/three@0.160.0/examples/jsm/loaders/DRACOLoader.js")]);
+    // our copies (tools/vendor.py points the loaders' "three" import at the same file: no import map needed,
+    // and the loaders get the same three.js instance)
+    import("../vendor/three/three.module.min.js"), import("../vendor/three/GLTFLoader.js"),
+    import("../vendor/three/DRACOLoader.js")]);
   return { THREE, GLTFLoader, DRACOLoader };
 }
 function loadJsQR() {
   if (window.jsQR) return Promise.resolve();
   return new Promise((ok, no) => {
     const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"; s.onload = ok; s.onerror = no;
+    s.src = "../vendor/jsqr/jsQR.js"; s.onload = ok; s.onerror = no;
     document.head.appendChild(s);
   });
 }
@@ -854,7 +854,7 @@ async function start(opt) {
   ground.receiveShadow = true; spot.add(ground);
 
   const loader = new GLTFLoader(), draco = new DRACOLoader();
-  draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.6/");
+  draco.setDecoderPath(new URL("../vendor/draco/", location.href).href);
   loader.setDRACOLoader(draco);
   let radius = 0.17;
   loader.load(opt.src, gltf => {
